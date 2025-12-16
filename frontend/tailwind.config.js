@@ -6,7 +6,7 @@ export default {
     darkMode: 'class',
     theme: {
         fontFamily: {
-            sans: ['Roboto', ...defaultTheme.fontFamily.sans],
+            sans: ['Poter Bold', 'Roboto', ...defaultTheme.fontFamily.sans],
         },
         screens: {
             '2xsm': '375px',
