@@ -10,7 +10,7 @@ const AppUserHeader: React.FC = () => {
     const location = useLocation();
 
     return (
-        <header className="bg-brand-dark-900 font-sans relative z-50 shadow-theme-md">
+        <header className="bg-brand-dark-900 font-sans fixed top-0 left-0 w-full z-50 shadow-theme-md transition-all duration-300">
             <div className="w-full max-w-[95%] mx-auto px-2">
                 <div className="flex justify-between items-center h-20">
                     <div className="flex items-center gap-10">

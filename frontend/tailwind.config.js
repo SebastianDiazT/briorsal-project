@@ -58,6 +58,7 @@ export default {
                     900: '#1E1810',
                     950: '#120D08',
                 },
+                'blue-bg': '#1b252f',
                 gray: {
                     25: '#FCFCFD',
                     50: '#F9FAFB',
