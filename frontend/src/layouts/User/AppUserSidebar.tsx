@@ -1,13 +1,19 @@
 import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { useSidebar } from '@context/SidebarContext';
+import { useAppDispatch, useAppSelector } from '@store/hooks';
+import { toggleMobileSidebar } from '@store/slices/uiSlice';
 import { IoCloseSharp } from 'react-icons/io5';
 import { items } from './menuData';
 import logoBriorsal from '@assets/logo.png';
 
 const AppUserSidebar: React.FC = () => {
-    const { isMobileOpen, toggleMobileSidebar } = useSidebar();
+    const dispatch = useAppDispatch();
+    const isMobileOpen = useAppSelector((state) => state.ui.isMobileOpen);
     const location = useLocation();
+
+    const handleClose = () => {
+        dispatch(toggleMobileSidebar());
+    };
 
     const renderMenuItems = () => (
         <ul className="flex flex-col gap-2">
@@ -18,7 +24,7 @@ const AppUserSidebar: React.FC = () => {
                     <li key={nav.name}>
                         <Link
                             to={nav.path || '#'}
-                            onClick={() => toggleMobileSidebar()}
+                            onClick={handleClose}
                             className={`
                                 group flex items-center gap-3 rounded-lg px-4 py-3 text-sm font-medium transition-colors duration-300
                                 ${
@@ -45,7 +51,7 @@ const AppUserSidebar: React.FC = () => {
                 className={`fixed inset-0 bg-black/50 z-40 lg:hidden transition-opacity duration-300 ${
                     isMobileOpen ? 'opacity-100 visible' : 'opacity-0 invisible'
                 }`}
-                onClick={toggleMobileSidebar}
+                onClick={handleClose}
             />
 
             <aside
@@ -54,7 +60,7 @@ const AppUserSidebar: React.FC = () => {
                 lg:hidden shadow-2xl`}
             >
                 <div className="flex items-center justify-between px-6 py-8 border-b border-brand-dark-800">
-                    <Link to="/" onClick={() => toggleMobileSidebar()}>
+                    <Link to="/" onClick={handleClose}>
                         <img
                             src={logoBriorsal}
                             alt="Briorsal Logo"
@@ -62,7 +68,7 @@ const AppUserSidebar: React.FC = () => {
                         />
                     </Link>
                     <button
-                        onClick={toggleMobileSidebar}
+                        onClick={handleClose}
                         className="text-white hover:text-brand-400 transition-colors"
                     >
                         <IoCloseSharp className="w-7 h-7" />

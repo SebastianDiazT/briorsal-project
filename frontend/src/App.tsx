@@ -1,10 +1,13 @@
 import { Route, BrowserRouter as Router, Routes } from 'react-router';
-import UserLayout from './layouts/User/UserLayout';
+import UserLayout from '@layouts/User/UserLayout';
 
 import About from '@pages/About';
 import Projects from '@pages/Projects';
 import Services from '@pages/Services';
 import Contact from '@pages/Contact';
+
+// import Login from '@pages/Admin/Login';
+// import Dashboard from '@pages/Admin/Dashboard';
 
 export default function App() {
     return (
@@ -17,6 +20,12 @@ export default function App() {
                     <Route path="/services" element={<Services />} />
                     <Route path="/contact" element={<Contact />} />
                 </Route>
+
+                {/* <Route path="/admin/login" element={<Login />} /> */}
+
+                {/* <Route element={<ProtectedRoute />}>
+                    <Route path="/admin" element={<Dashboard />} />
+                </Route> */}
             </Routes>
         </Router>
     );

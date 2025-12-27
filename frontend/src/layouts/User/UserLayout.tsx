@@ -1,11 +1,27 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { Outlet } from 'react-router';
-import { SidebarProvider } from '@context/SidebarContext';
 import AppUserHeader from './AppUserHeader';
 import AppUserSidebar from './AppUserSidebar';
 import Footer from '@components/footer/Footer';
 
-const LayoutContent: React.FC = () => {
+import { useAppDispatch } from '@store/hooks';
+import { setIsMobile } from '@store/slices/uiSlice'
+
+const UserLayout: React.FC = () => {
+    const dispatch = useAppDispatch();
+
+    useEffect(() => {
+        const handleResize = () => {
+            const isMobile = window.innerWidth < 1024;
+            dispatch(setIsMobile(isMobile));
+        };
+
+        handleResize();
+
+        window.addEventListener('resize', handleResize);
+        return () => window.removeEventListener('resize', handleResize);
+    }, [dispatch]);
+
     return (
         <>
             <div className="min-h-screen bg-gray-50 dark:bg-gray-900 transition-colors duration-300">
@@ -20,14 +36,6 @@ const LayoutContent: React.FC = () => {
                 </div>
             </div>
         </>
-    );
-};
-
-const UserLayout: React.FC = () => {
-    return (
-        <SidebarProvider>
-            <LayoutContent />
-        </SidebarProvider>
     );
 };
 

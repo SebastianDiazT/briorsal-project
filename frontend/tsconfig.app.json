@@ -30,7 +30,6 @@
             "@layouts/*": ["./src/layouts/*"],
             "@pages/*": ["./src/pages/*"],
             "@assets/*": ["./src/assets/*"],
-            "@context/*": ["./src/context/*"],
             "@hooks/*": ["./src/hooks/*"],
             "@store/*": ["./src/store/*"],
             "@utils/*": ["./src/utils/*"],

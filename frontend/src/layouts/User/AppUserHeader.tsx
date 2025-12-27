@@ -1,12 +1,18 @@
 import React from 'react';
-import { Link, useLocation } from 'react-router';
-import { useSidebar } from '@context/SidebarContext';
+import { Link, useLocation } from 'react-router-dom';
+import { useAppDispatch } from '@store/hooks';
+import { toggleMobileSidebar } from '@store/slices/uiSlice';
 import { items } from './menuData';
 import logoBriorsal from '@assets/logo.png';
-import { FaFacebookF, FaInstagram, FaLinkedinIn, FaTiktok } from 'react-icons/fa';
+import {
+    FaFacebookF,
+    FaInstagram,
+    FaLinkedinIn,
+    FaTiktok,
+} from 'react-icons/fa';
 
 const AppUserHeader: React.FC = () => {
-    const { toggleMobileSidebar } = useSidebar();
+    const dispatch = useAppDispatch();
     const location = useLocation();
 
     return (
@@ -74,9 +80,11 @@ const AppUserHeader: React.FC = () => {
                             <FaLinkedinIn size={20} />
                         </a>
                     </div>
+
+                    {/* Botón Menú Móvil */}
                     <div className="lg:hidden">
                         <button
-                            onClick={toggleMobileSidebar}
+                            onClick={() => dispatch(toggleMobileSidebar())}
                             className="text-white hover:text-brand-400 focus:outline-none p-2"
                         >
                             <svg
