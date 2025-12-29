@@ -3,6 +3,11 @@ import { useAppSelector } from '@store/hooks';
 
 const ProtectedRoute = () => {
     const { isAuthenticated, loading } = useAppSelector((state) => state.auth);
+    const token = localStorage.getItem('access');
+
+    if (!token) {
+        return <Navigate to="/admin/login" replace />;
+    }
 
     if (loading) {
         return (
