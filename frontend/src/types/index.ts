@@ -32,3 +32,10 @@ export interface AboutUs {
     vision: string;
     image: string | null;
 }
+
+export interface ClientLogo {
+    id: number;
+    name: string;
+    image: string;
+    order?: number;
+}

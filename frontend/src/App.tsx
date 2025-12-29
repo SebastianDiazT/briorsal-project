@@ -10,6 +10,7 @@ import ProtectedRoute from '@features/auth/components/ProtectedRoute';
 import { useAppDispatch } from '@store/hooks';
 import { checkAuth } from '@store/slices/authSlice';
 
+import Home from './pages/public/Home';
 import Services from '@/pages/public/Services';
 import About from '@/pages/public/About';
 import NotFound from '@/pages/public/NotFound';
@@ -18,6 +19,7 @@ import ServicesList from './pages/admin/services/ServicesList';
 import ServiceCreate from './pages/admin/services/ServiceCreate';
 import ServiceEdit from './pages/admin/services/ServiceEdit';
 
+import ClientsList from './pages/admin/company/ClientsList';
 import CompanySettings from './pages/admin/company/CompanySettings';
 import AboutSettings from './pages/admin/company/AboutSettings';
 
@@ -35,7 +37,7 @@ export default function App() {
             <AppToast />
             <Routes>
                 <Route element={<UserLayout />}>
-                    <Route path="/" element={<>Home</>} />
+                    <Route path="/" element={<Home />} />
                     <Route path="/about" element={<About />} />
                     <Route path="/services" element={<Services />} />
                 </Route>
@@ -53,6 +55,7 @@ export default function App() {
 
                         <Route path="/admin/settings" element={<CompanySettings />} />
                         <Route path="/admin/about" element={<AboutSettings />} />
+                        <Route path="/admin/clients" element={<ClientsList />} />
                     </Route>
                 </Route>
 

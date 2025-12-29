@@ -1,12 +1,13 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import api from '@api/axios';
-import { Service, CompanyInfo, AboutUs } from '@/types';
+import { Service, CompanyInfo, AboutUs, ClientLogo } from '@/types';
 
 interface CompanyState {
     services: Service[];
     count: number;
     companyInfo: CompanyInfo | null;
     aboutUs: AboutUs | null;
+    clients: ClientLogo[];
     loading: boolean;
     error: string | null;
 }
@@ -16,6 +17,7 @@ const initialState: CompanyState = {
     count: 0,
     companyInfo: null,
     aboutUs: null,
+    clients: [],
     loading: false,
     error: null,
 };
@@ -148,6 +150,62 @@ export const updateAboutUs = createAsyncThunk(
     }
 );
 
+export const fetchClients = createAsyncThunk(
+    'company/fetchClients',
+    async (_, { rejectWithValue }) => {
+        try {
+            const response = await api.get('company/clients/');
+            return response.data;
+        } catch (err: any) {
+            return rejectWithValue(err.response?.data);
+        }
+    }
+);
+
+export const createClient = createAsyncThunk(
+    'company/createClient',
+    async (formData: FormData, { rejectWithValue }) => {
+        try {
+            const config = {
+                headers: { 'Content-Type': 'multipart/form-data' },
+            };
+            const response = await api.post(
+                'company/clients/',
+                formData,
+                config
+            );
+            return response.data;
+        } catch (err: any) {
+            return rejectWithValue(err.response?.data);
+        }
+    }
+);
+
+export const updateClient = createAsyncThunk(
+    'company/updateClient',
+    async ({ id, data }: { id: number; data: FormData }, { rejectWithValue }) => {
+        try {
+            const config = { headers: { 'Content-Type': 'multipart/form-data' } };
+            const response = await api.patch(`company/clients/${id}/`, data, config);
+            return response.data;
+        } catch (err: any) {
+            return rejectWithValue(err.response?.data);
+        }
+    }
+);
+
+export const deleteClient = createAsyncThunk(
+    'company/deleteClient',
+    async (id: number, { rejectWithValue }) => {
+        try {
+            await api.delete(`company/clients/${id}/`);
+            return id;
+        } catch (err: any) {
+            return rejectWithValue(err.response?.data);
+        }
+    }
+);
+
 const companySlice = createSlice({
     name: 'company',
     initialState,
@@ -205,6 +263,29 @@ const companySlice = createSlice({
                 state.loading = false;
                 state.aboutUs = action.payload;
             });
+
+        builder
+            .addCase(fetchClients.fulfilled, (state, action) => {
+                state.loading = false;
+                state.clients = action.payload;
+            })
+            .addCase(createClient.fulfilled, (state, action) => {
+                state.loading = false;
+                state.clients.push(action.payload);
+            })
+            .addCase(updateClient.fulfilled, (state, action) => {
+        state.loading = false;
+                const index = state.clients.findIndex(c => c.id === action.payload.id);
+                if (index !== -1) {
+                    state.clients[index] = action.payload;
+                }
+            })
+            .addCase(deleteClient.fulfilled, (state, action) => {
+                state.loading = false;
+                state.clients = state.clients.filter(
+                    (c) => c.id !== action.payload
+                );
+        });
     },
 });
 

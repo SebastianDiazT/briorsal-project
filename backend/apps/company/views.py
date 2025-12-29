@@ -13,6 +13,7 @@ from .serializers import (
 class ClientLogoViewSet(viewsets.ModelViewSet):
     queryset = ClientLogo.objects.all()
     serializer_class = ClientLogoSerializer
+    pagination_class = None
     permission_classes = [permissions.IsAuthenticatedOrReadOnly]
 
 class ServiceViewSet(viewsets.ModelViewSet):
