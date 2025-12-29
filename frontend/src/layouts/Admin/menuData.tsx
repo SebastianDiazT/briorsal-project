@@ -4,8 +4,6 @@ import {
     FaProjectDiagram,
     FaLayerGroup,
     FaTools,
-    FaStar,
-    FaImages,
     FaUsersCog,
     FaCogs,
 } from 'react-icons/fa';
@@ -44,17 +42,6 @@ export const menuGroups = [
                 path: '/admin/services',
                 icon: <FaTools />,
             },
-        ],
-    },
-    {
-        name: 'MARKETING',
-        items: [
-            {
-                name: 'Testimonios',
-                path: '/admin/testimonials',
-                icon: <FaStar />,
-            },
-            { name: 'Banners', path: '/admin/banners', icon: <FaImages /> },
         ],
     },
     {

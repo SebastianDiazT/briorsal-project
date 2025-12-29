@@ -9,97 +9,94 @@ import {
     FaInstagram,
     FaLinkedinIn,
     FaTiktok,
+    FaBars,
 } from 'react-icons/fa';
+
+// Datos de redes sociales para iterar (DRY)
+const SOCIAL_LINKS = [
+    {
+        href: 'https://www.facebook.com/BriorsalConstructora',
+        icon: <FaFacebookF size={18} />,
+    },
+    {
+        href: 'https://www.instagram.com/briorsalconstructora/',
+        icon: <FaInstagram size={18} />,
+    },
+    {
+        href: 'https://www.tiktok.com/@briorsalconstructora',
+        icon: <FaTiktok size={18} />,
+    },
+    {
+        href: 'https://www.linkedin.com/company/briorsalconstructora/',
+        icon: <FaLinkedinIn size={18} />,
+    },
+];
 
 const AppUserHeader: React.FC = () => {
     const dispatch = useAppDispatch();
     const location = useLocation();
 
     return (
-        <header className="bg-brand-dark-900 font-sans fixed top-0 left-0 w-full z-50 shadow-theme-md transition-all duration-300">
-            <div className="w-full max-w-[95%] mx-auto px-2">
+        <header className="fixed top-0 left-0 w-full z-50 bg-brand-dark-900/95 backdrop-blur-md shadow-lg transition-all duration-300 border-b border-brand-dark-800">
+            <div className="w-full max-w-[95%] mx-auto px-4">
                 <div className="flex justify-between items-center h-20">
-                    <div className="flex items-center gap-10">
-                        <a href="/" className="flex-shrink-0">
+                    {/* LOGO + NAV DESKTOP */}
+                    <div className="flex items-center gap-12">
+                        <Link
+                            to="/"
+                            className="flex-shrink-0 hover:opacity-90 transition-opacity"
+                        >
                             <img
                                 src={logoBriorsal}
                                 alt="Briorsal Constructora"
                                 className="h-10 w-auto object-contain"
                             />
-                        </a>
+                        </Link>
 
-                        <nav className="hidden lg:flex items-center gap-4 xl:gap-6 text-[15px] font-medium text-brand-dark-200 tracking-wider">
-                            {items.map((item) => (
-                                <Link
-                                    key={item.name}
-                                    to={item.path || '#'}
-                                    className={`hover:text-white transition-colors uppercase
-                                    ${
-                                        location.pathname === item.path
-                                            ? 'text-white'
-                                            : 'text-gray-300'
-                                    }`}
-                                >
-                                    {item.name}
-                                </Link>
-                            ))}
+                        <nav className="hidden lg:flex items-center gap-8 text-[14px] xl:text-[15px] font-semibold text-brand-dark-200 tracking-wider">
+                            {items.map((item) => {
+                                const isActive =
+                                    location.pathname === item.path;
+                                return (
+                                    <Link
+                                        key={item.name}
+                                        to={item.path || '#'}
+                                        className={`relative py-2 transition-colors uppercase hover:text-white
+                                            ${isActive ? 'text-white' : 'text-gray-400'}
+                                            after:content-[''] after:absolute after:bottom-0 after:left-0 after:w-0 after:h-[2px] after:bg-brand-500 after:transition-all after:duration-300 hover:after:w-full
+                                            ${isActive ? 'after:w-full' : ''}
+                                        `}
+                                    >
+                                        {item.name}
+                                    </Link>
+                                );
+                            })}
                         </nav>
                     </div>
 
-                    <div className="hidden lg:flex items-center gap-5">
-                        <a
-                            href="https://www.facebook.com/BriorsalConstructora"
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="text-white hover:text-brand-400 transition-colors duration-300"
-                        >
-                            <FaFacebookF size={20} />
-                        </a>
-                        <a
-                            href="https://www.instagram.com/briorsalconstructora/"
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="text-white hover:text-brand-400 transition-colors duration-300"
-                        >
-                            <FaInstagram size={20} />
-                        </a>
-                        <a
-                            href="https://www.tiktok.com/@briorsalconstructora"
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="text-white hover:text-brand-400 transition-colors duration-300"
-                        >
-                            <FaTiktok size={20} />
-                        </a>
-                        <a
-                            href="https://www.linkedin.com/company/briorsalconstructora/"
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="text-white hover:text-brand-400 transition-colors duration-300"
-                        >
-                            <FaLinkedinIn size={20} />
-                        </a>
+                    {/* REDES SOCIALES DESKTOP */}
+                    <div className="hidden lg:flex items-center gap-4">
+                        {SOCIAL_LINKS.map((social, index) => (
+                            <a
+                                key={index}
+                                href={social.href}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="w-9 h-9 flex items-center justify-center rounded-full bg-brand-dark-800 text-white hover:bg-brand-500 hover:text-white transition-all duration-300 hover:-translate-y-1"
+                            >
+                                {social.icon}
+                            </a>
+                        ))}
                     </div>
 
-                    {/* Botón Menú Móvil */}
+                    {/* BOTÓN MENÚ MÓVIL */}
                     <div className="lg:hidden">
                         <button
                             onClick={() => dispatch(toggleMobileSidebar())}
-                            className="text-white hover:text-brand-400 focus:outline-none p-2"
+                            className="text-white hover:text-brand-400 p-2 rounded-lg transition-colors focus:outline-none focus:ring-2 focus:ring-brand-500"
+                            aria-label="Abrir menú"
                         >
-                            <svg
-                                className="h-8 w-8"
-                                fill="none"
-                                viewBox="0 0 24 24"
-                                stroke="currentColor"
-                            >
-                                <path
-                                    strokeLinecap="round"
-                                    strokeLinejoin="round"
-                                    strokeWidth={2}
-                                    d="M4 6h16M4 12h16M4 18h16"
-                                />
-                            </svg>
+                            <FaBars size={28} />
                         </button>
                     </div>
                 </div>

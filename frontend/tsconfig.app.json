@@ -35,7 +35,6 @@
             "@store/*": ["./src/store/*"],
             "@utils/*": ["./src/utils/*"],
             "@types/*": ["./src/types/*"],
-            "@data/*": ["./src/data/*"],
         }
 
     },

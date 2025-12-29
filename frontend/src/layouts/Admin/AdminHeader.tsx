@@ -5,7 +5,6 @@ import { toggleSidebar, toggleMobileSidebar } from '@store/slices/uiSlice';
 
 const AdminHeader: React.FC = () => {
     const dispatch = useAppDispatch();
-    const { user } = useAppSelector((state) => state.auth);
     const { isExpanded } = useAppSelector((state) => state.ui);
 
     return (
@@ -48,7 +47,7 @@ const AdminHeader: React.FC = () => {
                 <div className="flex items-center gap-3 pl-6 border-l border-slate-100">
                     <div className="text-right hidden md:block">
                         <p className="text-sm font-bold text-slate-700 leading-tight">
-                            {user || 'Admin'}
+                            Admin
                         </p>
                         <p className="text-xs font-medium text-slate-400">
                             Super Admin
@@ -57,7 +56,7 @@ const AdminHeader: React.FC = () => {
 
                     <div className="h-10 w-10 rounded-full bg-slate-200 ring-2 ring-white overflow-hidden shadow-sm">
                         <img
-                            src={`https://ui-avatars.com/api/?name=${user || 'Admin'}&background=0f172a&color=fff&bold=true`}
+                            src={`https://ui-avatars.com/api/?name=Admin&background=0f172a&color=fff&bold=true`}
                             alt="User"
                             className="h-full w-full object-cover"
                         />

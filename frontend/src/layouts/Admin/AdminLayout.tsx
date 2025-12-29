@@ -20,6 +20,15 @@ const AdminLayout: React.FC = () => {
                         <Outlet />
                     </div>
                 </main>
+                <footer className="mt-auto pt-8 pb-4 text-center text-sm text-slate-400">
+                    <p>
+                        &copy; {new Date().getFullYear()}{' '}
+                        <span className="font-semibold">
+                            Briorsal Constructora
+                        </span>
+                        . Todos los derechos reservados.
+                    </p>
+                </footer>
             </div>
 
             {isMobileOpen && (
