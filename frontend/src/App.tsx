@@ -17,6 +17,8 @@ import ServicesList from './pages/admin/services/ServicesList';
 import ServiceCreate from './pages/admin/services/ServiceCreate';
 import ServiceEdit from './pages/admin/services/ServiceEdit';
 
+import CompanySettings from './pages/admin/company/CompanySettings';
+
 import Login from '@pages/admin/Login';
 
 export default function App() {
@@ -45,6 +47,8 @@ export default function App() {
                         <Route path="/admin/services" element={<ServicesList />} />
                         <Route path="/admin/services/new" element={<ServiceCreate />} />
                         <Route path="/admin/services/edit/:id" element={<ServiceEdit />} />
+
+                        <Route path="/admin/settings" element={<CompanySettings />} />
                     </Route>
                 </Route>
 

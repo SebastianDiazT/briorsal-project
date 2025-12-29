@@ -1,9 +1,11 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { useAppDispatch } from '@store/hooks';
+import { useAppDispatch, useAppSelector } from '@store/hooks';
 import { toggleMobileSidebar } from '@store/slices/uiSlice';
+import { fetchCompanyInfo } from '@store/slices/companySlice';
 import { items } from './menuData';
 import logoBriorsal from '@assets/logo.png';
+
 import {
     FaFacebookF,
     FaInstagram,
@@ -12,28 +14,24 @@ import {
     FaBars,
 } from 'react-icons/fa';
 
-const SOCIAL_LINKS = [
-    {
-        href: 'https://www.facebook.com/BriorsalConstructora',
-        icon: <FaFacebookF size={18} />,
-    },
-    {
-        href: 'https://www.instagram.com/briorsalconstructora/',
-        icon: <FaInstagram size={18} />,
-    },
-    {
-        href: 'https://www.tiktok.com/@briorsalconstructora',
-        icon: <FaTiktok size={18} />,
-    },
-    {
-        href: 'https://www.linkedin.com/company/briorsalconstructora/',
-        icon: <FaLinkedinIn size={18} />,
-    },
-];
-
 const AppUserHeader: React.FC = () => {
     const dispatch = useAppDispatch();
     const location = useLocation();
+
+    const { companyInfo } = useAppSelector((state) => state.company);
+
+    useEffect(() => {
+        if (!companyInfo) {
+            dispatch(fetchCompanyInfo());
+        }
+    }, [dispatch, companyInfo]);
+
+    const socialLinks = [
+        { url: companyInfo?.facebook, icon: <FaFacebookF size={18} /> },
+        { url: companyInfo?.instagram, icon: <FaInstagram size={18} /> },
+        { url: companyInfo?.tiktok, icon: <FaTiktok size={18} /> },
+        { url: companyInfo?.linkedin, icon: <FaLinkedinIn size={18} /> },
+    ].filter((link) => link.url);
 
     return (
         <header className="fixed top-0 left-0 w-full z-50 bg-brand-dark-900/95 backdrop-blur-md shadow-lg transition-all duration-300 border-b border-brand-dark-800">
@@ -73,10 +71,10 @@ const AppUserHeader: React.FC = () => {
                     </div>
 
                     <div className="hidden lg:flex items-center gap-4">
-                        {SOCIAL_LINKS.map((social, index) => (
+                        {socialLinks.map((social, index) => (
                             <a
                                 key={index}
-                                href={social.href}
+                                href={social.url}
                                 target="_blank"
                                 rel="noopener noreferrer"
                                 className="w-9 h-9 flex items-center justify-center rounded-full bg-brand-dark-800 text-white hover:bg-brand-500 hover:text-white transition-all duration-300 hover:-translate-y-1"

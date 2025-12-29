@@ -1,16 +1,18 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import api from '@api/axios';
-import { Service } from '@/types';
+import { Service, CompanyInfo } from '@/types';
 
 interface CompanyState {
     services: Service[];
     count: number;
+    companyInfo: CompanyInfo | null;
     loading: boolean;
     error: string | null;
 }
 
 const initialState: CompanyState = {
     services: [],
+    companyInfo: null,
     count: 0,
     loading: false,
     error: null,
@@ -83,6 +85,36 @@ export const deleteService = createAsyncThunk(
     }
 );
 
+export const fetchCompanyInfo = createAsyncThunk(
+    'company/fetchCompanyInfo',
+    async (_, { rejectWithValue }) => {
+        try {
+            const response = await api.get('company/info/');
+            return Array.isArray(response.data)
+                ? response.data[0]
+                : response.data;
+        } catch (error: any) {
+            return rejectWithValue(
+                error.response?.data || 'Error al obtener info'
+            );
+        }
+    }
+);
+
+export const updateCompanyInfo = createAsyncThunk(
+    'company/updateCompanyInfo',
+    async (data: any, { rejectWithValue }) => {
+        try {
+            const res = await api.patch('company/info/', data);
+            return res.data;
+        } catch (err: any) {
+            return rejectWithValue(
+                err.response?.data || 'Error al actualizar info'
+            );
+        }
+    }
+);
+
 const companySlice = createSlice({
     name: 'company',
     initialState,
@@ -119,6 +151,16 @@ const companySlice = createSlice({
                 state.services = state.services.filter(
                     (s) => s.id !== action.payload
                 );
+            });
+
+        builder
+            .addCase(fetchCompanyInfo.fulfilled, (state, action) => {
+                state.loading = false;
+                state.companyInfo = action.payload;
+            })
+            .addCase(updateCompanyInfo.fulfilled, (state, action) => {
+                state.loading = false;
+                state.companyInfo = action.payload;
             });
     },
 });

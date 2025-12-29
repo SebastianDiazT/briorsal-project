@@ -12,3 +12,15 @@ export interface Service {
     image: string;
     description: string;
 }
+
+export interface CompanyInfo {
+    id: number;
+    phone: string;
+    email: string;
+    address: string;
+    facebook: string;
+    instagram: string;
+    linkedin: string;
+    tiktok: string;
+    whatsapp: string;
+}

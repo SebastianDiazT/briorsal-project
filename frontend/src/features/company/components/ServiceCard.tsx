@@ -1,4 +1,4 @@
-import React from 'react';
+import { useAppSelector } from '@store/hooks';
 
 interface ServiceCardProps {
     title: string;
@@ -11,6 +11,16 @@ const ServiceCard: React.FC<ServiceCardProps> = ({
     description,
     image,
 }) => {
+    const { companyInfo } = useAppSelector((state) => state.company);
+
+    const phoneNumber =
+        companyInfo?.whatsapp || companyInfo?.phone || '51952322024';
+
+    const cleanNumber = phoneNumber.replace(/\D/g, '');
+
+    const message = `Hola, estoy interesado en el servicio de *${title}*.`;
+    const whatsappLink = `https://wa.me/${cleanNumber}?text=${encodeURIComponent(message)}`;
+
     return (
         <div className="flex flex-col group h-full">
             <div className="h-64 w-full overflow-hidden mb-8 relative rounded-sm shadow-xl bg-slate-800">
@@ -35,7 +45,7 @@ const ServiceCard: React.FC<ServiceCardProps> = ({
                 </p>
 
                 <a
-                    href="https://wa.me/51952322024"
+                    href={whatsappLink}
                     target="_blank"
                     rel="noreferrer"
                     className="inline-flex items-center gap-2 bg-btm border border-gray-500 text-white font-bold py-3 px-8 text-base uppercase tracking-widest transition-all duration-300"
