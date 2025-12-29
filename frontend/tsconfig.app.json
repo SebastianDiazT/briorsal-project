@@ -25,7 +25,7 @@
         /* Paths */
         "baseUrl": ".",
         "paths": {
-            "@": ["./src"],
+            "@/*": ["./src/*"],
             "@components/*": ["./src/components/*"],
             "@layouts/*": ["./src/layouts/*"],
             "@pages/*": ["./src/pages/*"],
@@ -34,7 +34,7 @@
             "@hooks/*": ["./src/hooks/*"],
             "@store/*": ["./src/store/*"],
             "@utils/*": ["./src/utils/*"],
-            "@types/*": ["./src/types/*"],
+            "@features/*": ["./src/features/*"],
         }
 
     },

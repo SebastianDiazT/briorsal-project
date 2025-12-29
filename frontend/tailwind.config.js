@@ -44,6 +44,7 @@ export default {
                     900: '#7E240A',
                     950: '#451003',
                 },
+                btm: '#ef7d05',
                 'brand-dark': {
                     25: '#FCFCFC',
                     50: '#F7F7F6',

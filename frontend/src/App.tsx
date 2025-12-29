@@ -3,6 +3,8 @@ import { Route, BrowserRouter as Router, Routes } from 'react-router';
 import UserLayout from '@layouts/User/UserLayout';
 import AdminLayout from '@layouts/Admin/AdminLayout';
 
+import Services from '@pages/Services';
+
 export default function App() {
 
     return (
@@ -10,6 +12,7 @@ export default function App() {
             <Routes>
                 <Route element={<UserLayout />}>
                     <Route path="/" element={<>Home</>} />
+                    <Route path="/services" element={<Services />} />
                 </Route>
 
                 <Route element={<AdminLayout />}>
