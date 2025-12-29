@@ -30,6 +30,11 @@ class Category(models.Model):
 
 
 class Project(models.Model):
+    STATUS_CHOICES = [
+        ("In Progress", "En Ejecución"),
+        ("Delivered", "Entregado"),
+    ]
+
     category = models.ForeignKey(
         Category, on_delete=models.CASCADE, related_name='projects'
     )
@@ -38,7 +43,7 @@ class Project(models.Model):
     service_type = models.CharField(max_length=255, blank=True, null=True)
     levels = models.CharField(max_length=50, blank=True, null=True)
     area = models.CharField(max_length=100, blank=True, null=True)
-    status = models.CharField(max_length=100, default='Delivered')
+    status = models.CharField(max_length=100, choices=STATUS_CHOICES, default='Delivered')
     extra_info = models.TextField(blank=True, null=True, verbose_name="Datos Extras")
     is_featured = models.BooleanField(
         default=False, verbose_name='¿Destacar en Inicio?'

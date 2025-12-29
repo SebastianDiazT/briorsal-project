@@ -33,15 +33,43 @@ class CompanyInfo(models.Model):
     phone = models.CharField(max_length=50, verbose_name='Teléfono')
     email = models.EmailField(verbose_name='Email')
     address = models.CharField(max_length=255, verbose_name='Dirección')
+
     facebook = models.URLField(blank=True, null=True)
     instagram = models.URLField(blank=True, null=True)
     linkedin = models.URLField(blank=True, null=True)
-    whatsapp = models.CharField(max_length=50, blank=True)
+    tiktok = models.URLField(blank=True, null=True)
+    whatsapp = models.CharField(max_length=50, blank=True, help_text="Número para link de WA")
 
     class Meta:
-        db_table = 'company_info'
         verbose_name = 'Información de Empresa'
         verbose_name_plural = 'Información de Empresa'
 
     def __str__(self):
         return 'Configuración General'
+
+    def save(self, *args, **kwargs):
+        if not self.pk and CompanyInfo.objects.exists():
+            return CompanyInfo.objects.first()
+        return super(CompanyInfo, self).save(*args, **kwargs)
+
+
+class AboutUs(models.Model):
+    description = models.TextField(verbose_name='Descripción de la Empresa')
+
+    mission = models.TextField(verbose_name='Misión')
+
+    vision = models.TextField(verbose_name='Visión')
+
+    image = models.ImageField(upload_to='company/about/', blank=True, null=True, verbose_name='Imagen Principal')
+
+    class Meta:
+        verbose_name = 'Nosotros (Misión/Visión)'
+        verbose_name_plural = 'Nosotros (Misión/Visión)'
+
+    def __str__(self):
+        return 'Información de Nosotros'
+
+    def save(self, *args, **kwargs):
+        if not self.pk and AboutUs.objects.exists():
+            return AboutUs.objects.first()
+        return super(AboutUs, self).save(*args, **kwargs)
