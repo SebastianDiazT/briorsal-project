@@ -17,7 +17,7 @@ class ClientLogo(models.Model):
 
 class Service(models.Model):
     title = models.CharField(max_length=100, verbose_name='Título Servicio')
-    icon = models.ImageField(upload_to='company/services/', blank=True, null=True)
+    image = models.ImageField(upload_to="company/services/", blank=True, null=True)
     description = models.TextField(verbose_name='Descripción')
 
     class Meta:
