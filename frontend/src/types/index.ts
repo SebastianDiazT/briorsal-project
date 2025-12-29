@@ -9,6 +9,6 @@ export interface User {
 export interface Service {
     id: number;
     title: string;
-    icon: string;
+    image: string;
     description: string;
 }

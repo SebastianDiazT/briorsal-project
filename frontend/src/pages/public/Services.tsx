@@ -12,7 +12,7 @@ const Services = () => {
 
     useEffect(() => {
         if (services.length === 0) {
-            dispatch(fetchServices());
+            dispatch(fetchServices({ page: 1, pageSize: 12 }));
         }
     }, [dispatch, services.length]);
 
@@ -60,7 +60,7 @@ const Services = () => {
                                     <ServiceCard
                                         title={service.title}
                                         description={service.description}
-                                        icon={service.icon}
+                                        image={service.image}
                                     />
                                 </FadeIn>
                             ))}

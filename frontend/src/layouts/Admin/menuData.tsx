@@ -1,9 +1,9 @@
 import {
     FaEnvelope,
     FaThLarge,
-    FaProjectDiagram,
+    FaBuilding,
     FaLayerGroup,
-    FaTools,
+    FaHardHat,
     FaUsersCog,
     FaCogs,
 } from 'react-icons/fa';
@@ -30,7 +30,7 @@ export const menuGroups = [
             {
                 name: 'Proyectos',
                 path: '/admin/projects',
-                icon: <FaProjectDiagram />,
+                icon: <FaBuilding />,
             },
             {
                 name: 'Categorías',
@@ -40,7 +40,7 @@ export const menuGroups = [
             {
                 name: 'Servicios',
                 path: '/admin/services',
-                icon: <FaTools />,
+                icon: <FaHardHat />,
             },
         ],
     },
