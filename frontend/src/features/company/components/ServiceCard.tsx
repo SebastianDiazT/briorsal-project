@@ -13,7 +13,6 @@ const ServiceCard: React.FC<ServiceCardProps> = ({
 }) => {
     return (
         <div className="flex flex-col group h-full">
-            {/* Imagen/Icono */}
             <div className="h-64 w-full overflow-hidden mb-8 relative rounded-sm shadow-xl bg-slate-800">
                 <img
                     src={icon}
@@ -24,7 +23,6 @@ const ServiceCard: React.FC<ServiceCardProps> = ({
                 <div className="absolute bottom-0 left-0 w-0 h-1 bg-btm transition-all duration-500 group-hover:w-full"></div>
             </div>
 
-            {/* Contenido */}
             <div className="flex flex-col items-start flex-1">
                 <h3 className="text-white text-2xl lg:text-3xl font-bold uppercase mb-3 tracking-wide group-hover:text-btm transition-colors">
                     {title}

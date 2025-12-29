@@ -1,8 +1,9 @@
 import React, { useState } from 'react';
-import { NavLink, useLocation } from 'react-router-dom';
+import { NavLink, useLocation, useNavigate } from 'react-router-dom';
 import { FaSignOutAlt, FaTimes } from 'react-icons/fa';
 import { useAppDispatch, useAppSelector } from '@store/hooks';
 import { toggleMobileSidebar } from '@store/slices/uiSlice';
+import { logout } from '@store/slices/authSlice';
 
 import logoBriorsal from '@assets/logo.png';
 import iconBriorsal from '@assets/icon.png';
@@ -10,12 +11,18 @@ import { menuGroups } from './menuData';
 
 const AdminSidebar: React.FC = () => {
     const dispatch = useAppDispatch();
+    const navigate = useNavigate();
     const location = useLocation();
     const { isExpanded, isMobileOpen } = useAppSelector((state) => state.ui);
 
     const [isHovered, setIsHovered] = useState(false);
 
     const showExpanded = isExpanded || (isHovered && window.innerWidth >= 1024);
+
+    const handleLogout = () => {
+        dispatch(logout());
+        navigate('/admin/login');
+    };
 
     return (
         <aside
@@ -112,6 +119,7 @@ const AdminSidebar: React.FC = () => {
 
             <div className="border-t border-slate-800 p-4">
                 <button
+                    onClick={handleLogout}
                     className={`group flex w-full items-center rounded-xl border border-slate-700 bg-slate-800/50 p-3 transition-all hover:bg-red-500 hover:border-red-500 hover:text-white ${!showExpanded && 'justify-center'}`}
                 >
                     <FaSignOutAlt
@@ -120,7 +128,7 @@ const AdminSidebar: React.FC = () => {
                     <span
                         className={`ml-3 font-semibold text-slate-200 group-hover:text-white ${!showExpanded ? 'hidden' : 'block'}`}
                     >
-                        Salir
+                        Cerrar Sesión
                     </span>
                 </button>
             </div>

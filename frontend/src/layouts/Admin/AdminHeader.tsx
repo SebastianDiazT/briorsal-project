@@ -6,6 +6,30 @@ import { toggleSidebar, toggleMobileSidebar } from '@store/slices/uiSlice';
 const AdminHeader: React.FC = () => {
     const dispatch = useAppDispatch();
     const { isExpanded } = useAppSelector((state) => state.ui);
+    const { user } = useAppSelector((state) => state.auth);
+
+    const getInitials = () => {
+        if (!user) return 'AD';
+
+        const firstName = user.first_name || '';
+        const lastName = user.last_name || '';
+
+        if (firstName && lastName) {
+            return `${firstName.charAt(0)}${lastName.charAt(0)}`.toUpperCase();
+        }
+
+        if (user.email) {
+            return user.email.substring(0, 2).toUpperCase();
+        }
+
+        return 'AD';
+    };
+
+    const displayName = user?.first_name
+        ? `${user.first_name} ${user.last_name || ''}`
+        : user?.email?.split('@')[0] || 'Admin';
+
+    const userInitials = getInitials();
 
     return (
         <header className="sticky top-0 z-30 flex h-20 w-full items-center justify-between bg-white px-6 shadow-sm border-b border-slate-100">
@@ -47,17 +71,17 @@ const AdminHeader: React.FC = () => {
                 <div className="flex items-center gap-3 pl-6 border-l border-slate-100">
                     <div className="text-right hidden md:block">
                         <p className="text-sm font-bold text-slate-700 leading-tight">
-                            Admin
+                            {displayName}
                         </p>
                         <p className="text-xs font-medium text-slate-400">
-                            Super Admin
+                            {user?.is_staff ? 'Administrador' : 'Usuario'}
                         </p>
                     </div>
 
                     <div className="h-10 w-10 rounded-full bg-slate-200 ring-2 ring-white overflow-hidden shadow-sm">
                         <img
-                            src={`https://ui-avatars.com/api/?name=Admin&background=0f172a&color=fff&bold=true`}
-                            alt="User"
+                            src={`https://ui-avatars.com/api/?name=${userInitials}&background=0f172a&color=fff&bold=true&length=2`}
+                            alt="User Avatar"
                             className="h-full w-full object-cover"
                         />
                     </div>
