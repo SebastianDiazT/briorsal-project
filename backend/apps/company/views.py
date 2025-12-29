@@ -48,8 +48,8 @@ class AboutUsView(APIView):
     def get(self, request, format=None):
         about_data = AboutUs.objects.first()
         if about_data:
-            serializer = AboutUsSerializer(about_data)
-            return Response(serializer.data, status=status.HTTP_200_OK)
+            serializer = AboutUsSerializer(about_data, context={"request": request})
+            return Response(serializer.data)
         else:
             return Response(
                 {'error': 'No se ha cargado la información de Nosotros'},
@@ -59,9 +59,9 @@ class AboutUsView(APIView):
     def patch(self, request, format=None):
         about_data = AboutUs.objects.first()
         if not about_data:
-            serializer = AboutUsSerializer(data=request.data)
+            serializer = AboutUsSerializer(data=request.data, context={'request': request})
         else:
-            serializer = AboutUsSerializer(about_data, data=request.data, partial=True)
+            serializer = AboutUsSerializer(about_data, data=request.data, partial=True, context={'request': request})
 
         if serializer.is_valid():
             serializer.save()

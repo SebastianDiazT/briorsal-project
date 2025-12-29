@@ -24,3 +24,11 @@ export interface CompanyInfo {
     tiktok: string;
     whatsapp: string;
 }
+
+export interface AboutUs {
+    id: number;
+    description: string;
+    mission: string;
+    vision: string;
+    image: string | null;
+}

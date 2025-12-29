@@ -6,6 +6,7 @@ import {
     FaHardHat,
     FaUsersCog,
     FaCogs,
+    FaUserFriends,
 } from 'react-icons/fa';
 
 export const menuGroups = [
@@ -41,6 +42,11 @@ export const menuGroups = [
                 name: 'Servicios',
                 path: '/admin/services',
                 icon: <FaHardHat />,
+            },
+            {
+                name: 'Nosotros',
+                path: '/admin/about',
+                icon: <FaUserFriends />,
             },
         ],
     },

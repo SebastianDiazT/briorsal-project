@@ -1,19 +1,21 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import api from '@api/axios';
-import { Service, CompanyInfo } from '@/types';
+import { Service, CompanyInfo, AboutUs } from '@/types';
 
 interface CompanyState {
     services: Service[];
     count: number;
     companyInfo: CompanyInfo | null;
+    aboutUs: AboutUs | null;
     loading: boolean;
     error: string | null;
 }
 
 const initialState: CompanyState = {
     services: [],
-    companyInfo: null,
     count: 0,
+    companyInfo: null,
+    aboutUs: null,
     loading: false,
     error: null,
 };
@@ -115,6 +117,37 @@ export const updateCompanyInfo = createAsyncThunk(
     }
 );
 
+export const fetchAboutUs = createAsyncThunk(
+    'company/fetchAboutUs',
+    async (_, { rejectWithValue }) => {
+        try {
+            const response = await api.get('company/about/');
+            return Array.isArray(response.data)
+                ? response.data[0]
+                : response.data;
+        } catch (error: any) {
+            return rejectWithValue(
+                error.response?.data || 'Error al obtener info'
+            );
+        }
+    }
+);
+
+export const updateAboutUs = createAsyncThunk(
+    'company/updateAboutUs',
+    async (formData: FormData, { rejectWithValue }) => {
+        try {
+            const config = {
+                headers: { 'Content-Type': 'multipart/form-data' },
+            };
+            const res = await api.patch('company/about/', formData, config);
+            return res.data;
+        } catch (error: any) {
+            return rejectWithValue(error.response?.data || 'Error al actualizar');
+        }
+    }
+);
+
 const companySlice = createSlice({
     name: 'company',
     initialState,
@@ -161,6 +194,16 @@ const companySlice = createSlice({
             .addCase(updateCompanyInfo.fulfilled, (state, action) => {
                 state.loading = false;
                 state.companyInfo = action.payload;
+            });
+
+        builder
+            .addCase(fetchAboutUs.fulfilled, (state, action) => {
+                state.loading = false;
+                state.aboutUs = action.payload;
+            })
+            .addCase(updateAboutUs.fulfilled, (state, action) => {
+                state.loading = false;
+                state.aboutUs = action.payload;
             });
     },
 });

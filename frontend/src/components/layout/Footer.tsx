@@ -11,10 +11,8 @@ import {
 } from 'react-icons/fa';
 
 const Footer = () => {
-    // Obtenemos los datos dinámicos desde Redux
     const { companyInfo } = useAppSelector((state) => state.company);
 
-    // Filtramos solo las redes sociales que tienen URL
     const socialLinks = [
         { url: companyInfo?.facebook, icon: <FaFacebookF /> },
         { url: companyInfo?.instagram, icon: <FaInstagram /> },
@@ -26,7 +24,6 @@ const Footer = () => {
         <footer className="bg-brand-dark-950 text-white py-12 font-sans border-t border-brand-dark-800">
             <div className="w-full max-w-[90%] mx-auto px-4">
                 <div className="flex flex-col lg:flex-row justify-between items-center lg:items-start gap-12 lg:gap-8">
-                    {/* LOGO */}
                     <div className="flex justify-center items-center lg:justify-start">
                         <img
                             src={logoBriorsal}
@@ -35,19 +32,16 @@ const Footer = () => {
                         />
                     </div>
 
-                    {/* CONTACTO DINÁMICO */}
                     <div className="text-center lg:text-left">
                         <h3 className="font-extrabold text-base uppercase tracking-widest mb-6 relative inline-block pb-2 after:content-[''] after:absolute after:bottom-0 after:left-1/2 after:-translate-x-1/2 lg:after:left-0 lg:after:translate-x-0 after:w-12 after:h-[3px] after:bg-brand-500">
                             Contacto
                         </h3>
 
                         <ul className="space-y-5 text-sm font-medium text-gray-300">
-                            {/* CELULAR */}
                             {companyInfo?.phone && (
                                 <li className="flex flex-col lg:flex-row items-center lg:items-start gap-2 lg:gap-3 group">
                                     <FaPhoneAlt className="text-brand-500 text-lg mt-0.5 group-hover:scale-110 transition-transform" />
                                     <a
-                                        // Usa WhatsApp si está disponible, si no llama directo
                                         href={
                                             companyInfo.whatsapp
                                                 ? `https://wa.me/${companyInfo.whatsapp.replace(/\D/g, '')}`
@@ -65,7 +59,6 @@ const Footer = () => {
                                 </li>
                             )}
 
-                            {/* EMAIL */}
                             {companyInfo?.email && (
                                 <li className="flex flex-col lg:flex-row items-center lg:items-start gap-2 lg:gap-3 group">
                                     <FaEnvelope className="text-brand-500 text-lg mt-0.5 group-hover:scale-110 transition-transform" />
@@ -81,7 +74,6 @@ const Footer = () => {
                                 </li>
                             )}
 
-                            {/* DIRECCIÓN */}
                             {companyInfo?.address && (
                                 <li className="flex flex-col lg:flex-row items-center lg:items-start gap-2 lg:gap-3 group">
                                     <FaMapMarkerAlt className="text-brand-500 text-lg mt-0.5 group-hover:scale-110 transition-transform" />
@@ -101,7 +93,6 @@ const Footer = () => {
                         </ul>
                     </div>
 
-                    {/* REDES SOCIALES DINÁMICAS */}
                     <div className="text-center lg:text-right flex flex-col items-center lg:items-end">
                         <h3 className="font-extrabold text-base uppercase tracking-widest mb-6 relative inline-block pb-2 after:content-[''] after:absolute after:bottom-0 after:left-1/2 after:-translate-x-1/2 lg:after:right-0 lg:after:left-auto lg:after:translate-x-0 after:w-12 after:h-[3px] after:bg-brand-500">
                             Síguenos
