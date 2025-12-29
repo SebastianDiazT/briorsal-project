@@ -2,11 +2,9 @@ import { useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import toast from 'react-hot-toast';
 import { useAppDispatch, useAppSelector } from '@store/hooks';
-import {
-    updateService,
-    fetchServices,
-} from '@store/slices/companySlice';
+import { updateService, fetchServices } from '@store/slices/companySlice';
 import { ServiceForm } from '@features/company/components/ServiceForm';
+import PageMeta from '@components/common/PageMeta';
 
 const ServiceEdit = () => {
     const { id } = useParams<{ id: string }>();
@@ -46,23 +44,30 @@ const ServiceEdit = () => {
         );
 
     return (
-        <div className="max-w-5xl mx-auto animate-fade-in-up">
-            <div className="mb-8">
-                <h1 className="text-2xl font-bold text-slate-800">
-                    Editar Servicio
-                </h1>
-                <p className="text-slate-500 mt-1">
-                    Modificando: {serviceToEdit?.title}
-                </p>
-            </div>
-
-            <ServiceForm
-                initialData={serviceToEdit}
-                onSubmit={handleSubmit}
-                isLoading={loading}
-                onCancel={() => navigate('/admin/services')}
+        <>
+            <PageMeta
+                title="Admin - Editar Servicio"
+                description="Admin - Editar Servicio"
             />
-        </div>
+
+            <div className="max-w-5xl mx-auto animate-fade-in-up">
+                <div className="mb-8">
+                    <h1 className="text-2xl font-bold text-slate-800">
+                        Editar Servicio
+                    </h1>
+                    <p className="text-slate-500 mt-1">
+                        Modificando: {serviceToEdit?.title}
+                    </p>
+                </div>
+
+                <ServiceForm
+                    initialData={serviceToEdit}
+                    onSubmit={handleSubmit}
+                    isLoading={loading}
+                    onCancel={() => navigate('/admin/services')}
+                />
+            </div>
+        </>
     );
 };
 

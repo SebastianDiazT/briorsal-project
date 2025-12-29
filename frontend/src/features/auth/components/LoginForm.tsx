@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
     FaLock,
-    FaEnvelope, // Cambiamos FaUser por FaEnvelope
+    FaEnvelope,
     FaArrowRight,
     FaSpinner,
     FaEye,
@@ -11,37 +11,32 @@ import {
 import toast from 'react-hot-toast';
 
 import { useAppDispatch, useAppSelector } from '@store/hooks';
-import { login } from '@store/slices/authSlice'; // Asegúrate que se llame 'login' en tu slice
+import { login } from '@store/slices/authSlice';
 
 export const LoginForm = () => {
-    const [email, setEmail] = useState(''); // Cambiado de username a email
+    const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [showPassword, setShowPassword] = useState(false);
 
     const dispatch = useAppDispatch();
     const navigate = useNavigate();
 
-    // Obtenemos estado de Redux (authSlice)
     const { loading, error, isAuthenticated } = useAppSelector(
         (state) => state.auth
     );
-
-    // 1. Redirección si el login es exitoso
     useEffect(() => {
         if (isAuthenticated) {
-            toast.dismiss(); // Limpia toasts anteriores
+            toast.dismiss();
             toast.success('¡Bienvenido al Panel de Control!');
             navigate('/admin/dashboard');
         }
     }, [isAuthenticated, navigate]);
 
-    // 2. Manejo de errores
     useEffect(() => {
         if (error) {
             toast.error(
                 typeof error === 'string' ? error : 'Error de autenticación'
             );
-            // Opcional: dispatch(clearError()) si implementaste esa acción
         }
     }, [error]);
 
@@ -53,13 +48,11 @@ export const LoginForm = () => {
             return;
         }
 
-        // Enviamos la acción a Redux
         dispatch(login({ email, password }));
     };
 
     return (
         <form onSubmit={handleSubmit} className="space-y-8">
-            {/* INPUT EMAIL */}
             <div className="space-y-2">
                 <label className="text-xs font-bold text-brand-400 uppercase tracking-widest ml-1">
                     Correo Electrónico
@@ -80,7 +73,6 @@ export const LoginForm = () => {
                 </div>
             </div>
 
-            {/* INPUT PASSWORD */}
             <div className="space-y-2">
                 <label className="text-xs font-bold text-brand-400 uppercase tracking-widest ml-1">
                     Contraseña
@@ -115,7 +107,6 @@ export const LoginForm = () => {
                 </div>
             </div>
 
-            {/* BOTÓN SUBMIT */}
             <div className="pt-4">
                 <button
                     type="submit"
