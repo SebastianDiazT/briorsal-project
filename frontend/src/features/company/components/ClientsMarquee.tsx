@@ -15,7 +15,6 @@ const ClientsMarquee: React.FC = () => {
     if (loading && clients.length === 0) return null;
     if (clients.length === 0) return null;
 
-    // Repeticiones para asegurar loop infinito
     const repetitions = clients.length < 6 ? 8 : 4;
     const marqueeList = Array(repetitions).fill(clients).flat();
 
