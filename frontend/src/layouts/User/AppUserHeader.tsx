@@ -12,7 +12,6 @@ import {
     FaBars,
 } from 'react-icons/fa';
 
-// Datos de redes sociales para iterar (DRY)
 const SOCIAL_LINKS = [
     {
         href: 'https://www.facebook.com/BriorsalConstructora',
@@ -40,7 +39,6 @@ const AppUserHeader: React.FC = () => {
         <header className="fixed top-0 left-0 w-full z-50 bg-brand-dark-900/95 backdrop-blur-md shadow-lg transition-all duration-300 border-b border-brand-dark-800">
             <div className="w-full max-w-[95%] mx-auto px-4">
                 <div className="flex justify-between items-center h-20">
-                    {/* LOGO + NAV DESKTOP */}
                     <div className="flex items-center gap-12">
                         <Link
                             to="/"
@@ -74,7 +72,6 @@ const AppUserHeader: React.FC = () => {
                         </nav>
                     </div>
 
-                    {/* REDES SOCIALES DESKTOP */}
                     <div className="hidden lg:flex items-center gap-4">
                         {SOCIAL_LINKS.map((social, index) => (
                             <a
@@ -89,7 +86,6 @@ const AppUserHeader: React.FC = () => {
                         ))}
                     </div>
 
-                    {/* BOTÓN MENÚ MÓVIL */}
                     <div className="lg:hidden">
                         <button
                             onClick={() => dispatch(toggleMobileSidebar())}

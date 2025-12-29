@@ -14,7 +14,6 @@ const Footer = () => {
         <footer className="bg-brand-dark-950 text-white py-12 font-sans border-t border-brand-dark-800">
             <div className="w-full max-w-[90%] mx-auto px-4">
                 <div className="flex flex-col lg:flex-row justify-between items-center lg:items-start gap-12 lg:gap-8">
-                    {/* COLUMNA 1: LOGO */}
                     <div className="flex justify-center items-center lg:justify-start">
                         <img
                             src={logoBriorsal}
@@ -23,7 +22,6 @@ const Footer = () => {
                         />
                     </div>
 
-                    {/* COLUMNA 2: CONTACTO */}
                     <div className="text-center lg:text-left">
                         <h3 className="font-extrabold text-base uppercase tracking-widest mb-6 relative inline-block pb-2 after:content-[''] after:absolute after:bottom-0 after:left-1/2 after:-translate-x-1/2 lg:after:left-0 lg:after:translate-x-0 after:w-12 after:h-[3px] after:bg-brand-500">
                             Contacto
@@ -75,7 +73,6 @@ const Footer = () => {
                         </ul>
                     </div>
 
-                    {/* COLUMNA 3: REDES */}
                     <div className="text-center lg:text-right flex flex-col items-center lg:items-end">
                         <h3 className="font-extrabold text-base uppercase tracking-widest mb-6 relative inline-block pb-2 after:content-[''] after:absolute after:bottom-0 after:left-1/2 after:-translate-x-1/2 lg:after:right-0 lg:after:left-auto lg:after:translate-x-0 after:w-12 after:h-[3px] after:bg-brand-500">
                             Síguenos
@@ -114,7 +111,6 @@ const Footer = () => {
                     </div>
                 </div>
 
-                {/* COPYRIGHT */}
                 <div className="mt-12 pt-8 border-t border-brand-dark-800 text-center text-xs text-gray-500">
                     <p>
                         &copy; {new Date().getFullYear()} Grupo Briorsal. Todos
