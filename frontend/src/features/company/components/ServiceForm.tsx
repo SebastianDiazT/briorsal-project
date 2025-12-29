@@ -7,7 +7,7 @@ import {
     FaCheckCircle,
     FaUndo,
 } from 'react-icons/fa';
-import { Service } from '../../../types';
+import { Service } from '@/types';
 
 interface ServiceFormProps {
     initialData?: Service | null;
@@ -22,35 +22,27 @@ export const ServiceForm: React.FC<ServiceFormProps> = ({
     isLoading,
     onCancel,
 }) => {
-    // Campos de texto
     const [title, setTitle] = useState('');
     const [description, setDescription] = useState('');
 
-    // Campos de Imagen
     const [previewUrl, setPreviewUrl] = useState<string>('');
     const [selectedImage, setSelectedImage] = useState<File | null>(null);
 
-    // NUEVO: Bandera para saber si el usuario quiso borrar la imagen explícitamente
     const [isImageDeleted, setIsImageDeleted] = useState(false);
 
-    // UI State
     const [isDragActive, setIsDragActive] = useState(false);
     const fileInputRef = useRef<HTMLInputElement>(null);
 
-    // Cargar datos iniciales
     useEffect(() => {
         if (initialData) {
             setTitle(initialData.title);
             setDescription(initialData.description);
-            // Si hay imagen guardada, la mostramos
             if (initialData.image) {
                 setPreviewUrl(initialData.image);
                 setIsImageDeleted(false);
             }
         }
     }, [initialData]);
-
-    // --- MANEJO DE IMÁGENES ---
 
     const processFile = (file: File) => {
         if (!file.type.startsWith('image/')) {
@@ -59,7 +51,7 @@ export const ServiceForm: React.FC<ServiceFormProps> = ({
         }
         setSelectedImage(file);
         setPreviewUrl(URL.createObjectURL(file));
-        setIsImageDeleted(false); // Ya no está borrada, hay una nueva
+        setIsImageDeleted(false);
     };
 
     const handleDrag = (e: React.DragEvent) => {
@@ -85,16 +77,14 @@ export const ServiceForm: React.FC<ServiceFormProps> = ({
         }
     };
 
-    // ACCIÓN: BORRAR IMAGEN
     const removeImage = (e: React.MouseEvent) => {
         e.stopPropagation();
         setSelectedImage(null);
         setPreviewUrl('');
-        setIsImageDeleted(true); // <--- Marcamos para borrar en backend
+        setIsImageDeleted(true);
         if (fileInputRef.current) fileInputRef.current.value = '';
     };
 
-    // ACCIÓN: RESTAURAR (Si el usuario se arrepiente y quiere la imagen original)
     const restoreOriginalImage = (e: React.MouseEvent) => {
         e.stopPropagation();
         if (initialData?.image) {
@@ -104,8 +94,6 @@ export const ServiceForm: React.FC<ServiceFormProps> = ({
         }
     };
 
-    // --- SUBMIT ---
-
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
         const formData = new FormData();
@@ -113,16 +101,11 @@ export const ServiceForm: React.FC<ServiceFormProps> = ({
         formData.append('title', title);
         formData.append('description', description);
 
-        // LÓGICA DE 3 ESTADOS PARA IMAGEN:
         if (selectedImage) {
-            // 1. Si hay nueva imagen, la enviamos (Reemplazar)
             formData.append('image', selectedImage);
         } else if (isImageDeleted) {
-            // 2. Si el usuario la borró explícitamente, enviamos cadena vacía (Borrar)
             formData.append('image', '');
         }
-        // 3. Si no hay new image y no está borrada, NO enviamos el campo.
-        // Django mantendrá la imagen que ya existe en base de datos.
 
         onSubmit(formData);
     };
@@ -132,10 +115,8 @@ export const ServiceForm: React.FC<ServiceFormProps> = ({
             onSubmit={handleSubmit}
             className="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden"
         >
-            {/* IZQUIERDA: FORMULARIO */}
             <div className="p-8 space-y-8">
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-                    {/* COLUMNA 1: INFO TEXTUAL */}
                     <div className="lg:col-span-2 space-y-6">
                         <div>
                             <div className="flex items-center justify-between mb-6 pb-4 border-b border-slate-100">
@@ -190,7 +171,6 @@ export const ServiceForm: React.FC<ServiceFormProps> = ({
                         </div>
                     </div>
 
-                    {/* COLUMNA 2: DRAG & DROP IMAGEN */}
                     <div className="lg:col-span-1">
                         <h3 className="text-lg font-bold text-slate-800 border-b border-slate-100 pb-2 mb-4">
                             Icono / Imagen
@@ -218,14 +198,12 @@ export const ServiceForm: React.FC<ServiceFormProps> = ({
 
                             {previewUrl ? (
                                 <>
-                                    {/* VISTA PREVIA IMAGEN */}
                                     <img
                                         src={previewUrl}
                                         alt="Preview"
                                         className="w-full h-full object-contain p-4"
                                     />
 
-                                    {/* OVERLAY HOVER */}
                                     <div className="absolute inset-0 bg-slate-900/60 flex flex-col items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300">
                                         <FaCloudUploadAlt className="text-white text-3xl mb-2" />
                                         <span className="text-white font-bold text-sm">
@@ -233,14 +211,12 @@ export const ServiceForm: React.FC<ServiceFormProps> = ({
                                         </span>
                                     </div>
 
-                                    {/* INDICADOR NUEVA IMAGEN */}
                                     {selectedImage && (
                                         <div className="absolute bottom-4 left-4 z-20 bg-green-500 text-white text-[10px] font-bold px-2 py-1 rounded-full flex items-center gap-1 shadow-md">
                                             <FaCheckCircle /> NUEVA
                                         </div>
                                     )}
 
-                                    {/* BOTÓN ELIMINAR */}
                                     <button
                                         type="button"
                                         onClick={removeImage}
@@ -252,7 +228,6 @@ export const ServiceForm: React.FC<ServiceFormProps> = ({
                                 </>
                             ) : (
                                 <>
-                                    {/* ESTADO VACÍO O BORRADO */}
                                     <div className="text-center p-6 pointer-events-none">
                                         {isImageDeleted &&
                                         initialData?.image ? (
@@ -302,7 +277,6 @@ export const ServiceForm: React.FC<ServiceFormProps> = ({
                 </div>
             </div>
 
-            {/* FOOTER */}
             <div className="bg-slate-50 px-8 py-4 border-t border-slate-200 flex items-center justify-end gap-3">
                 <button
                     type="button"
