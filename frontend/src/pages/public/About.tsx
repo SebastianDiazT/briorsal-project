@@ -4,7 +4,6 @@ import PageMeta from '@components/common/PageMeta';
 import FadeIn from '@components/common/FadeIn';
 import { useAppDispatch, useAppSelector } from '@store/hooks';
 import { fetchAboutUs } from '@store/slices/companySlice';
-import defaultImage from '@assets/about/Nosotros.png';
 
 const About = () => {
     const dispatch = useAppDispatch();
@@ -30,7 +29,7 @@ const About = () => {
                 <div className="relative w-full xl:w-[45%] h-[50vh] xl:h-screen xl:sticky xl:top-0 group overflow-hidden">
                     <div className="absolute inset-0">
                         <img
-                            src={aboutUs?.image || defaultImage}
+                            src={aboutUs?.image || ''}
                             alt="Briorsal Nosotros"
                             className={`w-full h-full object-cover transition-transform duration-[2000ms] group-hover:scale-110 ${loading ? 'opacity-50 blur-sm' : 'opacity-100'}`}
                         />

@@ -66,8 +66,8 @@ const ServicesList: React.FC = () => {
     return (
         <>
             <PageMeta
-                title="Admin - Servicios"
-                description="Admin - Servicios"
+                title="GESTIÓN DE SERVICIOS"
+                description="GESTIÓN Y ADMINISTRACIÓN DE SERVICIOS"
             />
 
             <div className="w-full animate-fade-in-up">

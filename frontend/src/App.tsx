@@ -23,6 +23,8 @@ import ClientsList from '@pages/admin/company/ClientsList';
 import CompanySettings from '@pages/admin/company/CompanySettings';
 import AboutSettings from '@pages/admin/company/AboutSettings';
 
+import CategoriesList from '@pages/admin/categories/CategoriesList';
+
 import Login from '@pages/admin/Login';
 
 export default function App() {
@@ -56,6 +58,8 @@ export default function App() {
                         <Route path="/admin/settings" element={<CompanySettings />} />
                         <Route path="/admin/about" element={<AboutSettings />} />
                         <Route path="/admin/clients" element={<ClientsList />} />
+
+                        <Route path="/admin/categories" element={<CategoriesList />} />
                     </Route>
                 </Route>
 

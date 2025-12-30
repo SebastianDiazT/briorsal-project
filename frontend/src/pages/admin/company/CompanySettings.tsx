@@ -10,6 +10,7 @@ import {
     FaLinkedin,
     FaTiktok,
     FaWhatsapp,
+    FaGlobe,
 } from 'react-icons/fa';
 import toast from 'react-hot-toast';
 import { useAppDispatch, useAppSelector } from '@store/hooks';
@@ -75,24 +76,38 @@ const CompanySettings: React.FC = () => {
 
     if (loading && !companyInfo)
         return (
-            <div className="p-10 text-center">Cargando configuración...</div>
+            <div className="flex items-center justify-center min-h-[400px]">
+                <div className="text-slate-400 font-medium animate-pulse">
+                    Cargando configuración...
+                </div>
+            </div>
         );
+
     return (
         <>
-            <PageMeta title="Configuración de la Empresa" description="Configuración de la Empresa" />
+            <PageMeta
+                title="CONFIGURACIÓN EMPRESA"
+                description="Gestiona los datos de contacto y redes sociales de tu empresa."
+            />
 
-            <div className="max-w-5xl mx-auto animate-fade-in-up pb-10">
-                <div className="flex items-center gap-4 mb-8">
-                    <div className="w-12 h-12 rounded-2xl bg-brand-600 text-white flex items-center justify-center shadow-lg shadow-brand-600/20">
-                        <FaBuilding size={20} />
-                    </div>
-                    <div>
-                        <h1 className="text-2xl font-bold text-slate-800">
-                            Información de la Empresa
-                        </h1>
-                        <p className="text-slate-500 text-sm">
-                            Gestiona los datos de contacto y redes sociales.
-                        </p>
+            <div className="w-full animate-fade-in-up pb-10">
+                <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-200 mb-8 flex flex-col lg:flex-row justify-between items-start lg:items-center gap-6 relative overflow-hidden">
+                    <div className="absolute top-0 right-0 w-32 h-32 bg-brand-50 rounded-bl-full -mr-10 -mt-10 pointer-events-none opacity-50"></div>
+
+                    <div className="flex items-center gap-5 relative z-10">
+                        <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-brand-50 to-white text-brand-600 flex items-center justify-center border border-brand-100 shadow-sm shadow-brand-100/50">
+                            <FaBuilding size={28} />
+                        </div>
+
+                        <div className="flex flex-col">
+                            <h1 className="text-2xl font-bold text-slate-800 leading-tight">
+                                Información de la Empresa
+                            </h1>
+                            <p className="text-slate-500 text-sm mt-1">
+                                Gestiona los datos de contacto y enlaces a redes
+                                sociales que aparecerán en el pie de página.
+                            </p>
+                        </div>
                     </div>
                 </div>
 
@@ -100,25 +115,32 @@ const CompanySettings: React.FC = () => {
                     onSubmit={handleSubmit}
                     className="grid grid-cols-1 lg:grid-cols-2 gap-8"
                 >
-                    <div className="bg-white p-6 md:p-8 rounded-3xl shadow-sm border border-slate-200">
-                        <h3 className="text-lg font-bold text-slate-800 border-b border-slate-100 pb-4 mb-6 flex items-center gap-2">
-                            <FaMapMarkerAlt className="text-brand-500" /> Datos
-                            de Contacto
-                        </h3>
+                    <div className="bg-white p-8 rounded-2xl shadow-sm border border-slate-200 h-full flex flex-col">
+                        <div className="flex items-center gap-3 mb-6 pb-4 border-b border-slate-100">
+                            <span className="w-10 h-10 rounded-lg bg-brand-50 text-brand-600 flex items-center justify-center border border-brand-100">
+                                <FaMapMarkerAlt size={16} />
+                            </span>
+                            <h3 className="text-lg font-bold text-slate-800">
+                                Datos de Contacto
+                            </h3>
+                        </div>
 
-                        <div className="space-y-5">
+                        <div className="space-y-6 flex-1">
                             <div className="group">
                                 <label className="block text-xs font-bold text-slate-500 uppercase tracking-widest mb-2 ml-1">
                                     Dirección Física
                                 </label>
                                 <div className="relative">
-                                    <FaMapMarkerAlt className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" />
+                                    <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                                        <FaMapMarkerAlt className="text-slate-400 group-focus-within:text-brand-500 transition-colors" />
+                                    </div>
                                     <input
                                         type="text"
                                         name="address"
                                         value={formData.address}
                                         onChange={handleChange}
-                                        className="w-full pl-10 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:border-brand-500 focus:ring-4 focus:ring-brand-500/10 outline-none transition-all font-medium"
+                                        className="w-full pl-11 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:border-brand-500 focus:ring-4 focus:ring-brand-500/10 outline-none transition-all font-medium text-slate-700 placeholder-slate-400"
+                                        placeholder="Ej: Av. Principal 123, Oficina 404"
                                     />
                                 </div>
                             </div>
@@ -128,13 +150,16 @@ const CompanySettings: React.FC = () => {
                                     Correo Electrónico
                                 </label>
                                 <div className="relative">
-                                    <FaEnvelope className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" />
+                                    <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                                        <FaEnvelope className="text-slate-400 group-focus-within:text-brand-500 transition-colors" />
+                                    </div>
                                     <input
                                         type="email"
                                         name="email"
                                         value={formData.email}
                                         onChange={handleChange}
-                                        className="w-full pl-10 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:border-brand-500 focus:ring-4 focus:ring-brand-500/10 outline-none transition-all font-medium"
+                                        className="w-full pl-11 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:border-brand-500 focus:ring-4 focus:ring-brand-500/10 outline-none transition-all font-medium text-slate-700 placeholder-slate-400"
+                                        placeholder="contacto@tuempresa.com"
                                     />
                                 </div>
                             </div>
@@ -145,13 +170,16 @@ const CompanySettings: React.FC = () => {
                                         Teléfono
                                     </label>
                                     <div className="relative">
-                                        <FaPhone className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" />
+                                        <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                                            <FaPhone className="text-slate-400 group-focus-within:text-brand-500 transition-colors" />
+                                        </div>
                                         <input
                                             type="text"
                                             name="phone"
                                             value={formData.phone}
                                             onChange={handleChange}
-                                            className="w-full pl-10 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:border-brand-500 focus:ring-4 focus:ring-brand-500/10 outline-none transition-all font-medium"
+                                            className="w-full pl-11 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:border-brand-500 focus:ring-4 focus:ring-brand-500/10 outline-none transition-all font-medium text-slate-700 placeholder-slate-400"
+                                            placeholder="+51 987 654 321"
                                         />
                                     </div>
                                 </div>
@@ -160,14 +188,16 @@ const CompanySettings: React.FC = () => {
                                         WhatsApp
                                     </label>
                                     <div className="relative">
-                                        <FaWhatsapp className="absolute left-4 top-1/2 -translate-y-1/2 text-green-500" />
+                                        <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                                            <FaWhatsapp className="text-slate-400 group-focus-within:text-green-500 transition-colors" />
+                                        </div>
                                         <input
                                             type="text"
                                             name="whatsapp"
                                             value={formData.whatsapp}
                                             onChange={handleChange}
-                                            placeholder="519..."
-                                            className="w-full pl-10 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:border-brand-500 focus:ring-4 focus:ring-brand-500/10 outline-none transition-all font-medium"
+                                            className="w-full pl-11 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:border-brand-500 focus:ring-4 focus:ring-brand-500/10 outline-none transition-all font-medium text-slate-700 placeholder-slate-400"
+                                            placeholder="51987654321"
                                         />
                                     </div>
                                 </div>
@@ -175,90 +205,106 @@ const CompanySettings: React.FC = () => {
                         </div>
                     </div>
 
-                    <div className="bg-white p-6 md:p-8 rounded-3xl shadow-sm border border-slate-200">
-                        <h3 className="text-lg font-bold text-slate-800 border-b border-slate-100 pb-4 mb-6 flex items-center gap-2">
-                            Redes Sociales
-                        </h3>
+                    <div className="bg-white p-8 rounded-2xl shadow-sm border border-slate-200 h-full flex flex-col">
+                        <div className="flex items-center gap-3 mb-6 pb-4 border-b border-slate-100">
+                            <span className="w-10 h-10 rounded-lg bg-blue-50 text-blue-600 flex items-center justify-center border border-blue-100">
+                                <FaGlobe size={16} />
+                            </span>
+                            <h3 className="text-lg font-bold text-slate-800">
+                                Redes Sociales
+                            </h3>
+                        </div>
 
-                        <div className="space-y-5">
+                        <div className="space-y-5 flex-1">
                             <div className="group">
                                 <label className="block text-xs font-bold text-slate-500 uppercase tracking-widest mb-2 ml-1">
-                                    Facebook URL
+                                    Facebook
                                 </label>
                                 <div className="relative">
-                                    <FaFacebook className="absolute left-4 top-1/2 -translate-y-1/2 text-blue-600" />
+                                    <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                                        <FaFacebook className="text-slate-400 group-focus-within:text-blue-600 transition-colors" />
+                                    </div>
                                     <input
                                         type="url"
                                         name="facebook"
                                         value={formData.facebook}
                                         onChange={handleChange}
+                                        className="w-full pl-11 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:border-brand-500 focus:ring-4 focus:ring-brand-500/10 outline-none transition-all font-medium text-slate-700 placeholder-slate-400"
                                         placeholder="https://facebook.com/..."
-                                        className="w-full pl-10 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:border-brand-500 focus:ring-4 focus:ring-brand-500/10 outline-none transition-all font-medium"
                                     />
                                 </div>
                             </div>
 
                             <div className="group">
                                 <label className="block text-xs font-bold text-slate-500 uppercase tracking-widest mb-2 ml-1">
-                                    Instagram URL
+                                    Instagram
                                 </label>
                                 <div className="relative">
-                                    <FaInstagram className="absolute left-4 top-1/2 -translate-y-1/2 text-pink-600" />
+                                    <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                                        <FaInstagram className="text-slate-400 group-focus-within:text-pink-600 transition-colors" />
+                                    </div>
                                     <input
                                         type="url"
                                         name="instagram"
                                         value={formData.instagram}
                                         onChange={handleChange}
+                                        className="w-full pl-11 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:border-brand-500 focus:ring-4 focus:ring-brand-500/10 outline-none transition-all font-medium text-slate-700 placeholder-slate-400"
                                         placeholder="https://instagram.com/..."
-                                        className="w-full pl-10 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:border-brand-500 focus:ring-4 focus:ring-brand-500/10 outline-none transition-all font-medium"
                                     />
                                 </div>
                             </div>
 
                             <div className="group">
                                 <label className="block text-xs font-bold text-slate-500 uppercase tracking-widest mb-2 ml-1">
-                                    LinkedIn URL
+                                    LinkedIn
                                 </label>
                                 <div className="relative">
-                                    <FaLinkedin className="absolute left-4 top-1/2 -translate-y-1/2 text-blue-700" />
+                                    <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                                        <FaLinkedin className="text-slate-400 group-focus-within:text-blue-700 transition-colors" />
+                                    </div>
                                     <input
                                         type="url"
                                         name="linkedin"
                                         value={formData.linkedin}
                                         onChange={handleChange}
-                                        placeholder="https://linkedin.com/in/..."
-                                        className="w-full pl-10 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:border-brand-500 focus:ring-4 focus:ring-brand-500/10 outline-none transition-all font-medium"
+                                        className="w-full pl-11 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:border-brand-500 focus:ring-4 focus:ring-brand-500/10 outline-none transition-all font-medium text-slate-700 placeholder-slate-400"
+                                        placeholder="https://linkedin.com/company/..."
                                     />
                                 </div>
                             </div>
 
                             <div className="group">
                                 <label className="block text-xs font-bold text-slate-500 uppercase tracking-widest mb-2 ml-1">
-                                    TikTok URL
+                                    TikTok
                                 </label>
                                 <div className="relative">
-                                    <FaTiktok className="absolute left-4 top-1/2 -translate-y-1/2 text-black" />
+                                    <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                                        <FaTiktok className="text-slate-400 group-focus-within:text-black transition-colors" />
+                                    </div>
                                     <input
                                         type="url"
                                         name="tiktok"
                                         value={formData.tiktok}
                                         onChange={handleChange}
+                                        className="w-full pl-11 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:border-brand-500 focus:ring-4 focus:ring-brand-500/10 outline-none transition-all font-medium text-slate-700 placeholder-slate-400"
                                         placeholder="https://tiktok.com/@..."
-                                        className="w-full pl-10 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:border-brand-500 focus:ring-4 focus:ring-brand-500/10 outline-none transition-all font-medium"
                                     />
                                 </div>
                             </div>
                         </div>
                     </div>
 
-                    <div className="lg:col-span-2 flex justify-end">
+                    <div className="lg:col-span-2 flex justify-end pt-4">
                         <button
                             type="submit"
                             disabled={loading}
-                            className="flex items-center gap-2 px-10 py-4 rounded-xl bg-brand-600 text-white font-bold text-lg shadow-xl shadow-brand-600/30 hover:bg-brand-700 hover:scale-[1.02] active:scale-95 transition-all disabled:opacity-70 disabled:cursor-not-allowed"
+                            className="flex items-center gap-2 px-10 py-4 rounded-xl bg-brand-600 text-white font-bold text-lg shadow-xl shadow-brand-600/20 hover:bg-brand-700 hover:shadow-brand-600/30 hover:-translate-y-0.5 active:scale-95 transition-all disabled:opacity-70 disabled:cursor-not-allowed"
                         >
                             {loading ? (
-                                'Guardando...'
+                                <>
+                                    <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
+                                    Guardando...
+                                </>
                             ) : (
                                 <>
                                     <FaSave /> Guardar Configuración
