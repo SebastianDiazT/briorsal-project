@@ -3,6 +3,7 @@ import uiReducer from './slices/uiSlice';
 import companyReducer from './slices/companySlice';
 import authReducer from './slices/authSlice';
 import categoryReducer from './slices/categorySlice';
+import projectsReducer from './slices/projectSlice';
 
 export const store = configureStore({
     reducer: {
@@ -10,6 +11,7 @@ export const store = configureStore({
         company: companyReducer,
         auth: authReducer,
         categories: categoryReducer,
+        projects: projectsReducer,
     },
 });
 

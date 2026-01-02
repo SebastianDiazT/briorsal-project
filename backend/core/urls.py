@@ -1,9 +1,13 @@
 from django.conf import settings
 from django.conf.urls.static import static
 from django.contrib import admin
-from django.urls import include, path
+from django.urls import include, path, re_path
 from django.views.static import serve
 from drf_spectacular.views import SpectacularAPIView, SpectacularSwaggerView
+
+admin.site.site_header = 'Administración Briorsal'
+admin.site.site_title = 'Portal Briorsal'
+admin.site.index_title = 'Bienvenido al Panel de Control'
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -24,6 +28,5 @@ if settings.DEBUG:
     urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
 else:
     urlpatterns += [
-        path('media/<path:path>', serve, {'document_root': settings.MEDIA_ROOT}),
-        path('static/<path:path>', serve, {'document_root': settings.STATIC_ROOT}),
+        re_path(r"^media/(?P<path>.*)$", serve, {"document_root": settings.MEDIA_ROOT}),
     ]

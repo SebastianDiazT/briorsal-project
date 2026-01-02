@@ -1,24 +1,33 @@
 from django.db import models
+from django.core.validators import FileExtensionValidator
+from core.validators import validate_image_size
 
 class ClientLogo(models.Model):
-    name = models.CharField(max_length=100, verbose_name='Nombre Cliente')
-    image = models.ImageField(upload_to='company/clients/', verbose_name='Logo')
-    order = models.IntegerField(default=0, verbose_name='Orden')
+    name = models.CharField(max_length=100, verbose_name='Nombre del Cliente')
+    image = models.ImageField(
+        upload_to='company/clients/',
+        verbose_name='Logo',
+        validators=[validate_image_size, FileExtensionValidator(allowed_extensions=['jpg', 'jpeg', 'png', 'webp'])],
+    )
 
     class Meta:
         db_table = 'client_logos'
-        ordering = ['order']
         verbose_name = 'Cliente'
         verbose_name_plural = 'Clientes'
 
     def __str__(self):
         return self.name
 
-
 class Service(models.Model):
-    title = models.CharField(max_length=100, verbose_name='Título Servicio')
-    image = models.ImageField(upload_to="company/services/", blank=True, null=True)
+    name = models.CharField(max_length=100, verbose_name='Nombre del Servicio')
     description = models.TextField(verbose_name='Descripción')
+    image = models.ImageField(
+        upload_to='company/services/',
+        verbose_name='Imagen',
+        blank=True,
+        null=True,
+        validators=[validate_image_size, FileExtensionValidator(allowed_extensions=['jpg', 'jpeg', 'png', 'webp'])],
+    )
 
     class Meta:
         db_table = 'services'
@@ -26,50 +35,53 @@ class Service(models.Model):
         verbose_name_plural = 'Servicios'
 
     def __str__(self):
-        return self.title
-
+        return self.name
 
 class CompanyInfo(models.Model):
-    phone = models.CharField(max_length=50, verbose_name='Teléfono')
-    email = models.EmailField(verbose_name='Email')
-    address = models.CharField(max_length=255, verbose_name='Dirección')
+    phone = models.CharField(max_length=20, blank=True, verbose_name='Teléfono')
+    email = models.EmailField(blank=True, verbose_name='Email')
+    address = models.CharField(max_length=255, blank=True, verbose_name='Dirección')
+    google_maps_url = models.URLField(
+        max_length=500,
+        blank=True,
+        verbose_name='Link Google Maps',
+        help_text='Enlace directo a la ubicación',
+    )
+    opening_hours = models.TextField(
+        blank=True,
+        verbose_name='Horario de Atención',
+        help_text='Ej: Lunes a Viernes: 8 am - 5 pm (Usa saltos de línea para separar días)',
+    )
 
-    facebook = models.URLField(blank=True, null=True)
-    instagram = models.URLField(blank=True, null=True)
-    linkedin = models.URLField(blank=True, null=True)
-    tiktok = models.URLField(blank=True, null=True)
-    whatsapp = models.CharField(max_length=50, blank=True, help_text="Número para link de WA")
-
+    facebook = models.URLField(blank=True, null=True, verbose_name='Facebook')
+    instagram = models.URLField(blank=True, null=True, verbose_name='Instagram')
+    linkedin = models.URLField(blank=True, null=True, verbose_name='LinkedIn')
+    tiktok = models.URLField(blank=True, null=True, verbose_name='TikTok')
+    whatsapp = models.CharField(max_length=50, blank=True, help_text='Número para link de WA', verbose_name='WhatsApp')
     class Meta:
+        db_table = 'company_info'
         verbose_name = 'Información de Empresa'
         verbose_name_plural = 'Información de Empresa'
 
     def __str__(self):
         return 'Configuración General'
 
-    def save(self, *args, **kwargs):
-        if not self.pk and CompanyInfo.objects.exists():
-            return CompanyInfo.objects.first()
-        return super(CompanyInfo, self).save(*args, **kwargs)
-
-
 class AboutUs(models.Model):
     description = models.TextField(verbose_name='Descripción de la Empresa')
-
     mission = models.TextField(verbose_name='Misión')
-
     vision = models.TextField(verbose_name='Visión')
-
-    image = models.ImageField(upload_to='company/about/', blank=True, null=True, verbose_name='Imagen Principal')
+    image = models.ImageField(
+        upload_to='company/about/',
+        blank=True,
+        null=True,
+        verbose_name='Imagen Principal',
+        validators=[validate_image_size, FileExtensionValidator(allowed_extensions=['jpg', 'jpeg', 'png', 'webp'])],
+    )
 
     class Meta:
+        db_table = 'about_us'
         verbose_name = 'Nosotros (Misión/Visión)'
         verbose_name_plural = 'Nosotros (Misión/Visión)'
 
     def __str__(self):
         return 'Información de Nosotros'
-
-    def save(self, *args, **kwargs):
-        if not self.pk and AboutUs.objects.exists():
-            return AboutUs.objects.first()
-        return super(AboutUs, self).save(*args, **kwargs)

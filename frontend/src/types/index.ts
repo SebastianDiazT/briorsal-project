@@ -44,3 +44,30 @@ export interface Category {
     id: number;
     name: string;
 }
+
+export interface ProjectImage {
+    id: number;
+    image: string;
+}
+
+export interface ProjectVideo {
+    id: number;
+    video: string;
+}
+
+export interface Project {
+    id: number;
+    slug: string;
+    category: number;
+    category_name?: string;
+    name: string;
+    location: string;
+    service_type?: string;
+    levels?: string;
+    area?: string;
+    status: 'In Progress' | 'Delivered';
+    extra_info?: string;
+    is_featured: boolean;
+    images: ProjectImage[];
+    videos: ProjectVideo[];
+}

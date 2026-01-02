@@ -12,7 +12,7 @@ import {
 
 export const menuGroups = [
     {
-        name: 'GESTIÓN',
+        name: 'PRINCIPAL',
         items: [
             {
                 name: 'Dashboard',
@@ -20,14 +20,14 @@ export const menuGroups = [
                 icon: <FaThLarge />,
             },
             {
-                name: 'Mensajes',
+                name: 'Buzón de Mensajes',
                 path: '/admin/messages',
                 icon: <FaEnvelope />,
             },
         ],
     },
     {
-        name: 'PORTAFOLIO',
+        name: 'CATÁLOGO Y OBRAS',
         items: [
             {
                 name: 'Proyectos',
@@ -44,20 +44,25 @@ export const menuGroups = [
                 path: '/admin/services',
                 icon: <FaHardHat />,
             },
+        ],
+    },
+    {
+        name: 'CONTENIDO WEB',
+        items: [
             {
-                name: 'Nosotros',
+                name: 'Info. Empresa',
                 path: '/admin/about',
                 icon: <FaUserFriends />,
             },
             {
-                name: 'Clientes',
+                name: 'Aliados / Clientes',
                 path: '/admin/clients',
                 icon: <FaHandshake />,
             },
         ],
     },
     {
-        name: 'SISTEMA',
+        name: 'ADMINISTRACIÓN',
         items: [
             {
                 name: 'Usuarios',
