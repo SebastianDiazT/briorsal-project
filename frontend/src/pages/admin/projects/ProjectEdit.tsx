@@ -95,7 +95,7 @@ const ProjectEdit = () => {
                 >
                     <div className="flex items-center gap-3">
                         <Link
-                            to={`/projects/${currentProject.slug}`}
+                            to={`/proyectos/${currentProject.slug}`}
                             target="_blank"
                             rel="noopener noreferrer"
                             className="flex items-center gap-2 px-4 py-2 bg-white border border-slate-200 rounded-lg text-slate-600 text-sm font-bold transition-all shadow-sm hover:bg-orange-50 hover:text-orange-600 hover:border-orange-200 group"

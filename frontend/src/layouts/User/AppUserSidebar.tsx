@@ -17,7 +17,12 @@ const AppUserSidebar: React.FC = () => {
     const location = useLocation();
 
     const isMobileOpen = useAppSelector((state) => state.ui.isMobileOpen);
-    const { companyInfo } = useAppSelector((state) => state.company);
+    const companyInfo = {
+        facebook: 'https://www.facebook.com/BriorsalConstructora',
+        instagram: 'https://www.instagram.com/briorsalconstructora',
+        tiktok: 'https://www.tiktok.com/@briorsalconstructora',
+        linkedin: 'https://www.linkedin.com/company/briorsalconstructora',
+    };
 
     const handleClose = () => dispatch(toggleMobileSidebar());
     const socialLinks = [

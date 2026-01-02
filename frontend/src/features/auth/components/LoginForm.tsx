@@ -65,7 +65,7 @@ export const LoginForm = () => {
     };
 
     return (
-        <div className="w-full max-w-md mx-auto px-4">
+        <div className="w-full max-w-md mx-auto">
             <form
                 onSubmit={handleSubmit(onSubmit)}
                 className="space-y-6 relative z-10"

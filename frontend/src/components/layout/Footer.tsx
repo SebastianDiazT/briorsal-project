@@ -1,4 +1,3 @@
-import { useAppSelector } from '@store/hooks';
 import logoBriorsal from '@assets/logo.png';
 import {
     FaFacebookF,
@@ -11,7 +10,16 @@ import {
 } from 'react-icons/fa';
 
 const Footer = () => {
-    const { companyInfo } = useAppSelector((state) => state.company);
+    const companyInfo = {
+        facebook: 'https://www.facebook.com/BriorsalConstructora',
+        instagram: 'https://www.instagram.com/briorsalconstructora',
+        tiktok: 'https://www.tiktok.com/@briorsalconstructora',
+        linkedin: 'https://www.linkedin.com/company/briorsalconstructora',
+        whatsapp: 'https://wa.me/573123456789',
+        phone: '+57 3123456789',
+        email: 'info@briorsalconstructora.com',
+        address: 'Calle 123, Bucaramanga, Santander',
+    };
 
     const socialLinks = [
         { url: companyInfo?.facebook, icon: <FaFacebookF /> },

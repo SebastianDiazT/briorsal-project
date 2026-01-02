@@ -1,8 +1,7 @@
-import React, { useEffect } from 'react';
+import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { useAppDispatch, useAppSelector } from '@store/hooks';
+import { useAppDispatch } from '@store/hooks';
 import { toggleMobileSidebar } from '@store/slices/uiSlice';
-import { fetchCompanyInfo } from '@store/slices/companySlice';
 import { items } from './menuData';
 import logoBriorsal from '@assets/logo.png';
 
@@ -18,13 +17,13 @@ const AppUserHeader: React.FC = () => {
     const dispatch = useAppDispatch();
     const location = useLocation();
 
-    const { companyInfo } = useAppSelector((state) => state.company);
-
-    useEffect(() => {
-        if (!companyInfo) {
-            dispatch(fetchCompanyInfo());
-        }
-    }, [dispatch, companyInfo]);
+    const companyInfo =
+        {
+            facebook: 'https://www.facebook.com/BriorsalConstructora',
+            instagram: 'https://www.instagram.com/briorsalconstructora',
+            tiktok: 'https://www.tiktok.com/@briorsalconstructora',
+            linkedin: 'https://www.linkedin.com/company/briorsalconstructora',
+        };
 
     const socialLinks = [
         { url: companyInfo?.facebook, icon: <FaFacebookF size={18} /> },

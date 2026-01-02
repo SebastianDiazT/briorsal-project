@@ -8,7 +8,7 @@ import {
     FaCalendarAlt,
     FaLayerGroup,
 } from 'react-icons/fa';
-import { Project } from '@/features/projects/types';
+import { Project } from '@features/projects/types';
 
 interface ProjectsTableProps {
     projects: Project[];
@@ -25,7 +25,6 @@ export const ProjectsTable: React.FC<ProjectsTableProps> = ({
     onDelete,
     EmptyState,
 }) => {
-    // Skeletons ajustados al nuevo layout
     if (isLoading) {
         return (
             <div className="hidden md:block bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
@@ -52,32 +51,24 @@ export const ProjectsTable: React.FC<ProjectsTableProps> = ({
 
     return (
         <div className="hidden md:block bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
-            {/* Contenedor con overflow controlado */}
             <div className="w-full overflow-x-auto">
                 <table className="w-full text-left border-collapse table-fixed">
                     <thead>
                         <tr className="bg-slate-50 border-b border-slate-100">
-                            {/* COL 1: PORTADA (Ancho fijo pequeño) */}
                             <th className="py-4 px-4 text-[11px] font-extrabold text-slate-400 uppercase tracking-widest w-[100px] text-center">
                                 Portada
                             </th>
 
-                            {/* COL 2: INFO (Ancho fluido, ocupa el espacio sobrante) */}
                             <th className="py-4 px-4 text-[11px] font-extrabold text-slate-400 uppercase tracking-widest w-auto">
                                 Información
                             </th>
-
-                            {/* COL 3: CATEGORÍA (Ancho controlado) */}
                             <th className="py-4 px-4 text-[11px] font-extrabold text-slate-400 uppercase tracking-widest w-[15%] xl:w-[12%] hidden lg:table-cell">
                                 Categoría
                             </th>
 
-                            {/* COL 4: ESTADO (Ancho controlado) */}
                             <th className="py-4 px-4 text-[11px] font-extrabold text-slate-400 uppercase tracking-widest w-[15%] text-center">
                                 Estado
                             </th>
-
-                            {/* COL 5: ACCIONES (Ancho fijo para botones) */}
                             <th className="py-4 px-6 text-[11px] font-extrabold text-slate-400 uppercase tracking-widest w-[120px] text-right">
                                 Acciones
                             </th>
@@ -96,7 +87,6 @@ export const ProjectsTable: React.FC<ProjectsTableProps> = ({
                                     key={project.id}
                                     className="group hover:bg-slate-50/60 transition-colors duration-150"
                                 >
-                                    {/* 1. PORTADA */}
                                     <td className="py-3 px-4 align-middle text-center">
                                         <div
                                             className={`relative inline-block h-12 w-16 rounded-lg overflow-hidden border bg-slate-100 shadow-sm ${project.is_featured ? 'border-orange-400 ring-1 ring-orange-100' : 'border-slate-200'}`}
@@ -126,10 +116,8 @@ export const ProjectsTable: React.FC<ProjectsTableProps> = ({
                                         </div>
                                     </td>
 
-                                    {/* 2. INFORMACIÓN (Truncamiento activado) */}
                                     <td className="py-3 px-4 align-middle">
                                         <div className="flex flex-col gap-1 pr-4">
-                                            {/* Nombre truncado */}
                                             <span
                                                 className="text-sm font-bold text-slate-800 leading-tight group-hover:text-orange-600 transition-colors truncate block w-full"
                                                 title={project.name}
@@ -137,7 +125,6 @@ export const ProjectsTable: React.FC<ProjectsTableProps> = ({
                                                 {project.name}
                                             </span>
 
-                                            {/* Metadata */}
                                             <div className="flex items-center gap-3 text-xs text-slate-500 font-medium truncate">
                                                 <div
                                                     className="flex items-center gap-1 min-w-0"
@@ -166,7 +153,6 @@ export const ProjectsTable: React.FC<ProjectsTableProps> = ({
                                                     </div>
                                                 )}
 
-                                                {/* Categoría (Solo visible en MD, oculta en LG donde tiene su propia columna) */}
                                                 <span className="lg:hidden px-2 py-0.5 bg-slate-100 rounded text-[10px] border border-slate-200 truncate">
                                                     {project.category_name}
                                                 </span>
@@ -174,7 +160,6 @@ export const ProjectsTable: React.FC<ProjectsTableProps> = ({
                                         </div>
                                     </td>
 
-                                    {/* 3. CATEGORÍA (Visible solo en pantallas grandes) */}
                                     <td className="py-3 px-4 align-middle hidden lg:table-cell">
                                         <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-white text-slate-600 text-xs font-semibold border border-slate-200 shadow-sm max-w-full truncate">
                                             <FaLayerGroup
@@ -187,7 +172,6 @@ export const ProjectsTable: React.FC<ProjectsTableProps> = ({
                                         </span>
                                     </td>
 
-                                    {/* 4. ESTADO */}
                                     <td className="py-3 px-4 align-middle text-center">
                                         <span
                                             className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-bold border whitespace-nowrap ${
@@ -210,7 +194,6 @@ export const ProjectsTable: React.FC<ProjectsTableProps> = ({
                                         </span>
                                     </td>
 
-                                    {/* 5. ACCIONES */}
                                     <td className="py-3 px-6 align-middle text-right">
                                         <div className="flex items-center justify-end gap-2">
                                             <button

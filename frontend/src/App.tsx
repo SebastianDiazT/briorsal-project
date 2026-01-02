@@ -1,6 +1,7 @@
 import { Route, BrowserRouter as Router, Routes, Navigate } from 'react-router';
 
-import AdminLayout from '@/layouts/admin/AdminLayout';
+import AdminLayout from '@layouts/admin/AdminLayout';
+import UserLayout from '@layouts/user/UserLayout';
 
 import { AppToast } from '@components/ui/AppToast';
 
@@ -13,18 +14,24 @@ import ProjectEdit from '@pages/admin/projects/ProjectEdit';
 
 import Login from '@pages/admin/Login';
 
+import { ProjectsPage } from '@pages/public/projects/ProjectsPage';
+import { ProjectDetailPage } from '@pages/public/projects/ProjectDetailPage';
+
 export default function App() {
     return (
         <Router>
             <AppToast />
             <Routes>
-                {/* <Route element={<UserLayout />}>
-                    <Route path="/" element={<Home />} />
+                <Route element={<UserLayout />}>
+                    {/* <Route path="/" element={<Home />} />
                     <Route path="/about" element={<About />} />
-                    <Route path="/services" element={<Services />} />
-                    <Route path="/projects" element={<Projects />} />
-                    <Route path="/projects/:slug" element={<ProjectDetail />} />
-                </Route> */}
+                    <Route path="/services" element={<Services />} /> */}
+                    <Route path="/proyectos" element={<ProjectsPage />} />
+                    <Route
+                        path="/proyectos/:slug"
+                        element={<ProjectDetailPage />}
+                    />
+                </Route>
 
                 <Route element={<PublicRoute />}>
                     <Route path="/admin/login" element={<Login />} />
@@ -32,13 +39,29 @@ export default function App() {
 
                 <Route element={<ProtectedRoute />}>
                     <Route path="/admin" element={<AdminLayout />}>
-                        <Route index element={<Navigate to="/admin/dashboard" replace />} />
-                        <Route path="dashboard" element={<><h1>Dashboard</h1></>} />
+                        <Route
+                            index
+                            element={<Navigate to="/admin/dashboard" replace />}
+                        />
+                        <Route
+                            path="dashboard"
+                            element={
+                                <>
+                                    <h1>Dashboard</h1>
+                                </>
+                            }
+                        />
 
                         <Route path="projects" element={<ProjectsList />} />
-                        <Route path="projects/new" element={<ProjectCreate />} />
-                        <Route path="projects/edit/:slug" element={<ProjectEdit />} />
-                        
+                        <Route
+                            path="projects/new"
+                            element={<ProjectCreate />}
+                        />
+                        <Route
+                            path="projects/edit/:slug"
+                            element={<ProjectEdit />}
+                        />
+
                         {/* <Route path="/admin/dashboard" element={<Dashboard />} />
 
                         <Route path="/admin/services" element={<ServicesList />} />

@@ -1,7 +1,7 @@
 import { useNavigate } from 'react-router-dom';
 import toast from 'react-hot-toast';
 import { FaBuilding, FaArrowLeft } from 'react-icons/fa';
-import { useCreateProjectMutation } from '@/features/projects/api/projectsApi'; // <--- USAMOS TU API
+import { useCreateProjectMutation } from '@/features/projects/api/projectsApi';
 import { ProjectForm } from '@features/projects/components/admin/ProjectForm';
 import PageMeta from '@components/common/PageMeta';
 import { PageHeader } from '@components/ui/PageHeader';
@@ -9,13 +9,10 @@ import { PageHeader } from '@components/ui/PageHeader';
 const ProjectCreate = () => {
     const navigate = useNavigate();
 
-    // Hook generado por RTK Query
     const [createProject, { isLoading }] = useCreateProjectMutation();
 
     const handleSubmit = async (formData: FormData) => {
         try {
-            // .unwrap() es clave en RTK Query: lanza un error si la promesa falla (catch)
-            // o devuelve la data limpia si es exitosa.
             await createProject(formData).unwrap();
 
             toast.success('¡Proyecto creado con éxito!');
@@ -28,7 +25,7 @@ const ProjectCreate = () => {
 
     return (
         <>
-            <PageMeta title="CREAR PROYECTO" description="..." />
+            <PageMeta title="CREAR PROYECTO" description="Crear un nuevo proyecto" />
 
             <div className="w-full animate-fade-in-up pb-10">
                 <PageHeader

@@ -128,7 +128,7 @@ const ProjectsList: React.FC = () => {
                     totalRecords={meta?.total_records || 0}
                 >
                     <Link
-                        to="/projects"
+                        to="/proyectos"
                         target="_blank"
                         className="group flex-1 md:flex-none flex items-center justify-center gap-2 px-5 py-2.5
                             bg-white border border-slate-200 rounded-xl text-slate-600 text-sm font-bold

@@ -8,7 +8,7 @@ import {
 export const items = [
     {
         name: 'PROYECTOS',
-        path: '/projects',
+        path: '/proyectos',
         icon: <FaBuilding />,
     },
     {
