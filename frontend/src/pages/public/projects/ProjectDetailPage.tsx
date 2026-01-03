@@ -11,7 +11,7 @@ import { ProjectSpecs } from '@features/projects/components/public/ProjectSpecs'
 import { ProjectGallery } from '@features/projects/components/public/ProjectGallery';
 import PageMeta from '@components/common/PageMeta';
 
-export const ProjectDetailPage = () => {
+const ProjectDetailPage = () => {
     const { slug } = useParams<{ slug: string }>();
     const { data: project, isLoading } = useGetProjectBySlugQuery(slug!);
 
@@ -156,3 +156,5 @@ export const ProjectDetailPage = () => {
         </>
     );
 };
+
+export default ProjectDetailPage;

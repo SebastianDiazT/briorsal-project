@@ -13,17 +13,17 @@ export const items = [
     },
     {
         name: 'NOSOTROS',
-        path: '/about',
+        path: '/nosotros',
         icon: <FaUserFriends />,
     },
     {
         name: 'SERVICIOS',
-        path: '/services',
+        path: '/servicios',
         icon: <FaHardHat />,
     },
     {
         name: 'CONTACTO',
-        path: '/contact',
+        path: '/contacto',
         icon: <FaEnvelope />,
     },
 ];

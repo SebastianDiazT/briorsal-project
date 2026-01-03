@@ -38,7 +38,7 @@ class Service(models.Model):
         return self.name
 
 class CompanyInfo(models.Model):
-    phone = models.CharField(max_length=20, blank=True, verbose_name='Teléfono')
+    phone = models.CharField(max_length=50, blank=True, verbose_name='Teléfono')
     email = models.EmailField(blank=True, verbose_name='Email')
     address = models.CharField(max_length=255, blank=True, verbose_name='Dirección')
     google_maps_url = models.URLField(
@@ -53,11 +53,11 @@ class CompanyInfo(models.Model):
         help_text='Ej: Lunes a Viernes: 8 am - 5 pm (Usa saltos de línea para separar días)',
     )
 
-    facebook = models.URLField(blank=True, null=True, verbose_name='Facebook')
-    instagram = models.URLField(blank=True, null=True, verbose_name='Instagram')
-    linkedin = models.URLField(blank=True, null=True, verbose_name='LinkedIn')
-    tiktok = models.URLField(blank=True, null=True, verbose_name='TikTok')
-    whatsapp = models.CharField(max_length=50, blank=True, help_text='Número para link de WA', verbose_name='WhatsApp')
+    facebook = models.URLField(blank=True, default='', verbose_name='Facebook')
+    instagram = models.URLField(blank=True, default='', verbose_name='Instagram')
+    linkedin = models.URLField(blank=True, default='', verbose_name='LinkedIn')
+    tiktok = models.URLField(blank=True, default='', verbose_name='TikTok')
+    whatsapp = models.URLField(blank=True, default='', help_text='Número para link de WA', verbose_name='WhatsApp')
     class Meta:
         db_table = 'company_info'
         verbose_name = 'Información de Empresa'

@@ -5,9 +5,8 @@ import {
     FaHandshake,
     FaLayerGroup,
     FaHardHat,
-    FaUsersCog,
-    FaCogs,
-    FaUserFriends,
+    FaInfoCircle, // Icono para Nosotros
+    FaMapMarkedAlt, // Icono para Contacto
 } from 'react-icons/fa';
 
 export const menuGroups = [
@@ -47,32 +46,22 @@ export const menuGroups = [
         ],
     },
     {
-        name: 'CONTENIDO WEB',
+        name: 'GESTIÓN WEB',
         items: [
             {
-                name: 'Info. Empresa',
+                name: 'Nosotros',
                 path: '/admin/about',
-                icon: <FaUserFriends />,
+                icon: <FaInfoCircle />,
+            },
+            {
+                name: 'Contacto y Sede',
+                path: '/admin/company',
+                icon: <FaMapMarkedAlt />,
             },
             {
                 name: 'Aliados / Clientes',
                 path: '/admin/clients',
                 icon: <FaHandshake />,
-            },
-        ],
-    },
-    {
-        name: 'ADMINISTRACIÓN',
-        items: [
-            {
-                name: 'Usuarios',
-                path: '/admin/users',
-                icon: <FaUsersCog />,
-            },
-            {
-                name: 'Configuración',
-                path: '/admin/settings',
-                icon: <FaCogs />,
             },
         ],
     },

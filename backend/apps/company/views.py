@@ -32,3 +32,14 @@ class AboutUsView(generics.RetrieveUpdateAPIView):
     def get_object(self):
         obj, created = AboutUs.objects.get_or_create(defaults={'description': ''})
         return obj
+
+    def perform_update(self, serializer):
+        delete_image = self.request.data.get('delete_image')
+
+        if delete_image == 'true':
+            if serializer.instance.image:
+                serializer.instance.image.delete(save=False)
+
+            serializer.save(image=None)
+        else:
+            serializer.save()

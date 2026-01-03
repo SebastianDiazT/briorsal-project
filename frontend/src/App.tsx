@@ -11,11 +11,14 @@ import { PublicRoute } from '@features/auth/components/PublicRoute';
 import ProjectsList from '@pages/admin/projects/ProjectsList';
 import ProjectCreate from '@pages/admin/projects/ProjectCreate';
 import ProjectEdit from '@pages/admin/projects/ProjectEdit';
+import CompanyInfoPage from '@pages/admin/company/CompanyInfoPage';
+import AboutUsPage from '@pages/admin/company/AboutUsPage';
 
 import Login from '@pages/admin/Login';
 
-import { ProjectsPage } from '@pages/public/projects/ProjectsPage';
-import { ProjectDetailPage } from '@pages/public/projects/ProjectDetailPage';
+import ProjectsPage from '@pages/public/projects/ProjectsPage';
+import ProjectDetailPage from '@pages/public/projects/ProjectDetailPage';
+import About from '@pages/public/About';
 
 export default function App() {
     return (
@@ -27,10 +30,8 @@ export default function App() {
                     <Route path="/about" element={<About />} />
                     <Route path="/services" element={<Services />} /> */}
                     <Route path="/proyectos" element={<ProjectsPage />} />
-                    <Route
-                        path="/proyectos/:slug"
-                        element={<ProjectDetailPage />}
-                    />
+                    <Route path="/proyectos/:slug" element={<ProjectDetailPage />} />
+                    <Route path="/nosotros" element={<About />} />
                 </Route>
 
                 <Route element={<PublicRoute />}>
@@ -39,28 +40,15 @@ export default function App() {
 
                 <Route element={<ProtectedRoute />}>
                     <Route path="/admin" element={<AdminLayout />}>
-                        <Route
-                            index
-                            element={<Navigate to="/admin/dashboard" replace />}
-                        />
-                        <Route
-                            path="dashboard"
-                            element={
-                                <>
-                                    <h1>Dashboard</h1>
-                                </>
-                            }
-                        />
+                        <Route index element={<Navigate to="/admin/dashboard" replace />} />
+                        <Route path="dashboard" element={<>Dashboard</>} />
 
                         <Route path="projects" element={<ProjectsList />} />
-                        <Route
-                            path="projects/new"
-                            element={<ProjectCreate />}
-                        />
-                        <Route
-                            path="projects/edit/:slug"
-                            element={<ProjectEdit />}
-                        />
+                        <Route path="projects/new" element={<ProjectCreate />} />
+                        <Route path="projects/edit/:slug" element={<ProjectEdit />} />
+
+                        <Route path="company" element={<CompanyInfoPage />} />
+                        <Route path="about" element={<AboutUsPage />} />
 
                         {/* <Route path="/admin/dashboard" element={<Dashboard />} />
 

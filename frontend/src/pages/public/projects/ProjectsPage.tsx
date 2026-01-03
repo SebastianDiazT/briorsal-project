@@ -12,7 +12,7 @@ import { ProjectCard } from '@features/projects/components/public/ProjectCard';
 import { ProjectFilters } from '@features/projects/components/public/ProjectFilters';
 import heroBgImg from '@assets/projects/hero.png';
 
-export const ProjectsPage = () => {
+const ProjectsPage = () => {
     const [selectedCategory, setSelectedCategory] = useState<string>('');
     const [search, setSearch] = useState('');
     const [page, setPage] = useState(1);
@@ -198,3 +198,5 @@ export const ProjectsPage = () => {
         </div>
     );
 };
+
+export default ProjectsPage;
