@@ -4,6 +4,7 @@ export interface CompanyInfo {
     email: string;
     address: string;
     google_maps_url: string;
+    google_maps_link: string;
     opening_hours: string;
     facebook: string;
     instagram: string;

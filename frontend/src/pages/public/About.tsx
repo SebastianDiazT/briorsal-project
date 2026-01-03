@@ -24,7 +24,7 @@ const About = () => {
             />
 
             <div className="relative flex flex-col xl:flex-row min-h-screen bg-slate-950">
-                <div className="relative w-full xl:w-[45%] h-[50vh] xl:h-screen xl:sticky xl:top-0 group overflow-hidden z-0">
+                <div className="relative w-full xl:w-[45%] h-[50vh] xl:sticky xl:top-20 xl:h-[calc(100vh-5rem)] group overflow-hidden z-0">
                     <div className="absolute inset-0 bg-slate-900">
                         <img
                             src={heroImage}

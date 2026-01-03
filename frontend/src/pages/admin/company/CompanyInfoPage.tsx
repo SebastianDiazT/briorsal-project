@@ -1,4 +1,4 @@
-import React from 'react';
+import { useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import {
     FaSave,
@@ -13,7 +13,9 @@ import {
     FaTiktok,
     FaWhatsapp,
     FaSpinner,
-    FaBuilding,
+    FaMapMarkedAlt,
+    FaExternalLinkAlt,
+    FaInfoCircle,
 } from 'react-icons/fa';
 import toast from 'react-hot-toast';
 
@@ -37,7 +39,7 @@ export const CompanyInfoPage = () => {
 
     const { register, handleSubmit, reset } = useForm<CompanyInfo>();
 
-    React.useEffect(() => {
+    useEffect(() => {
         if (response?.data) {
             const cleanData = {
                 ...response.data,
@@ -47,6 +49,8 @@ export const CompanyInfoPage = () => {
                 tiktok: response.data.tiktok || '',
                 whatsapp: response.data.whatsapp || '',
                 opening_hours: response.data.opening_hours || '',
+                google_maps_url: response.data.google_maps_url || '',
+                google_maps_link: response.data.google_maps_link || '',
             };
             reset(cleanData);
         }
@@ -65,11 +69,8 @@ export const CompanyInfoPage = () => {
                 ...data,
                 google_maps_url: extractGoogleMapsUrl(data.google_maps_url),
             };
-
             await updateCompany(cleanData).unwrap();
-
             reset(cleanData);
-
             toast.success('Información actualizada correctamente');
         } catch (error) {
             console.error(error);
@@ -86,8 +87,8 @@ export const CompanyInfoPage = () => {
         hint,
         isTextArea = false,
     }: any) => (
-        <div className="space-y-1.5">
-            <label className="text-sm font-bold text-slate-700 ml-1">
+        <div className="space-y-2">
+            <label className="text-sm font-bold text-slate-800 ml-1 flex items-center gap-2">
                 {label}
             </label>
             <div className="relative group">
@@ -102,7 +103,7 @@ export const CompanyInfoPage = () => {
                         {...register(name)}
                         placeholder={placeholder}
                         rows={4}
-                        className="w-full pl-10 pr-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500 transition-all text-sm font-medium text-slate-800 placeholder:text-slate-400 resize-none"
+                        className="w-full pl-10 pr-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500 transition-all text-sm font-medium text-slate-800 placeholder:text-slate-400 resize-none leading-relaxed"
                     />
                 ) : (
                     <input
@@ -113,7 +114,12 @@ export const CompanyInfoPage = () => {
                     />
                 )}
             </div>
-            {hint && <p className="text-xs text-slate-400 ml-1">{hint}</p>}
+            {hint && (
+                <p className="text-xs text-slate-500 ml-1 leading-relaxed flex items-start gap-1.5">
+                    <FaInfoCircle className="text-blue-400 mt-0.5 flex-shrink-0" />
+                    <span>{hint}</span>
+                </p>
+            )}
         </div>
     );
 
@@ -127,16 +133,8 @@ export const CompanyInfoPage = () => {
 
     if (isError) {
         return (
-            <div className="p-10 text-center">
-                <p className="text-red-500 font-bold mb-2">
-                    Error al cargar la información.
-                </p>
-                <button
-                    onClick={() => window.location.reload()}
-                    className="text-sm text-slate-600 hover:text-slate-900 underline"
-                >
-                    Intentar recargar
-                </button>
+            <div className="p-10 text-center text-red-500">
+                Error al cargar datos.
             </div>
         );
     }
@@ -150,9 +148,9 @@ export const CompanyInfoPage = () => {
 
             <div className="w-full animate-fade-in-up pb-20">
                 <PageHeader
-                    title="Información de Empresa"
-                    breadcrumbs={['Administración', 'Configuración', 'Empresa']}
-                    icon={FaBuilding}
+                    title="Contacto y Sede"
+                    breadcrumbs={['Administración', 'Gestión Web', 'Contacto']}
+                    icon={FaMapMarkedAlt}
                 >
                     <button
                         onClick={handleSubmit(onSubmit)}
@@ -178,115 +176,125 @@ export const CompanyInfoPage = () => {
                     className="mt-8 grid grid-cols-1 lg:grid-cols-12 gap-8"
                 >
                     <div className="lg:col-span-7 space-y-6">
-                        <div className="bg-white p-6 md:p-8 rounded-2xl shadow-sm border border-slate-200/60">
-                            <h2 className="text-lg font-bold text-slate-800 mb-6 flex items-center gap-2 border-b border-slate-100 pb-4">
-                                <span className="bg-orange-100 text-orange-600 p-2 rounded-lg">
-                                    <FaMapMarkerAlt size={16} />
+                        <div className="bg-white p-6 md:p-8 rounded-2xl shadow-sm border border-slate-200/60 border-t-4 border-t-orange-400">
+                            <h2 className="text-lg font-bold text-slate-800 mb-6 flex items-center gap-3 border-b border-slate-100 pb-4">
+                                <span className="bg-orange-100 text-orange-600 p-2.5 rounded-xl shadow-sm">
+                                    <FaMapMarkerAlt size={18} />
                                 </span>
-                                Datos de Contacto
+                                Ubicación y Horarios
                             </h2>
 
-                            <div className="space-y-6">
+                            <div className="space-y-8">
                                 <InputField
-                                    label="Dirección Física"
+                                    label="Dirección Física Completa"
                                     name="address"
                                     icon={FaMapMarkerAlt}
-                                    placeholder="Ej: Av. Ejército 123, Cayma"
+                                    placeholder="Ej: Av. Ejército 123, Of. 405, Cayma, Arequipa"
+                                    hint="Esta dirección aparecerá en el pie de página de la web."
                                 />
 
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                                     <InputField
-                                        label="Teléfono / Celular"
+                                        label="Teléfono Fijo o Celular"
                                         name="phone"
                                         icon={FaPhone}
-                                        placeholder="+51 999 999 999"
+                                        placeholder="Ej: (054) 254-456  o  +51 987 654 321"
                                     />
                                     <InputField
-                                        label="Correo Electrónico"
+                                        label="Correo Electrónico de Contacto"
                                         name="email"
                                         icon={FaEnvelope}
                                         type="email"
-                                        placeholder="contacto@briorsal.com"
+                                        placeholder="Ej: contacto@briorsal.com"
                                     />
                                 </div>
 
                                 <InputField
-                                    label="Horario de Atención"
+                                    label="Horario de Atención al Público"
                                     name="opening_hours"
                                     icon={FaClock}
                                     isTextArea={true}
-                                    placeholder="Ej: Lunes a Viernes: 9:00am - 6:00pm&#10;Sábados: 9:00am - 1:00pm"
-                                    hint="Usa saltos de línea para separar los días."
+                                    placeholder={
+                                        'Ej:\nLunes a Viernes: 9:00am - 6:00pm\nSábados: 9:00am - 1:00pm\nDomingos: Cerrado'
+                                    }
+                                    hint="Usa 'Enter' para escribir cada día en una línea diferente."
                                 />
 
-                                <div className="space-y-1.5">
-                                    <label className="text-sm font-bold text-slate-700 ml-1">
-                                        Link Google Maps
-                                    </label>
-                                    <div className="relative group">
-                                        <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-400 group-focus-within:text-blue-500 transition-colors">
-                                            <FaMap />
-                                        </div>
-                                        <input
-                                            {...register('google_maps_url')}
-                                            placeholder='Pega aquí el código "Insertar mapa" o el enlace...'
-                                            className="w-full pl-10 pr-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all text-sm font-medium text-blue-600 underline decoration-blue-300 underline-offset-2 placeholder:no-underline placeholder:text-slate-400"
-                                        />
-                                    </div>
-                                    <p className="text-xs text-slate-400 ml-1">
-                                        Puedes pegar el código HTML del iframe
-                                        completo, nosotros extraeremos el
-                                        enlace.
-                                    </p>
+                                <div className="bg-slate-50 p-6 rounded-2xl border border-slate-200/60 space-y-6">
+                                    <h3 className="text-xs font-bold text-slate-500 uppercase tracking-wider mb-2 border-b border-slate-200 pb-2">
+                                        Configuración de Google Maps
+                                    </h3>
+
+                                    <InputField
+                                        label="1. Mapa Visual (Para mostrar en la web)"
+                                        name="google_maps_url"
+                                        icon={FaMap}
+                                        placeholder='Pega aquí el código que empieza con <iframe src="...">...'
+                                        hint='Ve a Google Maps > Compartir > "Insertar un mapa" > Copiar HTML. Pégalo aquí completo.'
+                                    />
+
+                                    <InputField
+                                        label="2. Enlace GPS (Botón 'Cómo llegar')"
+                                        name="google_maps_link"
+                                        icon={FaExternalLinkAlt}
+                                        placeholder="Ej: https://maps.app.goo.gl/XyZ123..."
+                                        hint='Ve a Google Maps > Compartir > "Enviar un vínculo". Copia el enlace corto.'
+                                    />
                                 </div>
                             </div>
                         </div>
                     </div>
 
                     <div className="lg:col-span-5 space-y-6">
-                        <div className="bg-white p-6 md:p-8 rounded-2xl shadow-sm border border-slate-200/60 h-full">
-                            <h2 className="text-lg font-bold text-slate-800 mb-6 flex items-center gap-2 border-b border-slate-100 pb-4">
-                                <span className="bg-blue-100 text-blue-600 p-2 rounded-lg">
-                                    <FaFacebook size={16} />
+                        <div className="bg-white p-6 md:p-8 rounded-2xl shadow-sm border border-slate-200/60 border-t-4 border-t-blue-400 h-full">
+                            <h2 className="text-lg font-bold text-slate-800 mb-6 flex items-center gap-3 border-b border-slate-100 pb-4">
+                                <span className="bg-blue-100 text-blue-600 p-2.5 rounded-xl shadow-sm">
+                                    <FaFacebook size={18} />
                                 </span>
                                 Redes Sociales
                             </h2>
 
-                            <div className="space-y-5">
+                            <p className="text-sm text-slate-500 mb-6 bg-blue-50 p-3 rounded-lg border border-blue-100">
+                                Copia y pega el enlace completo de tu perfil
+                                (ej: https://...). Si dejas un campo vacío, el
+                                icono no aparecerá en la web.
+                            </p>
+
+                            <div className="space-y-6">
                                 <InputField
-                                    label="WhatsApp (Enlace)"
+                                    label="Enlace de WhatsApp (API)"
                                     name="whatsapp"
                                     icon={FaWhatsapp}
-                                    placeholder="https://wa.me/51955123456"
-                                    hint="Usa el formato de enlace corto de WhatsApp."
+                                    placeholder="Ej: https://wa.me/51955123456"
+                                    hint="Usa el formato: https://wa.me/ seguido de tu número con código de país (51)."
                                 />
 
                                 <InputField
-                                    label="Facebook"
+                                    label="Perfil de Facebook"
                                     name="facebook"
                                     icon={FaFacebook}
-                                    placeholder="https://facebook.com/briorsal"
+                                    placeholder="Ej: https://www.facebook.com/briorsal"
                                 />
 
                                 <InputField
-                                    label="Instagram"
+                                    label="Perfil de Instagram"
                                     name="instagram"
                                     icon={FaInstagram}
-                                    placeholder="https://instagram.com/briorsal"
+                                    placeholder="Ej: https://www.instagram.com/briorsal_constructora"
                                 />
 
                                 <InputField
-                                    label="LinkedIn"
+                                    label="Perfil de LinkedIn"
                                     name="linkedin"
                                     icon={FaLinkedin}
-                                    placeholder="https://linkedin.com/in/briorsal"
+                                    placeholder="Ej: https://www.linkedin.com/company/briorsal"
                                 />
 
                                 <InputField
-                                    label="TikTok"
+                                    label="Perfil de TikTok"
                                     name="tiktok"
                                     icon={FaTiktok}
-                                    placeholder="https://tiktok.com/@briorsal"
+                                    placeholder="Ej: https://www.tiktok.com/@briorsal"
                                 />
                             </div>
                         </div>

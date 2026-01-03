@@ -7,21 +7,17 @@ import {
     FaPhoneAlt,
     FaEnvelope,
     FaMapMarkerAlt,
+    FaWhatsapp,
 } from 'react-icons/fa';
 
+import { useGetCompanyInfoQuery } from '@/features/company/api/companyApi';
+
 const Footer = () => {
-    const companyInfo = {
-        facebook: 'https://www.facebook.com/BriorsalConstructora',
-        instagram: 'https://www.instagram.com/briorsalconstructora',
-        tiktok: 'https://www.tiktok.com/@briorsalconstructora',
-        linkedin: 'https://www.linkedin.com/company/briorsalconstructora',
-        whatsapp: 'https://wa.me/573123456789',
-        phone: '+57 3123456789',
-        email: 'info@briorsalconstructora.com',
-        address: 'Calle 123, Bucaramanga, Santander',
-    };
+    const { data: response } = useGetCompanyInfoQuery();
+    const companyInfo = response?.data;
 
     const socialLinks = [
+        { url: companyInfo?.whatsapp, icon: <FaWhatsapp /> },
         { url: companyInfo?.facebook, icon: <FaFacebookF /> },
         { url: companyInfo?.instagram, icon: <FaInstagram /> },
         { url: companyInfo?.tiktok, icon: <FaTiktok /> },
@@ -32,6 +28,7 @@ const Footer = () => {
         <footer className="bg-brand-dark-950 text-white py-12 font-sans border-t border-brand-dark-800">
             <div className="w-full max-w-[90%] mx-auto px-4">
                 <div className="flex flex-col lg:flex-row justify-between items-center lg:items-start gap-12 lg:gap-8">
+                    {/* LOGO */}
                     <div className="flex justify-center items-center lg:justify-start">
                         <img
                             src={logoBriorsal}
@@ -40,20 +37,24 @@ const Footer = () => {
                         />
                     </div>
 
+                    {/* CONTACTO */}
                     <div className="text-center lg:text-left">
-                        <h3 className="font-extrabold text-base uppercase tracking-widest mb-6 relative inline-block pb-2 after:content-[''] after:absolute after:bottom-0 after:left-1/2 after:-translate-x-1/2 lg:after:left-0 lg:after:translate-x-0 after:w-12 after:h-[3px] after:bg-brand-500">
+                        <h3
+                            className="font-extrabold text-base uppercase tracking-widest mb-6 relative inline-block pb-2 
+                            after:content-[''] after:absolute after:bottom-0 after:left-1/2 after:-translate-x-1/2 lg:after:left-0 lg:after:translate-x-0 
+                            after:w-12 after:h-[3px] after:bg-brand-500"
+                        >
                             Contacto
                         </h3>
 
                         <ul className="space-y-5 text-sm font-medium text-gray-300">
-                            {companyInfo?.phone && (
+                            {(companyInfo?.phone || companyInfo?.whatsapp) && (
                                 <li className="flex flex-col lg:flex-row items-center lg:items-start gap-2 lg:gap-3 group">
                                     <FaPhoneAlt className="text-brand-500 text-lg mt-0.5 group-hover:scale-110 transition-transform" />
                                     <a
                                         href={
-                                            companyInfo.whatsapp
-                                                ? `https://wa.me/${companyInfo.whatsapp.replace(/\D/g, '')}`
-                                                : `tel:${companyInfo.phone}`
+                                            companyInfo.whatsapp ||
+                                            `tel:${companyInfo.phone}`
                                         }
                                         target="_blank"
                                         rel="noopener noreferrer"
@@ -86,7 +87,9 @@ const Footer = () => {
                                 <li className="flex flex-col lg:flex-row items-center lg:items-start gap-2 lg:gap-3 group">
                                     <FaMapMarkerAlt className="text-brand-500 text-lg mt-0.5 group-hover:scale-110 transition-transform" />
                                     <a
-                                        href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(companyInfo.address)}`}
+                                        href={
+                                            companyInfo.google_maps_link || '#'
+                                        }
                                         target="_blank"
                                         rel="noopener noreferrer"
                                         className="uppercase hover:text-white transition-colors max-w-xs text-center lg:text-left"
@@ -101,8 +104,13 @@ const Footer = () => {
                         </ul>
                     </div>
 
+                    {/* SÍGUENOS */}
                     <div className="text-center lg:text-right flex flex-col items-center lg:items-end">
-                        <h3 className="font-extrabold text-base uppercase tracking-widest mb-6 relative inline-block pb-2 after:content-[''] after:absolute after:bottom-0 after:left-1/2 after:-translate-x-1/2 lg:after:right-0 lg:after:left-auto lg:after:translate-x-0 after:w-12 after:h-[3px] after:bg-brand-500">
+                        <h3
+                            className="font-extrabold text-base uppercase tracking-widest mb-6 relative inline-block pb-2 
+                            after:content-[''] after:absolute after:bottom-0 after:left-1/2 after:-translate-x-1/2 lg:after:right-0 lg:after:left-auto lg:after:translate-x-0 
+                            after:w-12 after:h-[3px] after:bg-brand-500"
+                        >
                             Síguenos
                         </h3>
 
@@ -113,7 +121,7 @@ const Footer = () => {
                                     href={social.url}
                                     target="_blank"
                                     rel="noopener noreferrer"
-                                    className="bg-brand-dark-800 text-gray-300 rounded-full w-10 h-10 flex items-center justify-center hover:bg-brand-500 hover:text-white transition-all duration-300 hover:-translate-y-1 shadow-lg"
+                                    className="bg-brand-dark-800 text-gray-300 rounded-full w-10 h-10 flex items-center justify-center hover:bg-brand-500 hover:text-white transition-all duration-300 hover:-translate-y-1 shadow-lg border border-brand-dark-700"
                                 >
                                     {social.icon}
                                 </a>

@@ -5,36 +5,35 @@ import { toggleMobileSidebar } from '@store/slices/uiSlice';
 import { items } from './menuData';
 import logoBriorsal from '@assets/logo.png';
 
+import { useGetCompanyInfoQuery } from '@/features/company/api/companyApi';
+
 import {
     FaFacebookF,
     FaInstagram,
     FaLinkedinIn,
     FaTiktok,
     FaBars,
+    FaWhatsapp,
 } from 'react-icons/fa';
 
 const AppUserHeader: React.FC = () => {
     const dispatch = useAppDispatch();
     const location = useLocation();
 
-    const companyInfo =
-        {
-            facebook: 'https://www.facebook.com/BriorsalConstructora',
-            instagram: 'https://www.instagram.com/briorsalconstructora',
-            tiktok: 'https://www.tiktok.com/@briorsalconstructora',
-            linkedin: 'https://www.linkedin.com/company/briorsalconstructora',
-        };
+    const { data: response } = useGetCompanyInfoQuery();
+    const companyInfo = response?.data;
 
     const socialLinks = [
-        { url: companyInfo?.facebook, icon: <FaFacebookF size={18} /> },
+        { url: companyInfo?.whatsapp, icon: <FaWhatsapp size={19} /> },
+        { url: companyInfo?.facebook, icon: <FaFacebookF size={17} /> },
         { url: companyInfo?.instagram, icon: <FaInstagram size={18} /> },
-        { url: companyInfo?.tiktok, icon: <FaTiktok size={18} /> },
-        { url: companyInfo?.linkedin, icon: <FaLinkedinIn size={18} /> },
+        { url: companyInfo?.tiktok, icon: <FaTiktok size={17} /> },
+        { url: companyInfo?.linkedin, icon: <FaLinkedinIn size={17} /> },
     ].filter((link) => link.url);
 
     return (
         <header className="fixed top-0 left-0 w-full z-50 bg-brand-dark-900/95 backdrop-blur-md shadow-lg transition-all duration-300 border-b border-brand-dark-800">
-            <div className="w-full max-w-[95%] mx-auto px-4">
+            <div className="w-full px-4 sm:px-6 lg:px-10 xl:px-12">
                 <div className="flex justify-between items-center h-20">
                     <div className="flex items-center gap-12">
                         <Link
@@ -58,7 +57,9 @@ const AppUserHeader: React.FC = () => {
                                         to={item.path || '#'}
                                         className={`relative py-2 transition-colors uppercase hover:text-white
                                             ${isActive ? 'text-white' : 'text-gray-400'}
-                                            after:content-[''] after:absolute after:bottom-0 after:left-0 after:w-0 after:h-[2px] after:bg-brand-500 after:transition-all after:duration-300 hover:after:w-full
+
+                                            after:content-[''] after:absolute after:bottom-0 after:left-0 after:w-0 after:h-[2px]
+                                            after:bg-brand-500 after:transition-all after:duration-300 hover:after:w-full
                                             ${isActive ? 'after:w-full' : ''}
                                         `}
                                     >

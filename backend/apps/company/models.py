@@ -44,8 +44,14 @@ class CompanyInfo(models.Model):
     google_maps_url = models.URLField(
         max_length=500,
         blank=True,
-        verbose_name='Link Google Maps',
-        help_text='Enlace directo a la ubicación',
+        verbose_name="Link Iframe (Embed)",
+        help_text="El enlace que va dentro del src del iframe",
+    )
+    google_maps_link = models.URLField(
+        max_length=500,
+        blank=True,
+        verbose_name="Link Compartir (Navegación)",
+        help_text="El enlace corto (maps.app.goo.gl) para que el cliente navegue",
     )
     opening_hours = models.TextField(
         blank=True,
