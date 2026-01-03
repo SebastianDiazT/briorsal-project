@@ -11,14 +11,20 @@ import { PublicRoute } from '@features/auth/components/PublicRoute';
 import ProjectsList from '@pages/admin/projects/ProjectsList';
 import ProjectCreate from '@pages/admin/projects/ProjectCreate';
 import ProjectEdit from '@pages/admin/projects/ProjectEdit';
+
 import CompanyInfoPage from '@pages/admin/company/CompanyInfoPage';
 import AboutUsPage from '@pages/admin/company/AboutUsPage';
+
+import ServicesList from '@pages/admin/services/ServicesList';
+import ServiceCreate from '@pages/admin/services/ServiceCreate';
+import ServiceEdit from '@pages/admin/services/ServiceEdit';
 
 import Login from '@pages/admin/Login';
 
 import ProjectsPage from '@pages/public/projects/ProjectsPage';
 import ProjectDetailPage from '@pages/public/projects/ProjectDetailPage';
 import About from '@pages/public/About';
+import Services from '@pages/public/Services';
 
 export default function App() {
     return (
@@ -26,12 +32,10 @@ export default function App() {
             <AppToast />
             <Routes>
                 <Route element={<UserLayout />}>
-                    {/* <Route path="/" element={<Home />} />
-                    <Route path="/about" element={<About />} />
-                    <Route path="/services" element={<Services />} /> */}
                     <Route path="/proyectos" element={<ProjectsPage />} />
                     <Route path="/proyectos/:slug" element={<ProjectDetailPage />} />
                     <Route path="/nosotros" element={<About />} />
+                    <Route path="/servicios" element={<Services />} />
                 </Route>
 
                 <Route element={<PublicRoute />}>
@@ -50,21 +54,9 @@ export default function App() {
                         <Route path="company" element={<CompanyInfoPage />} />
                         <Route path="about" element={<AboutUsPage />} />
 
-                        {/* <Route path="/admin/dashboard" element={<Dashboard />} />
-
-                        <Route path="/admin/services" element={<ServicesList />} />
-                        <Route path="/admin/services/new" element={<ServiceCreate />} />
-                        <Route path="/admin/services/edit/:id" element={<ServiceEdit />} />
-
-                        <Route path="/admin/settings" element={<CompanySettings />} />
-                        <Route path="/admin/about" element={<AboutSettings />} />
-                        <Route path="/admin/clients" element={<ClientsList />} />
-
-                        <Route path="/admin/categories" element={<CategoriesList />} />
-
-                        <Route path="/admin/projects" element={<ProjectsList />} />
-                        <Route path="/admin/projects/new" element={<ProjectCreate />} />
-                        <Route path="/admin/projects/edit/:slug" element={<ProjectEdit />} /> */}
+                        <Route path="services" element={<ServicesList />} />
+                        <Route path="services/new" element={<ServiceCreate />} />
+                        <Route path="services/edit/:id" element={<ServiceEdit />} />
                     </Route>
                 </Route>
             </Routes>

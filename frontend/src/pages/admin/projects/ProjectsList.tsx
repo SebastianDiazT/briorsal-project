@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { FaPlus, FaBuilding, FaExternalLinkAlt } from 'react-icons/fa';
 import toast from 'react-hot-toast';
@@ -34,6 +34,7 @@ const ProjectsList: React.FC = () => {
         data: response,
         isLoading: isLoadingProjects,
         isFetching,
+        isError,
     } = useGetProjectsQuery({
         page,
         pageSize: isShowingAll ? 1000 : pageSize,
@@ -50,6 +51,22 @@ const ProjectsList: React.FC = () => {
 
     const projects = response?.data || [];
     const meta = response?.meta;
+
+    useEffect(() => {
+        if (
+            !isFetching &&
+            !isLoadingProjects &&
+            !isError &&
+            projects.length === 0 &&
+            page > 1
+        ) {
+            setPage((prev) => prev - 1);
+        }
+
+        if (isError && page > 1) {
+            setPage((prev) => prev - 1);
+        }
+    }, [projects.length, isFetching, isLoadingProjects, isError, page]);
 
     const handleSearch = (val: string) => {
         setSearchTerm(val);

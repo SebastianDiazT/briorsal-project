@@ -1,4 +1,5 @@
-from rest_framework import generics, permissions, viewsets
+from django_filters.rest_framework import DjangoFilterBackend
+from rest_framework import filters, generics, permissions, viewsets
 from .models import AboutUs, ClientLogo, CompanyInfo, Service
 from .serializers import (
     AboutUsSerializer,
@@ -8,14 +9,22 @@ from .serializers import (
 )
 
 class ClientLogoViewSet(viewsets.ModelViewSet):
-    queryset = ClientLogo.objects.all()
+    queryset = ClientLogo.objects.all().order_by('-created_at')
     serializer_class = ClientLogoSerializer
     permission_classes = [permissions.IsAuthenticatedOrReadOnly]
 
 class ServiceViewSet(viewsets.ModelViewSet):
-    queryset = Service.objects.all()
+    queryset = Service.objects.all().order_by('-created_at')
     serializer_class = ServiceSerializer
     permission_classes = [permissions.IsAuthenticatedOrReadOnly]
+
+    filter_backends = [
+        DjangoFilterBackend,
+        filters.SearchFilter,
+    ]
+
+    filterset_fields = ['name']
+    search_fields = ['name', 'description']
 
 class CompanyInfoView(generics.RetrieveUpdateAPIView):
     serializer_class = CompanyInfoSerializer

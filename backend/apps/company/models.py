@@ -9,6 +9,7 @@ class ClientLogo(models.Model):
         verbose_name='Logo',
         validators=[validate_image_size, FileExtensionValidator(allowed_extensions=['jpg', 'jpeg', 'png', 'webp'])],
     )
+    created_at = models.DateTimeField(auto_now_add=True, verbose_name='Fecha de Creación')
 
     class Meta:
         db_table = 'client_logos'
@@ -28,6 +29,7 @@ class Service(models.Model):
         null=True,
         validators=[validate_image_size, FileExtensionValidator(allowed_extensions=['jpg', 'jpeg', 'png', 'webp'])],
     )
+    created_at = models.DateTimeField(auto_now_add=True, verbose_name='Fecha de Creación')
 
     class Meta:
         db_table = 'services'
