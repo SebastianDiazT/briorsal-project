@@ -16,7 +16,7 @@ const About = () => {
     return (
         <>
             <PageMeta
-                title="NOSOTROS – BRIORSAL"
+                title="NOSOTROS – BRIORSAL CONSTRUCTORA"
                 description={
                     aboutUs?.description?.slice(0, 150) ||
                     'Conoce nuestra historia y visión.'

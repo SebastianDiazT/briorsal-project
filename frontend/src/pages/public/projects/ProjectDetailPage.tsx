@@ -55,7 +55,7 @@ const ProjectDetailPage = () => {
     return (
         <>
             <PageMeta
-                title={`${project.name} | Grupo Briorsal`}
+                title={`${project.name}  – BRIORSAL CONSTRUCTORA`}
                 description={
                     project.description
                         ? project.description.substring(0, 160)
