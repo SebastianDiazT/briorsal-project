@@ -312,7 +312,7 @@ const Contact = () => {
                             height="100%"
                             loading="lazy"
                             referrerPolicy="no-referrer-when-downgrade"
-                            className="w-full h-full border-0 grayscale hover:grayscale-0 transition-all duration-700"
+                            className="w-full h-full border-0"
                         ></iframe>
                     </div>
                 )}

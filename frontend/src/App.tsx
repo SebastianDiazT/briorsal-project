@@ -8,6 +8,8 @@ import { AppToast } from '@components/ui/AppToast';
 import { ProtectedRoute } from '@features/auth/components/ProtectedRoute';
 import { PublicRoute } from '@features/auth/components/PublicRoute';
 
+import Dashboard from '@pages/admin/Dashboard';
+
 import CategoriesList from '@pages/admin/categories/CategoriesList';
 import CategoryCreate from '@pages/admin/categories/CategoryCreate';
 import CategoryEdit from '@pages/admin/categories/CategoryEdit';
@@ -27,6 +29,7 @@ import ContactList from '@pages/admin/contact/ContactList';
 
 import Login from '@pages/admin/Login';
 
+import Home from '@pages/public/Home';
 import ProjectsPage from '@pages/public/projects/ProjectsPage';
 import ProjectDetailPage from '@pages/public/projects/ProjectDetailPage';
 import About from '@pages/public/About';
@@ -40,6 +43,7 @@ export default function App() {
             <AppToast />
             <Routes>
                 <Route element={<UserLayout />}>
+                    <Route index element={<Home />} />
                     <Route path="/proyectos" element={<ProjectsPage />} />
                     <Route path="/proyectos/:slug" element={<ProjectDetailPage />} />
                     <Route path="/nosotros" element={<About />} />
@@ -54,7 +58,7 @@ export default function App() {
                 <Route element={<ProtectedRoute />}>
                     <Route path="/admin" element={<AdminLayout />}>
                         <Route index element={<Navigate to="/admin/dashboard" replace />} />
-                        <Route path="dashboard" element={<>Dashboard</>} />
+                        <Route path="dashboard" element={<Dashboard />} />
 
                         <Route path="categories" element={<CategoriesList />} />
                         <Route path="categories/new" element={<CategoryCreate />} />
