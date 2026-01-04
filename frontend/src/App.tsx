@@ -23,12 +23,16 @@ import ServicesList from '@pages/admin/services/ServicesList';
 import ServiceCreate from '@pages/admin/services/ServiceCreate';
 import ServiceEdit from '@pages/admin/services/ServiceEdit';
 
+import ContactList from '@pages/admin/contact/ContactList';
+
 import Login from '@pages/admin/Login';
 
 import ProjectsPage from '@pages/public/projects/ProjectsPage';
 import ProjectDetailPage from '@pages/public/projects/ProjectDetailPage';
 import About from '@pages/public/About';
 import Services from '@pages/public/Services';
+import Contact from '@pages/public/Contact';
+import NotFound from '@/pages/public/NotFound';
 
 export default function App() {
     return (
@@ -40,6 +44,7 @@ export default function App() {
                     <Route path="/proyectos/:slug" element={<ProjectDetailPage />} />
                     <Route path="/nosotros" element={<About />} />
                     <Route path="/servicios" element={<Services />} />
+                    <Route path="/contacto" element={<Contact />} />
                 </Route>
 
                 <Route element={<PublicRoute />}>
@@ -65,8 +70,12 @@ export default function App() {
                         <Route path="services" element={<ServicesList />} />
                         <Route path="services/new" element={<ServiceCreate />} />
                         <Route path="services/edit/:id" element={<ServiceEdit />} />
+
+                        <Route path="messages" element={<ContactList />} />
                     </Route>
                 </Route>
+
+                <Route path="*" element={<NotFound />} />
             </Routes>
         </Router>
     );

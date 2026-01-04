@@ -1,7 +1,6 @@
 import { createApi, fetchBaseQuery, BaseQueryFn, FetchArgs, FetchBaseQueryError } from '@reduxjs/toolkit/query/react';
 import { RootState } from '@store/store';
 import { logout } from '@store/slices/authSlice';
-import { AppToast } from '@/components/ui/AppToast';
 
 const BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://127.0.0.1:8000/api/';
 
@@ -27,11 +26,6 @@ const baseQueryWithReauth: BaseQueryFn<
 
     if (result.error && result.error.status === 401) {
         api.dispatch(logout());
-        AppToast({
-            title: 'Error',
-            message: 'Sesión expirada',
-            type: 'error',
-        });
     }
 
     return result;
@@ -40,7 +34,7 @@ const baseQueryWithReauth: BaseQueryFn<
 export const apiSlice = createApi({
     reducerPath: 'api',
     baseQuery: baseQueryWithReauth,
-    tagTypes: ['Projects', 'Company', 'Users', 'Services', 'Categories'],
+    tagTypes: ['Projects', 'Company', 'Users', 'Services', 'Categories', 'ContactMessages'],
     endpoints: (_builder) => ({
     }),
 });

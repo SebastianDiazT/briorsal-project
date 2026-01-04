@@ -18,4 +18,4 @@ class ContactMessage(models.Model):
         verbose_name_plural = "Mensajes"
 
     def __str__(self):
-        return f"Mensaje de {self.name}"
+        return f"Mensaje de {self.first_name} {self.last_name}"
