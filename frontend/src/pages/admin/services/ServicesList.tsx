@@ -92,7 +92,6 @@ const ServicesList: React.FC = () => {
                 toast.success('Servicio eliminado');
                 setServiceToDelete(null);
             } catch (error) {
-                console.error(error);
                 toast.error('Error al eliminar');
             }
         }

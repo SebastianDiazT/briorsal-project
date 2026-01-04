@@ -45,7 +45,10 @@ const ProjectsList: React.FC = () => {
         is_featured: filterFeatured,
     });
 
-    const { data: categories = [] } = useGetCategoriesQuery();
+    const { data: categoriesResponse } = useGetCategoriesQuery({
+        no_page: true,
+    });
+    const categories = categoriesResponse?.data || [];
     const [deleteProject, { isLoading: isDeleting }] =
         useDeleteProjectMutation();
 

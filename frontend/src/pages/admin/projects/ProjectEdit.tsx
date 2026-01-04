@@ -36,7 +36,6 @@ const ProjectEdit = () => {
             toast.success('Proyecto actualizado correctamente');
             navigate('/admin/projects');
         } catch (error) {
-            console.error(error);
             toast.error('No se pudo actualizar el proyecto');
         }
     };

@@ -16,7 +16,6 @@ const ServiceCreate = () => {
             toast.success('¡Servicio creado con éxito!');
             navigate('/admin/services');
         } catch (error) {
-            console.error(error);
             toast.error('Error al crear el servicio');
         }
     };

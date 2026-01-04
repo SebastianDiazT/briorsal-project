@@ -102,7 +102,10 @@ export const ProjectForm: React.FC<ProjectFormProps> = ({
     isLoading,
     onCancel,
 }) => {
-    const { data: categories = [] } = useGetCategoriesQuery();
+    const { data: categoriesResponse } = useGetCategoriesQuery({
+        no_page: true,
+    });
+    const categories = categoriesResponse?.data || [];
     const [updateProjectImage] = useUpdateProjectImageMutation();
 
     const [activeTab, setActiveTab] = useState<TabType>('general');
@@ -418,7 +421,6 @@ export const ProjectForm: React.FC<ProjectFormProps> = ({
         try {
             await onSubmit(formData);
         } catch (err: any) {
-            console.error('Error form:', err);
             parseBackendErrors(err);
         }
     };

@@ -25,7 +25,7 @@ class Project(models.Model):
     name = models.CharField(max_length=255, verbose_name='Nombre del Proyecto')
     slug = models.SlugField(unique=True, blank=True, max_length=255, verbose_name='Slug(URL)')
     category = models.ForeignKey(
-        Category, on_delete=models.CASCADE, related_name='projects', verbose_name='Categoría'
+        Category, on_delete=models.PROTECT, related_name='projects', verbose_name='Categoría'
     )
     location = models.CharField(max_length=255, verbose_name='Ubicación')
     description = models.TextField(blank=True, verbose_name='Descripción')

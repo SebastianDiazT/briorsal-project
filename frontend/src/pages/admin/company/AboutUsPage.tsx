@@ -136,7 +136,6 @@ export const AboutUsPage = () => {
             toast.success('Sección "Nosotros" actualizada');
             setDeleteImageFlag(false);
         } catch (error) {
-            console.error(error);
             toast.error('Error al actualizar');
         }
     };

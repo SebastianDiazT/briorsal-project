@@ -1,19 +1,43 @@
+from django.db.models import ProtectedError
 from django_filters.rest_framework import DjangoFilterBackend
-from rest_framework import filters, parsers, permissions, viewsets
+from rest_framework import filters, parsers, permissions, status, viewsets
+from rest_framework.response import Response
 
 from .models import Category, Project, ProjectImage, ProjectVideo
 from .serializers import (
     CategorySerializer,
-    ProjectSerializer,
     ProjectImageSerializer,
+    ProjectSerializer,
     ProjectVideoSerializer,
 )
+
 
 class CategoryViewSet(viewsets.ModelViewSet):
     queryset = Category.objects.all()
     serializer_class = CategorySerializer
     permission_classes = [permissions.IsAuthenticatedOrReadOnly]
     lookup_field = 'id'
+
+    filter_backends = [
+        DjangoFilterBackend,
+        filters.SearchFilter,
+        filters.OrderingFilter,
+    ]
+
+    filterset_fields = ['name']
+    search_fields = ['name',]
+    ordering_fields = ['name', 'created_at']
+
+    def destroy(self, request, *args, **kwargs):
+        try:
+            return super().destroy(request, *args, **kwargs)
+        except ProtectedError:
+            return Response({
+                'status': 'error',
+                'code': 400,
+                'message': 'No se puede eliminar esta categoría porque tiene proyectos asociados.',
+                'errors': {'detail': 'ProtectedError: Integridad referencial violada'}
+            }, status=status.HTTP_400_BAD_REQUEST)
 
 class ProjectViewSet(viewsets.ModelViewSet):
     queryset = Project.objects.select_related('category').all().order_by('-created_at')

@@ -37,7 +37,6 @@ const ServiceEdit = () => {
             toast.success('Servicio actualizado correctamente');
             navigate('/admin/services');
         } catch (error) {
-            console.error(error);
             toast.error('No se pudo actualizar el servicio');
         }
     };

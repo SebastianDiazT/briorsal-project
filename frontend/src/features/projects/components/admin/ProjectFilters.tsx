@@ -7,7 +7,7 @@ import {
     FaSortAmountDown,
     FaStar,
 } from 'react-icons/fa';
-import { Category } from '@features/categories/api/categoriesApi';
+import { Category } from '@features/categories/types';
 import { CustomSelect } from '@components/ui/CustomSelect';
 
 interface ProjectFiltersProps {

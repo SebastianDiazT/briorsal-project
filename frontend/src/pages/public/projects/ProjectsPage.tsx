@@ -18,7 +18,10 @@ const ProjectsPage = () => {
     const [page, setPage] = useState(1);
     const PAGE_SIZE = 9;
 
-    const { data: categories = [] } = useGetCategoriesQuery();
+    const { data: categoriesResponse } = useGetCategoriesQuery({
+        no_page: true,
+    });
+    const categories = categoriesResponse?.data || [];
     const {
         data: response,
         isLoading,

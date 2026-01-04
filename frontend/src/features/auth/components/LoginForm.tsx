@@ -55,7 +55,6 @@ export const LoginForm = () => {
             toast.success(`¡Bienvenido, ${userData.first_name || 'Admin'}!`);
             navigate('/admin/dashboard');
         } catch (err: any) {
-            console.error('Error en login:', err);
             if (err?.status === 401) {
                 toast.error('Credenciales incorrectas');
             } else {

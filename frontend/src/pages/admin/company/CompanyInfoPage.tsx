@@ -73,7 +73,6 @@ export const CompanyInfoPage = () => {
             reset(cleanData);
             toast.success('Información actualizada correctamente');
         } catch (error) {
-            console.error(error);
             toast.error('Error al actualizar la información');
         }
     };

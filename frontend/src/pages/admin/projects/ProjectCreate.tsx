@@ -18,7 +18,6 @@ const ProjectCreate = () => {
             toast.success('¡Proyecto creado con éxito!');
             navigate('/admin/projects');
         } catch (error) {
-            console.error(error);
             toast.error('Error al crear el proyecto');
         }
     };
