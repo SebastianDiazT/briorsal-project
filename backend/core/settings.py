@@ -1,8 +1,10 @@
 import os
 import sys
-import environ
 from datetime import timedelta
 from pathlib import Path
+
+import dj_database_url
+import environ
 
 env = environ.Env()
 environ.Env.read_env()
@@ -88,6 +90,12 @@ DATABASES = {
         },
     }
 }
+
+if "DATABASE_URL" in os.environ:
+    DATABASES["default"] = dj_database_url.config(
+        conn_max_age=600,
+        conn_health_checks=True,
+    )
 
 CORS_ALLOWED_ORIGINS = env.list('CORS_ALLOWED_ORIGINS', default=[])
 CSRF_TRUSTED_ORIGINS = env.list('CORS_ALLOWED_ORIGINS', default=[])
