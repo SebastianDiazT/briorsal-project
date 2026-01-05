@@ -21,7 +21,6 @@ import { ServicesTable } from '@/features/services/components/admin/ServicesTabl
 const ServicesList: React.FC = () => {
     const navigate = useNavigate();
 
-    // --- ESTADOS ---
     const [page, setPage] = useState(1);
     const [pageSize, setPageSize] = useState(10);
     const [searchTerm, setSearchTerm] = useState('');

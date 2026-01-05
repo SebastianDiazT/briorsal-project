@@ -13,6 +13,14 @@ class ClientLogoViewSet(viewsets.ModelViewSet):
     serializer_class = ClientLogoSerializer
     permission_classes = [permissions.IsAuthenticatedOrReadOnly]
 
+    filter_backends = [
+        DjangoFilterBackend,
+        filters.SearchFilter,
+    ]
+
+    filterset_fields = ['name']
+    search_fields = ['name']
+
 class ServiceViewSet(viewsets.ModelViewSet):
     queryset = Service.objects.all().order_by('-created_at')
     serializer_class = ServiceSerializer

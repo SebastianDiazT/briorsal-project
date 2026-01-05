@@ -122,6 +122,15 @@ export default {
                 14.5: '3.625rem',
                 15: '3.75rem',
             },
+            animation: {
+                'infinite-scroll': 'infinite-scroll 40s linear infinite',
+            },
+            keyframes: {
+                'infinite-scroll': {
+                    from: { transform: 'translateX(0)' },
+                    to: { transform: 'translateX(-50%)' },
+                },
+            },
         },
     },
     plugins: [require('@tailwindcss/forms')],

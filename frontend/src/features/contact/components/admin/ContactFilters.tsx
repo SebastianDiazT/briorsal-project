@@ -22,7 +22,6 @@ export const ContactFilters: React.FC<ContactFiltersProps> = ({
     onClear,
 }) => {
     const statusOptions = [
-        { value: 'all', label: 'Todos los mensajes' },
         { value: 'unread', label: 'No Leídos (Nuevos)' },
         { value: 'read', label: 'Leídos (Histórico)' },
     ];
@@ -38,6 +37,7 @@ export const ContactFilters: React.FC<ContactFiltersProps> = ({
     return (
         <div className="bg-white p-2 rounded-2xl shadow-sm border border-slate-200 mb-6 flex flex-col xl:flex-row gap-3 relative z-20">
             <div className="flex-1 grid grid-cols-1 md:grid-cols-2 gap-3 p-1">
+                {/* BUSCADOR */}
                 <div className="relative group">
                     <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none">
                         <FaSearch
@@ -61,18 +61,21 @@ export const ContactFilters: React.FC<ContactFiltersProps> = ({
                     )}
                 </div>
 
+                {/* FILTROS Y BOTÓN LIMPIAR */}
                 <div className="flex gap-3">
                     <div className="flex-1">
                         <CustomSelect
                             value={filterStatus}
                             onChange={onStatusChange}
                             options={statusOptions}
-                            placeholder="Estado"
+                            placeholder="Filtrar Estado"
                             icon={FaFilter}
                         />
                     </div>
 
-                    {(searchTerm || filterStatus !== 'all') && (
+                    {/* El botón limpiar aparece si hay búsqueda O si hay un estado seleccionado (diferente de 'all' que es el default vacío) */}
+                    {(searchTerm ||
+                        (filterStatus && filterStatus !== 'all')) && (
                         <button
                             onClick={onClear}
                             className="h-[42px] px-4 flex items-center gap-2 bg-red-50 text-red-500 border border-red-100 rounded-xl hover:bg-red-100 transition-colors text-sm font-bold shrink-0"
@@ -84,6 +87,7 @@ export const ContactFilters: React.FC<ContactFiltersProps> = ({
                 </div>
             </div>
 
+            {/* PAGINACIÓN */}
             <div className="border-t xl:border-t-0 xl:border-l border-slate-100 p-1 xl:pl-3 flex items-center justify-end xl:justify-center min-w-[160px]">
                 <CustomSelect
                     value={pageSize}

@@ -27,6 +27,8 @@ import ServiceEdit from '@pages/admin/services/ServiceEdit';
 
 import ContactList from '@pages/admin/contact/ContactList';
 
+import ClientsList from '@pages/admin/clients/ClientsList';
+
 import Login from '@pages/admin/Login';
 
 import Home from '@pages/public/Home';
@@ -76,6 +78,8 @@ export default function App() {
                         <Route path="services/edit/:id" element={<ServiceEdit />} />
 
                         <Route path="messages" element={<ContactList />} />
+
+                        <Route path="clients" element={<ClientsList />} />
                     </Route>
                 </Route>
 

@@ -20,7 +20,7 @@ const ContactList: React.FC = () => {
     const [page, setPage] = useState(1);
     const [pageSize, setPageSize] = useState(10);
     const [searchTerm, setSearchTerm] = useState('');
-    const [filterStatus, setFilterStatus] = useState('all');
+    const [filterStatus, setFilterStatus] = useState('');
 
     const [selectedMessage, setSelectedMessage] =
         useState<ContactMessage | null>(null);
@@ -36,6 +36,7 @@ const ContactList: React.FC = () => {
         page,
         pageSize: isShowingAll ? 1000 : pageSize,
         search: searchTerm,
+        no_page: isShowingAll,
     });
 
     const [updateStatus] = useUpdateContactMessageStatusMutation();
@@ -44,7 +45,7 @@ const ContactList: React.FC = () => {
     const meta = response?.meta;
 
     const filteredMessages = useMemo(() => {
-        if (filterStatus === 'all') return messages;
+        if (filterStatus === '') return messages;
         if (filterStatus === 'unread')
             return messages.filter((m) => !m.is_read);
         if (filterStatus === 'read') return messages.filter((m) => m.is_read);
@@ -85,11 +86,11 @@ const ContactList: React.FC = () => {
 
     const clearFilters = () => {
         setSearchTerm('');
-        setFilterStatus('all');
+        setFilterStatus('');
         setPage(1);
     };
 
-    const hasActiveFilters = !!(searchTerm || filterStatus !== 'all');
+    const hasActiveFilters = !!(searchTerm || filterStatus !== '');
     const showLoading = isLoadingMessages || isFetching;
 
     const emptyStateProps = hasActiveFilters
@@ -117,7 +118,7 @@ const ContactList: React.FC = () => {
                     title="Buzón de Mensajes"
                     breadcrumbs={['Administración', 'Contacto']}
                     icon={FaEnvelopeOpenText}
-                    totalRecords={meta?.total_records || 0}
+                    totalRecords={meta?.total_records}
                 />
 
                 <div className="max-w-7xl mx-auto">

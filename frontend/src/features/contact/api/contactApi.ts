@@ -6,6 +6,7 @@ export interface GetContactMessagesArgs {
     page?: number;
     pageSize?: number;
     search?: string;
+    no_page?: boolean;
 }
 
 export const contactApi = apiSlice.injectEndpoints({
@@ -14,10 +15,14 @@ export const contactApi = apiSlice.injectEndpoints({
             ApiResponse<ContactMessage[]>,
             GetContactMessagesArgs
         >({
-            query: ({ page = 1, pageSize = 10, search }) => {
+            query: ({ page = 1, pageSize = 10, search, no_page }) => {
                 const params = new URLSearchParams();
-                params.append('page', page.toString());
-                params.append('page_size', pageSize.toString());
+                if (no_page) {
+                    params.append('no_page', 'true');
+                } else {
+                    params.append('page', page.toString());
+                    params.append('page_size', pageSize.toString());
+                }
                 if (search) params.append('search', search);
 
                 return `contact/messages/?${params.toString()}`;
