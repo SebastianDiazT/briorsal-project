@@ -1,17 +1,82 @@
 import { useState, useEffect } from 'react';
+import { Link } from 'react-router-dom';
 import {
-    FaSpinner,
     FaArrowLeft,
     FaArrowRight,
     FaBuilding,
-} from 'react-icons/fa';
+    FaMagnifyingGlass,
+    FaFilter,
+    FaHouse,
+} from 'react-icons/fa6';
 
-import { useGetProjectsQuery } from '@features/projects/api/projectsApi';
-import { useGetCategoriesQuery } from '@features/categories/api/categoriesApi';
-import { ProjectCard } from '@features/projects/components/public/ProjectCard';
-import { ProjectFilters } from '@features/projects/components/public/ProjectFilters';
-import PageMeta from '@components/common/PageMeta';
-import heroBgImg from '@assets/projects/hero.png';
+import { useGetProjectsQuery } from '@/features/projects/api/projectsApi';
+import { useGetCategoriesQuery } from '@/features/categories/api/categoriesApi';
+
+import PageMeta from '@/components/common/PageMeta';
+import FadeIn from '@/components/common/FadeIn';
+import { CustomSelect } from '@/components/ui/CustomSelect';
+import { Project } from '@/features/projects/types';
+
+import heroBgImg from '@/assets/projects/hero.png';
+
+const PortfolioCard = ({
+    project,
+    delay,
+}: {
+    project: Project;
+    delay: number;
+}) => {
+    const mainImage =
+        project.images && project.images.length > 0
+            ? project.images[0].image
+            : null;
+
+    return (
+        <FadeIn delay={delay} direction="up">
+            <Link
+                to={`/proyectos/${project.slug}`}
+                className="group relative block w-full overflow-hidden rounded-3xl bg-slate-900 shadow-lg aspect-[4/5] md:aspect-[3/4] hover:shadow-2xl hover:shadow-orange-500/10 transition-all duration-300"
+            >
+                {mainImage ? (
+                    <img
+                        src={mainImage}
+                        alt={project.name}
+                        className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-110 opacity-90 group-hover:opacity-100"
+                        loading="lazy"
+                    />
+                ) : (
+                    <div className="absolute inset-0 flex items-center justify-center bg-slate-800 text-slate-600">
+                        <FaBuilding size={40} />
+                    </div>
+                )}
+
+                <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/40 to-transparent opacity-80 group-hover:opacity-90 transition-opacity duration-300"></div>
+
+                <div className="absolute bottom-0 left-0 w-full p-8 translate-y-4 group-hover:translate-y-0 transition-transform duration-300">
+                    <span className="inline-block px-3 py-1 mb-3 text-xs font-bold text-white bg-orange-600 rounded-full shadow-lg shadow-orange-600/20">
+                        {project.category_name || 'General'}
+                    </span>
+                    <h3 className="text-2xl font-bold text-white mb-1 leading-tight line-clamp-2">
+                        {project.name}
+                    </h3>
+                    <p className="text-slate-300 text-xs flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300 delay-100 mt-2">
+                        <FaBuilding className="text-orange-500" />{' '}
+                        {project.location || 'Ubicación no especificada'}
+                    </p>
+                </div>
+            </Link>
+        </FadeIn>
+    );
+};
+
+const ProjectSkeleton = () => (
+    <div className="rounded-3xl aspect-[4/5] md:aspect-[3/4] bg-slate-100 animate-pulse relative overflow-hidden">
+        <div className="absolute bottom-0 left-0 w-full p-8 space-y-3">
+            <div className="w-20 h-6 bg-slate-200 rounded-full"></div>
+            <div className="w-3/4 h-8 bg-slate-200 rounded-lg"></div>
+        </div>
+    </div>
+);
 
 const ProjectsPage = () => {
     const [selectedCategory, setSelectedCategory] = useState<string>('');
@@ -22,7 +87,14 @@ const ProjectsPage = () => {
     const { data: categoriesResponse } = useGetCategoriesQuery({
         no_page: true,
     });
-    const categories = categoriesResponse?.data || [];
+    const categoryOptions = [
+        { value: '', label: 'Todas las Categorías' },
+        ...(categoriesResponse?.data || []).map((cat: any) => ({
+            value: cat.id,
+            label: cat.name,
+        })),
+    ];
+
     const {
         data: response,
         isLoading,
@@ -45,7 +117,7 @@ const ProjectsPage = () => {
         const gridElement = document.getElementById('projects-grid');
         if (gridElement) {
             const yCoordinate =
-                gridElement.getBoundingClientRect().top + window.scrollY - 120;
+                gridElement.getBoundingClientRect().top + window.scrollY - 100;
             window.scrollTo({ top: yCoordinate, behavior: 'smooth' });
         }
     };
@@ -61,150 +133,176 @@ const ProjectsPage = () => {
         <>
             <PageMeta
                 title="PORTAFOLIO – BRIORSAL CONSTRUCTORA"
-                description="Portafolio Oficial"
+                description="Explora nuestra colección de obras arquitectónicas y proyectos civiles."
             />
-            <div className="min-h-screen bg-gray-100">
-                <div className="relative h-[55vh] min-h-[450px] w-full flex items-center justify-center overflow-hidden">
+
+            <section className="relative h-[60vh] min-h-[500px] flex items-center justify-center overflow-hidden bg-slate-900 pt-20">
+                <div className="absolute inset-0 z-0">
                     <div
-                        className="absolute inset-0 bg-cover bg-center bg-no-repeat bg-fixed z-0 opacity-80"
+                        className="absolute inset-0 bg-cover bg-center bg-no-repeat bg-fixed opacity-40"
                         style={{ backgroundImage: `url(${heroBgImg})` }}
                     />
-
-                    <div className="absolute inset-0 bg-gradient-to-b from-gray-900/80 via-gray-900/50 to-gray-100 z-10" />
-
-                    <div className="relative z-20 text-center px-4 max-w-5xl mx-auto animate-fade-in-up mt-10">
-                        <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full border border-white/30 bg-white/10 backdrop-blur-md text-white text-xs font-bold uppercase tracking-widest mb-6 shadow-xl">
-                            <FaBuilding className="text-brand-400" /> Portafolio
-                            Oficial
-                        </div>
-                        <h1 className="text-4xl md:text-6xl font-extrabold text-white mb-6 tracking-tight leading-tight drop-shadow-lg">
-                            Nuestros{' '}
-                            <span className="text-brand-500">Proyectos</span>
-                        </h1>
-                        <p className="text-lg md:text-xl text-gray-100 font-light max-w-2xl mx-auto leading-relaxed drop-shadow-md opacity-90">
-                            Explora nuestra colección de obras arquitectónicas,
-                            diseños residenciales y construcciones comerciales.
-                        </p>
-                    </div>
+                    <div className="absolute inset-0 bg-gradient-to-b from-slate-950 via-slate-950/80 to-slate-50"></div>
                 </div>
 
-                <div
-                    id="projects-grid"
-                    className="container mx-auto px-4 pb-20 relative z-30 -mt-20"
-                >
-                    <div className="bg-white rounded-[2.5rem] shadow-xl shadow-gray-200/40 border border-white/50 p-6 md:p-10 min-h-[600px]">
-                        <ProjectFilters
-                            categories={categories}
-                            selectedCategory={selectedCategory}
-                            onCategoryChange={setSelectedCategory}
-                            search={search}
-                            onSearchChange={setSearch}
-                        />
+                <div className="container mx-auto px-4 relative z-10 text-center">
+                    <FadeIn direction="down">
+                        <div className="flex items-center justify-center gap-2 text-slate-400 text-sm font-medium mb-6 uppercase tracking-wider">
+                            <Link
+                                to="/"
+                                className="hover:text-white transition-colors flex items-center gap-1"
+                            >
+                                <FaHouse size={12} /> Inicio
+                            </Link>
+                            <span className="text-orange-500">/</span>
+                            <span className="text-white">Portafolio</span>
+                        </div>
+                    </FadeIn>
 
-                        {isLoading || isFetching ? (
-                            <div className="flex flex-col items-center justify-center py-32 gap-4 text-slate-400 animate-pulse">
-                                <FaSpinner className="animate-spin text-4xl text-brand-500" />
-                                <p className="text-sm font-medium">
-                                    Cargando portafolio...
-                                </p>
+                    <FadeIn direction="up" delay={0.2}>
+                        <h1 className="text-4xl md:text-7xl font-black text-white mb-6 leading-tight">
+                            Nuestros <br className="md:hidden" />
+                            <span className="text-transparent bg-clip-text bg-gradient-to-r from-orange-400 to-orange-600">
+                                Proyectos.
+                            </span>
+                        </h1>
+                    </FadeIn>
+
+                    <FadeIn direction="up" delay={0.4}>
+                        <p className="text-lg md:text-xl text-slate-400 font-light max-w-2xl mx-auto leading-relaxed">
+                            Una muestra de nuestra capacidad técnica y visión
+                            arquitectónica. Cada obra refleja nuestro compromiso
+                            con la calidad.
+                        </p>
+                    </FadeIn>
+                </div>
+            </section>
+
+            <section
+                id="projects-grid"
+                className="bg-slate-50 pb-24 min-h-screen -mt-20 relative z-20"
+            >
+                <div className="container mx-auto px-4">
+                    <div className="bg-white rounded-3xl shadow-xl shadow-slate-200/50 border border-slate-100 p-6 mb-16 transform -translate-y-8 relative z-30">
+                        <div className="flex flex-col lg:flex-row gap-6 items-center">
+                            <div className="w-full lg:flex-1 relative group">
+                                <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                                    <FaMagnifyingGlass className="text-slate-400 group-focus-within:text-orange-500 transition-colors" />
+                                </div>
+                                <input
+                                    type="text"
+                                    placeholder="Buscar por nombre, ubicación..."
+                                    value={search}
+                                    onChange={(e) => setSearch(e.target.value)}
+                                    className="w-full pl-11 pr-4 h-[42px] bg-white border border-slate-200 rounded-xl text-sm font-semibold text-slate-600 focus:outline-none focus:border-orange-500 focus:ring-2 focus:ring-orange-500/10 transition-all placeholder-slate-400"
+                                />
                             </div>
-                        ) : (
-                            <div className="animate-fade-in">
-                                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-12">
-                                    {projects.map((project) => (
-                                        <ProjectCard
-                                            key={project.id}
-                                            project={project}
-                                        />
+
+                            <div className="w-full lg:w-1/3">
+                                <CustomSelect
+                                    value={selectedCategory}
+                                    onChange={setSelectedCategory}
+                                    options={categoryOptions}
+                                    placeholder="Filtrar por Categoría"
+                                    icon={FaFilter}
+                                />
+                            </div>
+                        </div>
+                    </div>
+
+                    {isLoading || isFetching ? (
+                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                            {[1, 2, 3, 4, 5, 6].map((i) => (
+                                <ProjectSkeleton key={i} />
+                            ))}
+                        </div>
+                    ) : projects.length > 0 ? (
+                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                            {projects.map((project, index) => (
+                                <PortfolioCard
+                                    key={project.id}
+                                    project={project}
+                                    delay={0.05 * index}
+                                />
+                            ))}
+                        </div>
+                    ) : (
+                        <div className="text-center py-32 bg-white rounded-3xl border border-slate-200 border-dashed">
+                            <div className="w-20 h-20 bg-slate-50 rounded-full flex items-center justify-center mx-auto mb-6">
+                                <FaBuilding className="text-4xl text-slate-300" />
+                            </div>
+                            <h3 className="text-2xl font-bold text-slate-800 mb-2">
+                                Sin resultados
+                            </h3>
+                            <p className="text-slate-500 mb-8 max-w-sm mx-auto">
+                                No encontramos proyectos que coincidan con tu
+                                búsqueda.
+                            </p>
+                            <button
+                                onClick={() => {
+                                    setSearch('');
+                                    setSelectedCategory('');
+                                }}
+                                className="text-orange-600 font-bold hover:text-orange-700 hover:underline transition-all"
+                            >
+                                Limpiar filtros
+                            </button>
+                        </div>
+                    )}
+
+                    {showPagination && meta && (
+                        <div className="flex flex-col md:flex-row items-center justify-between mt-16 pt-8 border-t border-slate-200 gap-6">
+                            <span className="text-sm text-slate-500 font-medium order-2 md:order-1">
+                                Página{' '}
+                                <span className="text-slate-900 font-bold">
+                                    {page}
+                                </span>{' '}
+                                de{' '}
+                                <span className="text-slate-900 font-bold">
+                                    {meta.total_pages}
+                                </span>
+                            </span>
+
+                            <div className="flex items-center gap-2 order-1 md:order-2">
+                                <button
+                                    onClick={() => handlePageChange(page - 1)}
+                                    disabled={page === 1}
+                                    className="flex items-center gap-2 px-6 py-3 rounded-xl border border-slate-200 text-slate-600 font-bold text-sm transition-all hover:border-orange-500 hover:text-orange-600 hover:bg-orange-50 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-transparent disabled:hover:text-slate-600 disabled:hover:border-slate-200"
+                                >
+                                    <FaArrowLeft /> Anterior
+                                </button>
+
+                                <div className="hidden md:flex gap-2 mx-2">
+                                    {Array.from(
+                                        { length: meta.total_pages },
+                                        (_, i) => i + 1
+                                    ).map((p) => (
+                                        <button
+                                            key={p}
+                                            onClick={() => handlePageChange(p)}
+                                            className={`w-10 h-10 rounded-xl flex items-center justify-center text-sm font-bold transition-all ${
+                                                page === p
+                                                    ? 'bg-orange-600 text-white shadow-lg shadow-orange-500/30'
+                                                    : 'text-slate-500 hover:bg-slate-100 hover:text-slate-900'
+                                            }`}
+                                        >
+                                            {p}
+                                        </button>
                                     ))}
                                 </div>
 
-                                {projects.length === 0 && (
-                                    <div className="text-center py-24 bg-gray-100 rounded-3xl border-2 border-dashed border-gray-200">
-                                        <div className="w-16 h-16 bg-white rounded-full flex items-center justify-center mx-auto mb-4 text-gray-300 shadow-sm border border-gray-50">
-                                            <FaBuilding className="text-3xl" />
-                                        </div>
-                                        <h3 className="text-xl font-bold text-gray-700 mb-2">
-                                            Sin resultados
-                                        </h3>
-                                        <p className="text-gray-500 mb-6 max-w-sm mx-auto">
-                                            No encontramos proyectos que coincidan
-                                            con tu búsqueda actual.
-                                        </p>
-                                        <button
-                                            onClick={() => {
-                                                setSearch('');
-                                                setSelectedCategory('');
-                                            }}
-                                            className="text-brand-600 font-bold hover:text-brand-700 transition-colors underline decoration-2 underline-offset-4"
-                                        >
-                                            Ver todos los proyectos
-                                        </button>
-                                    </div>
-                                )}
-
-                                {showPagination && meta && (
-                                    <div className="flex flex-col md:flex-row items-center justify-between border-t border-gray-100 pt-10 gap-6">
-                                        <span className="text-sm text-gray-500 font-medium order-2 md:order-1">
-                                            Página{' '}
-                                            <span className="text-gray-900 font-bold">
-                                                {page}
-                                            </span>{' '}
-                                            de{' '}
-                                            <span className="text-gray-900 font-bold">
-                                                {meta.total_pages}
-                                            </span>
-                                        </span>
-
-                                        <div className="flex items-center gap-2 order-1 md:order-2">
-                                            <button
-                                                onClick={() =>
-                                                    handlePageChange(page - 1)
-                                                }
-                                                disabled={page === 1}
-                                                className="flex items-center gap-2 px-6 py-3 rounded-full border border-gray-200 text-gray-600 font-bold text-sm transition-all hover:border-brand-500 hover:text-brand-600 hover:bg-brand-50 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-transparent disabled:hover:text-gray-600 disabled:hover:border-gray-200"
-                                            >
-                                                <FaArrowLeft size={12} /> Anterior
-                                            </button>
-
-                                            <div className="hidden md:flex gap-1 mx-2">
-                                                {Array.from(
-                                                    { length: meta.total_pages },
-                                                    (_, i) => i + 1
-                                                ).map((p) => (
-                                                    <button
-                                                        key={p}
-                                                        onClick={() =>
-                                                            handlePageChange(p)
-                                                        }
-                                                        className={`w-10 h-10 rounded-full flex items-center justify-center text-sm font-bold transition-all ${
-                                                            page === p
-                                                                ? 'bg-brand-600 text-white shadow-lg scale-110'
-                                                                : 'text-gray-500 hover:bg-gray-100 hover:text-gray-900'
-                                                        }`}
-                                                    >
-                                                        {p}
-                                                    </button>
-                                                ))}
-                                            </div>
-
-                                            <button
-                                                onClick={() =>
-                                                    handlePageChange(page + 1)
-                                                }
-                                                disabled={page >= meta.total_pages}
-                                                className="flex items-center gap-2 px-6 py-3 rounded-full border border-gray-200 text-gray-600 font-bold text-sm transition-all hover:border-brand-500 hover:text-brand-600 hover:bg-brand-50 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-transparent disabled:hover:text-gray-600 disabled:hover:border-gray-200"
-                                            >
-                                                Siguiente <FaArrowRight size={12} />
-                                            </button>
-                                        </div>
-                                    </div>
-                                )}
+                                <button
+                                    onClick={() => handlePageChange(page + 1)}
+                                    disabled={page >= meta.total_pages}
+                                    className="flex items-center gap-2 px-6 py-3 rounded-xl border border-slate-200 text-slate-600 font-bold text-sm transition-all hover:border-orange-500 hover:text-orange-600 hover:bg-orange-50 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-transparent disabled:hover:text-slate-600 disabled:hover:border-slate-200"
+                                >
+                                    Siguiente <FaArrowRight />
+                                </button>
                             </div>
-                        )}
-                    </div>
+                        </div>
+                    )}
                 </div>
-            </div>
+            </section>
         </>
     );
 };
