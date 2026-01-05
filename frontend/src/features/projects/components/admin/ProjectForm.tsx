@@ -216,12 +216,23 @@ export const ProjectForm: React.FC<ProjectFormProps> = ({
     const processFiles = (files: FileList, type: 'image' | 'video') => {
         const validFiles: File[] = [];
         const validPreviews: string[] = [];
+        let hasInvalidFiles = false;
+
         Array.from(files).forEach((file) => {
             if (file.type.startsWith(`${type}/`)) {
                 validFiles.push(file);
                 validPreviews.push(URL.createObjectURL(file));
+            } else {
+                hasInvalidFiles = true;
             }
         });
+
+        if (hasInvalidFiles) {
+            toast.error(
+                `Algunos archivos no son formatos de ${type === 'image' ? 'imagen' : 'video'} válidos y fueron ignorados.`
+            );
+        }
+
         if (type === 'image') {
             setNewImages((p) => [...p, ...validFiles]);
             setImagePreviews((p) => [...p, ...validPreviews]);
@@ -232,6 +243,7 @@ export const ProjectForm: React.FC<ProjectFormProps> = ({
             setErrors((prev) => ({ ...prev, uploaded_videos: '' }));
         }
     };
+
     const handleDrop = (e: React.DragEvent, type: 'image' | 'video') => {
         e.preventDefault();
         e.stopPropagation();
@@ -275,6 +287,17 @@ export const ProjectForm: React.FC<ProjectFormProps> = ({
         const file = e.target.files?.[0];
         if (file && newFileToReplace) {
             const { index, type } = newFileToReplace;
+
+            if (!file.type.startsWith(`${type}/`)) {
+                toast.error(
+                    `El archivo seleccionado no es un formato de ${type === 'image' ? 'imagen' : 'video'} válido.`
+                );
+                if (replaceNewFileRef.current)
+                    replaceNewFileRef.current.value = '';
+                setNewFileToReplace(null);
+                return;
+            }
+
             const preview = URL.createObjectURL(file);
             if (type === 'image') {
                 const files = [...newImages];
@@ -305,6 +328,14 @@ export const ProjectForm: React.FC<ProjectFormProps> = ({
     ) => {
         const file = e.target.files?.[0];
         if (file && imgToReplaceId) {
+            if (!file.type.startsWith('image/')) {
+                toast.error('El archivo seleccionado no es una imagen válida.');
+                if (replaceServerImgRef.current)
+                    replaceServerImgRef.current.value = '';
+                setImgToReplaceId(null);
+                return;
+            }
+
             const toastId = toast.loading('Actualizando...');
             try {
                 const result = await updateProjectImage({
@@ -1118,7 +1149,12 @@ export const ProjectForm: React.FC<ProjectFormProps> = ({
                                                     <FaTrash size={12} />
                                                 </button>
                                             </div>
-                                            <FaFileVideo className="absolute bottom-3 left-3 text-white/50 text-xl z-0" />
+                                            <div className="absolute bottom-0 left-0 right-0 p-3 bg-gradient-to-t from-black/80 to-transparent text-white flex items-center gap-2">
+                                                <FaFileVideo className="text-white/70" />
+                                                <span className="text-xs truncate">
+                                                    {getFileName(src)}
+                                                </span>
+                                            </div>
                                         </div>
                                     ))}
                                     {existingVideos.map((vid) => (

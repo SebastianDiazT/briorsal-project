@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { NavLink, useLocation, useNavigate } from 'react-router-dom';
+import { Link, NavLink, useLocation, useNavigate } from 'react-router-dom';
 import { FaSignOutAlt, FaTimes } from 'react-icons/fa';
 import { useAppDispatch, useAppSelector } from '@store/hooks';
 import { toggleMobileSidebar } from '@store/slices/uiSlice';
@@ -39,19 +39,21 @@ const AdminSidebar: React.FC = () => {
                 className={`flex h-20 items-center border-b border-slate-800 ${showExpanded ? 'px-6 justify-between' : 'justify-center'}`}
             >
                 <div className="flex items-center gap-3 overflow-hidden">
-                    {showExpanded ? (
-                        <img
-                            src={logoBriorsal}
-                            alt="Logo"
-                            className="h-10 w-auto object-contain"
-                        />
-                    ) : (
-                        <img
-                            src={iconBriorsal}
-                            alt="Logo"
-                            className="h-10 w-auto object-contain"
-                        />
-                    )}
+                    <Link to="/admin">
+                        {showExpanded ? (
+                            <img
+                                src={logoBriorsal}
+                                alt="Logo"
+                                className="h-10 w-auto object-contain"
+                            />
+                        ) : (
+                            <img
+                                src={iconBriorsal}
+                                alt="Logo"
+                                className="h-10 w-auto object-contain"
+                            />
+                        )}
+                    </Link>
                 </div>
                 <button
                     onClick={() => dispatch(toggleMobileSidebar())}

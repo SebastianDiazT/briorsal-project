@@ -1,5 +1,5 @@
 import React from 'react';
-import { FaBars, FaBell, FaIndent, FaOutdent } from 'react-icons/fa';
+import { FaBars, FaIndent, FaOutdent } from 'react-icons/fa';
 import { useAppDispatch, useAppSelector } from '@store/hooks';
 import { toggleSidebar, toggleMobileSidebar } from '@store/slices/uiSlice';
 
@@ -61,13 +61,6 @@ const AdminHeader: React.FC = () => {
             </div>
 
             <div className="flex items-center gap-6">
-                <button className="relative text-slate-400 hover:text-brand-600 transition-colors">
-                    <FaBell size={20} />
-                    <span className="absolute -top-1 -right-1 flex h-4 w-4 items-center justify-center rounded-full bg-red-500 text-[10px] font-bold text-white ring-2 ring-white">
-                        2
-                    </span>
-                </button>
-
                 <div className="flex items-center gap-3 pl-6 border-l border-slate-100">
                     <div className="text-right hidden md:block">
                         <p className="text-sm font-bold text-slate-700 leading-tight">
