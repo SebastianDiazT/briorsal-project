@@ -77,25 +77,18 @@ TEMPLATES = [
 WSGI_APPLICATION = 'core.wsgi.application'
 ASGI_APPLICATION = 'core.asgi.application'
 
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.mysql',
-        'NAME': env('DB_NAME'),
-        'USER': env('DB_USER'),
-        'PASSWORD': env('DB_PASSWORD'),
-        'HOST': env('DB_HOST'),
-        'PORT': env('DB_PORT'),
-        'OPTIONS': {
-            'init_command': "SET sql_mode='STRICT_TRANS_TABLES'",
-        },
-    }
-}
+RENDER = env.bool('RENDER', default=False)
 
-if "DATABASE_URL" in os.environ:
-    DATABASES["default"] = dj_database_url.config(
-        conn_max_age=600,
-        conn_health_checks=True,
-    )
+db_config = dj_database_url.config(
+    default='sqlite:///db.sqlite3',
+    conn_max_age=600,
+    conn_health_checks=True,
+)
+
+if 'RENDER' in os.environ and db_config['ENGINE'] == 'django.db.backends.postgresql':
+    db_config['OPTIONS'] = {'sslmode': 'require'}
+
+DATABASES = {'default': db_config}
 
 CORS_ALLOWED_ORIGINS = env.list('CORS_ALLOWED_ORIGINS', default=[])
 CSRF_TRUSTED_ORIGINS = env.list('CORS_ALLOWED_ORIGINS', default=[])
