@@ -1,7 +1,7 @@
 import { Route, BrowserRouter as Router, Routes, Navigate } from 'react-router';
 
-import AdminLayout from '@layouts/admin/AdminLayout';
-import UserLayout from '@layouts/user/UserLayout';
+import AdminLayout from '@/layouts/Admin/AdminLayout';
+import UserLayout from '@/layouts/User/UserLayout';
 
 import { AppToast } from '@components/ui/AppToast';
 
