@@ -1,6 +1,7 @@
 import { createApi, fetchBaseQuery, BaseQueryFn, FetchArgs, FetchBaseQueryError } from '@reduxjs/toolkit/query/react';
 import { RootState } from '@store/store';
 import { logout } from '@store/slices/authSlice';
+import toast from 'react-hot-toast';
 
 const BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://127.0.0.1:8000/api/';
 
@@ -25,6 +26,9 @@ const baseQueryWithReauth: BaseQueryFn<
     let result = await baseQuery(args, api, extraOptions);
 
     if (result.error && result.error.status === 401) {
+        toast.error('Tu sesión ha expirado. Inicia sesión nuevamente.', {
+            id: 'session-expired',
+        });
         api.dispatch(logout());
     }
 

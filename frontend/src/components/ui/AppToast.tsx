@@ -1,30 +1,6 @@
 import React from 'react';
 import { Toaster } from 'react-hot-toast';
 
-const COLORS = {
-    background: '#1E1810',
-    border: '#46403E',
-    text: '#FFFFFF',
-    textMuted: '#B6B1AD',
-    success: '#12B76A',
-    error: '#F04438',
-    loading: '#FF7A3D',
-};
-
-const baseStyle: React.CSSProperties = {
-    background: 'rgba(30, 24, 16, 0.95)',
-    backdropFilter: 'blur(8px)',
-    color: COLORS.text,
-    border: `1px solid ${COLORS.border}`,
-    padding: '12px 16px',
-    fontSize: '14px',
-    fontWeight: 500,
-    borderRadius: '8px',
-    boxShadow:
-        '0 4px 6px -1px rgba(0, 0, 0, 0.5), 0 2px 4px -1px rgba(0, 0, 0, 0.3)',
-    fontFamily: 'inherit',
-};
-
 export const AppToast = React.memo(() => {
     return (
         <Toaster
@@ -33,7 +9,9 @@ export const AppToast = React.memo(() => {
             gutter={12}
             toastOptions={{
                 duration: 4000,
-                style: baseStyle,
+
+                className:
+                    '!bg-slate-900/95 !backdrop-blur-md !border !border-slate-700/50 !text-white !px-4 !py-3 !rounded-xl !shadow-2xl !text-sm !font-semibold',
 
                 ariaProps: {
                     role: 'status',
@@ -42,37 +20,31 @@ export const AppToast = React.memo(() => {
 
                 success: {
                     duration: 4000,
-                    style: {
-                        ...baseStyle,
-                        borderLeft: `4px solid ${COLORS.success}`,
-                    },
                     iconTheme: {
-                        primary: COLORS.success,
-                        secondary: COLORS.background,
+                        primary: '#10B981',
+                        secondary: '#ffffff',
                     },
+                    className:
+                        '!bg-slate-900/95 !backdrop-blur-md !border !border-emerald-500/30 !text-white !px-4 !py-3 !rounded-xl !shadow-2xl !text-sm !font-semibold',
                 },
 
                 error: {
                     duration: 5000,
-                    style: {
-                        ...baseStyle,
-                        borderLeft: `4px solid ${COLORS.error}`,
-                    },
                     iconTheme: {
-                        primary: COLORS.error,
-                        secondary: COLORS.background,
+                        primary: '#EF4444',
+                        secondary: '#ffffff',
                     },
+                    className:
+                        '!bg-slate-900/95 !backdrop-blur-md !border !border-red-500/30 !text-white !px-4 !py-3 !rounded-xl !shadow-2xl !text-sm !font-semibold',
                 },
 
                 loading: {
-                    style: {
-                        ...baseStyle,
-                        borderLeft: `4px solid ${COLORS.loading}`,
-                    },
                     iconTheme: {
-                        primary: COLORS.loading,
-                        secondary: COLORS.background,
+                        primary: '#F97316',
+                        secondary: 'transparent',
                     },
+                    className:
+                        '!bg-slate-900/95 !backdrop-blur-md !border !border-orange-500/30 !text-white !px-4 !py-3 !rounded-xl !shadow-2xl !text-sm !font-semibold',
                 },
             }}
         />

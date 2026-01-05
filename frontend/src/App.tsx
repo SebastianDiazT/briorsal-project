@@ -8,7 +8,7 @@ import { AppToast } from '@components/ui/AppToast';
 import { ProtectedRoute } from '@features/auth/components/ProtectedRoute';
 import { PublicRoute } from '@features/auth/components/PublicRoute';
 
-import Dashboard from '@pages/admin/Dashboard';
+import DashboardPage from '@/pages/admin/DashboardPage';
 
 import CategoriesList from '@pages/admin/categories/CategoriesList';
 import CategoryCreate from '@pages/admin/categories/CategoryCreate';
@@ -60,7 +60,7 @@ export default function App() {
                 <Route element={<ProtectedRoute />}>
                     <Route path="/admin" element={<AdminLayout />}>
                         <Route index element={<Navigate to="/admin/dashboard" replace />} />
-                        <Route path="dashboard" element={<Dashboard />} />
+                        <Route path="dashboard" element={<DashboardPage />} />
 
                         <Route path="categories" element={<CategoriesList />} />
                         <Route path="categories/new" element={<CategoryCreate />} />
