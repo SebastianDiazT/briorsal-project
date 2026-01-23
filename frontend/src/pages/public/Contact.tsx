@@ -15,6 +15,7 @@ import { useGetCompanyInfoQuery } from '@/features/company/api/companyApi';
 import { useCreateContactMessageMutation } from '@/features/contact/api/contactApi';
 import { ContactMessageRequest } from '@/features/contact/types';
 
+// Componente de Input Reutilizable con colores ajustados al tema #1b252f
 const FormInput = ({
     label,
     id,
@@ -24,13 +25,18 @@ const FormInput = ({
     onChange,
     placeholder,
 }: any) => (
-    <div className="space-y-2">
+    <div className="space-y-2 group">
         <label
             htmlFor={id}
-            className="text-xs font-bold text-slate-400 uppercase tracking-widest ml-1"
+            className="text-xs font-bold text-slate-400 uppercase tracking-widest ml-1 transition-colors group-focus-within:text-orange-500"
         >
             {label} {required && <span className="text-orange-500">*</span>}
         </label>
+        {/* DISEÑO DE COLORES:
+           - Fondo: bg-white/5 (Crea un tono #25303b sobre la base #1b252f)
+           - Borde: border-white/10 (Sutil) -> border-orange-500 (Foco)
+           - Texto: text-slate-200 (Mejor lectura que blanco puro)
+        */}
         <input
             id={id}
             name={id}
@@ -39,20 +45,23 @@ const FormInput = ({
             value={value}
             onChange={onChange}
             placeholder={placeholder}
-            className="w-full bg-slate-800/50 border border-slate-700 rounded-xl px-4 py-3.5 text-white placeholder-slate-600 focus:outline-none focus:border-orange-500 focus:ring-1 focus:ring-orange-500 transition-all duration-300"
+            className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3.5 text-slate-200 placeholder-slate-500 focus:outline-none focus:border-orange-500 focus:bg-white/10 focus:ring-1 focus:ring-orange-500 transition-all duration-300"
         />
     </div>
 );
 
 const ContactInfoItem = ({ icon: Icon, title, children, delay }: any) => (
     <FadeIn delay={delay} direction="right">
-        <div className="flex items-start gap-5 p-4 rounded-2xl hover:bg-white/5 transition-colors border border-transparent hover:border-white/5">
-            <div className="w-12 h-12 rounded-full bg-gradient-to-br from-orange-500 to-orange-600 flex items-center justify-center shrink-0 shadow-lg shadow-orange-500/20">
-                <Icon className="text-white text-xl" />
+        {/* Tarjetas de info con borde muy sutil para definirlas sobre el fondo oscuro */}
+        <div className="flex items-start gap-5 p-5 rounded-2xl hover:bg-white/5 transition-colors border border-white/5 hover:border-white/10 group">
+            <div className="w-12 h-12 rounded-full bg-[#25303b] border border-white/10 flex items-center justify-center shrink-0 group-hover:bg-orange-600 group-hover:border-orange-500 transition-all duration-300 shadow-lg">
+                <Icon className="text-white text-lg group-hover:scale-110 transition-transform" />
             </div>
             <div>
-                <h3 className="text-white font-bold text-lg mb-1">{title}</h3>
-                <div className="text-slate-400 font-light leading-relaxed">
+                <h3 className="text-white font-bold text-lg mb-1 group-hover:text-orange-400 transition-colors">
+                    {title}
+                </h3>
+                <div className="text-slate-400 font-light leading-relaxed group-hover:text-slate-300 transition-colors">
                     {children}
                 </div>
             </div>
@@ -100,6 +109,8 @@ const Contact = () => {
         }
     };
 
+    // Color Base: #1b252f
+
     return (
         <>
             <PageMeta
@@ -107,12 +118,14 @@ const Contact = () => {
                 description="Contáctanos para diseñar o construir tu próximo proyecto."
             />
 
-            <div className="min-h-screen bg-slate-900 font-sans">
+            <div className="min-h-screen bg-[#1b252f] font-sans selection:bg-orange-500/30 selection:text-orange-200">
                 <div className="grid grid-cols-1 lg:grid-cols-12 min-h-[calc(100vh-80px)]">
-                    <div className="lg:col-span-5 bg-slate-900 relative overflow-hidden p-8 lg:p-16 flex flex-col justify-center border-b lg:border-b-0 lg:border-r border-white/5">
+                    {/* --- COLUMNA IZQUIERDA: INFORMACIÓN --- */}
+                    <div className="lg:col-span-5 bg-[#1b252f] relative overflow-hidden p-8 lg:p-16 flex flex-col justify-center border-b lg:border-b-0 lg:border-r border-white/5">
+                        {/* Elementos decorativos de fondo (Blobs) */}
                         <div className="absolute top-0 left-0 w-full h-full overflow-hidden pointer-events-none">
-                            <div className="absolute top-[-20%] left-[-20%] w-[500px] h-[500px] bg-orange-500/10 rounded-full blur-[100px]"></div>
-                            <div className="absolute bottom-[-10%] right-[-10%] w-[400px] h-[400px] bg-blue-600/10 rounded-full blur-[100px]"></div>
+                            <div className="absolute top-[-20%] left-[-20%] w-[500px] h-[500px] bg-orange-500/10 rounded-full blur-[100px] animate-pulse"></div>
+                            <div className="absolute bottom-[-10%] right-[-10%] w-[400px] h-[400px] bg-blue-500/5 rounded-full blur-[100px]"></div>
                             <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] opacity-[0.03]"></div>
                         </div>
 
@@ -127,14 +140,14 @@ const Contact = () => {
                                         Proyecto.
                                     </span>
                                 </h1>
-                                <p className="text-slate-400 text-lg mb-12 max-w-md">
+                                <p className="text-slate-400 text-lg mb-12 max-w-md font-light">
                                     Estamos listos para escuchar tus ideas y
                                     convertirlas en realidad. Contáctanos por
                                     cualquiera de nuestros canales.
                                 </p>
                             </FadeIn>
 
-                            <div className="space-y-8">
+                            <div className="space-y-6">
                                 <ContactInfoItem
                                     icon={FaMapLocationDot}
                                     title="Ubicación"
@@ -154,7 +167,7 @@ const Contact = () => {
                                     <p className="mb-1">
                                         {companyInfo?.phone || '...'}
                                     </p>
-                                    <p className="text-orange-400">
+                                    <p className="text-orange-400 font-medium">
                                         {companyInfo?.email}
                                     </p>
                                 </ContactInfoItem>
@@ -176,9 +189,9 @@ const Contact = () => {
                                             href={companyInfo.whatsapp}
                                             target="_blank"
                                             rel="noreferrer"
-                                            className="inline-flex items-center gap-3 mt-4 text-white hover:text-orange-400 transition-colors font-bold group"
+                                            className="inline-flex items-center gap-3 mt-6 text-white hover:text-orange-400 transition-colors font-bold group border border-white/10 px-6 py-3 rounded-xl bg-white/5 hover:bg-white/10 hover:border-orange-500/50"
                                         >
-                                            <FaWhatsapp className="text-2xl group-hover:scale-110 transition-transform" />
+                                            <FaWhatsapp className="text-2xl text-green-500 group-hover:scale-110 transition-transform" />
                                             <span>Chatear por WhatsApp</span>
                                         </a>
                                     </FadeIn>
@@ -187,12 +200,14 @@ const Contact = () => {
                         </div>
                     </div>
 
-                    <div className="lg:col-span-7 bg-slate-950 p-8 lg:p-20 flex flex-col justify-center relative">
-                        <div className="absolute top-0 right-0 w-full h-1 bg-gradient-to-r from-transparent via-orange-500/20 to-transparent lg:hidden"></div>
+                    {/* --- COLUMNA DERECHA: FORMULARIO --- */}
+                    <div className="lg:col-span-7 bg-[#1b252f] p-8 lg:p-20 flex flex-col justify-center relative">
+                        {/* Gradiente sutil en móvil para separar secciones */}
+                        <div className="absolute top-0 right-0 w-full h-1 bg-gradient-to-r from-transparent via-white/10 to-transparent lg:hidden"></div>
 
                         <div className="max-w-2xl mx-auto w-full">
                             <FadeIn direction="up" delay={0.1}>
-                                <h2 className="text-3xl font-bold text-white mb-8">
+                                <h2 className="text-3xl font-bold text-white mb-8 border-l-4 border-orange-500 pl-4">
                                     Envíanos un mensaje
                                 </h2>
                             </FadeIn>
@@ -256,10 +271,10 @@ const Contact = () => {
                                 </FadeIn>
 
                                 <FadeIn direction="up" delay={0.45}>
-                                    <div className="space-y-2">
+                                    <div className="space-y-2 group">
                                         <label
                                             htmlFor="message"
-                                            className="text-xs font-bold text-slate-400 uppercase tracking-widest ml-1"
+                                            className="text-xs font-bold text-slate-400 uppercase tracking-widest ml-1 transition-colors group-focus-within:text-orange-500"
                                         >
                                             Tu Mensaje{' '}
                                             <span className="text-orange-500">
@@ -274,7 +289,7 @@ const Contact = () => {
                                             value={formData.message}
                                             onChange={handleChange}
                                             placeholder="Cuéntanos detalles sobre tu proyecto..."
-                                            className="w-full bg-slate-800/50 border border-slate-700 rounded-xl px-4 py-3 text-white placeholder-slate-600 focus:outline-none focus:border-orange-500 focus:ring-1 focus:ring-orange-500 transition-all duration-300 resize-none"
+                                            className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-slate-200 placeholder-slate-500 focus:outline-none focus:border-orange-500 focus:bg-white/10 focus:ring-1 focus:ring-orange-500 transition-all duration-300 resize-none"
                                         ></textarea>
                                     </div>
                                 </FadeIn>
@@ -304,7 +319,7 @@ const Contact = () => {
                 </div>
 
                 {companyInfo?.google_maps_url && (
-                    <div className="w-full h-[400px] bg-slate-800 relative border-t border-slate-800">
+                    <div className="w-full h-[400px] bg-[#1b252f] relative border-t border-white/5">
                         <iframe
                             title="Ubicación"
                             src={companyInfo.google_maps_url}
@@ -312,7 +327,7 @@ const Contact = () => {
                             height="100%"
                             loading="lazy"
                             referrerPolicy="no-referrer-when-downgrade"
-                            className="w-full h-full border-0"
+                            className="w-full h-full border-0 grayscale hover:grayscale-0 transition-all duration-700"
                         ></iframe>
                     </div>
                 )}

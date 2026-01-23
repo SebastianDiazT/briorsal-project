@@ -24,7 +24,7 @@ export const HomeStats = () => {
     const experienceYears = new Date().getFullYear() - FOUNDING_YEAR;
 
     return (
-        <div className="bg-slate-950 border-y border-white/5 py-16 relative z-20">
+        <div className="bg-slate-900 border-y border-white/5 py-16 relative z-20">
             <div className="container mx-auto px-4">
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-8 md:gap-12">
                     <StatItem

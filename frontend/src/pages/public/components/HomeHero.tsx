@@ -9,10 +9,18 @@ export const HomeHero = () => {
                 <img
                     src="https://images.unsplash.com/photo-1541888946425-d81bb19240f5?q=80&w=2070&auto=format&fit=crop"
                     alt="Background"
-                    className="w-full h-full object-cover opacity-20"
+                    // CAMBIO: opacity-60 (Antes 40). La imagen se ve mucho más nítida y clara.
+                    className="w-full h-full object-cover opacity-60"
                 />
-                <div className="absolute inset-0 bg-gradient-to-r from-slate-950 via-slate-950/80 to-slate-950/30"></div>
+
+                {/* CAMBIO: Degradado muy suave
+                    - from-slate-950/80: Oscuro solo al inicio para leer el texto.
+                    - via-slate-950/20: Se vuelve casi transparente muy rápido.
+                    - to-transparent: Totalmente invisible en el resto.
+                */}
+                <div className="absolute inset-0 bg-gradient-to-r from-slate-950/80 via-slate-950/20 to-transparent"></div>
             </div>
+
             <div className="container mx-auto px-4 relative z-10 grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
                 <div className="max-w-2xl">
                     <FadeIn direction="down">
@@ -22,7 +30,7 @@ export const HomeHero = () => {
                         </div>
                     </FadeIn>
                     <FadeIn direction="up" delay={0.2}>
-                        <h1 className="text-5xl md:text-7xl font-black text-white leading-[1.1] mb-8">
+                        <h1 className="text-5xl md:text-7xl font-black text-white leading-[1.1] mb-8 drop-shadow-lg">
                             Construimos <br />{' '}
                             <span className="text-transparent bg-clip-text bg-gradient-to-r from-orange-400 to-orange-600">
                                 El Futuro.
@@ -30,7 +38,8 @@ export const HomeHero = () => {
                         </h1>
                     </FadeIn>
                     <FadeIn direction="up" delay={0.4}>
-                        <p className="text-lg md:text-xl text-slate-400 mb-10 leading-relaxed max-w-lg">
+                        {/* Agregamos drop-shadow al texto pequeño para asegurar lectura si la imagen es clara */}
+                        <p className="text-lg md:text-xl text-slate-200 mb-10 leading-relaxed max-w-lg drop-shadow-md font-medium">
                             Transformamos visiones en estructuras tangibles. En
                             Briorsal, fusionamos ingeniería de precisión con
                             diseño arquitectónico de vanguardia.
@@ -46,7 +55,7 @@ export const HomeHero = () => {
                             </Link>
                             <Link
                                 to="/contacto"
-                                className="px-8 py-4 border border-white/20 hover:bg-white/5 text-white font-bold rounded-xl hover:-translate-y-1 text-center flex items-center justify-center gap-3 group transition-all"
+                                className="px-8 py-4 border border-white/20 hover:bg-white/10 text-white font-bold rounded-xl hover:-translate-y-1 text-center flex items-center justify-center gap-3 group transition-all backdrop-blur-sm"
                             >
                                 Contáctanos{' '}
                                 <FaArrowRight className="group-hover:translate-x-1 transition-transform" />

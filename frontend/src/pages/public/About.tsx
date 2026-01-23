@@ -13,6 +13,8 @@ const About = () => {
 
     const heroImage = aboutUs?.image || '/placeholder-about.jpg';
 
+    // Color base solicitado: #1b252f
+
     return (
         <>
             <PageMeta
@@ -23,9 +25,12 @@ const About = () => {
                 }
             />
 
-            <div className="relative flex flex-col xl:flex-row min-h-screen bg-slate-950">
+            {/* APLICACIÓN COLOR: Fondo principal #1b252f */}
+            <div className="relative flex flex-col xl:flex-row min-h-screen bg-[#1b252f]">
+                {/* SECCIÓN IZQUIERDA (IMAGEN) */}
                 <div className="relative w-full xl:w-[45%] h-[50vh] xl:sticky xl:top-20 xl:h-[calc(100vh-5rem)] group overflow-hidden z-0">
-                    <div className="absolute inset-0 bg-slate-900">
+                    {/* Fondo de respaldo por si la imagen tarda */}
+                    <div className="absolute inset-0 bg-[#1b252f]">
                         <img
                             src={heroImage}
                             alt="Briorsal Nosotros"
@@ -35,7 +40,8 @@ const About = () => {
                         />
                     </div>
 
-                    <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/40 to-transparent xl:bg-gradient-to-r xl:from-transparent xl:to-slate-950/90"></div>
+                    {/* APLICACIÓN COLOR: Degradados para fundir la imagen con el color #1b252f */}
+                    <div className="absolute inset-0 bg-gradient-to-t from-[#1b252f] via-[#1b252f]/40 to-transparent xl:bg-gradient-to-r xl:from-transparent xl:to-[#1b252f]/90"></div>
 
                     <div className="absolute bottom-0 left-0 p-8 xl:p-16 w-full z-10 pointer-events-none">
                         <FadeIn direction="up">
@@ -59,7 +65,8 @@ const About = () => {
                     </div>
                 </div>
 
-                <div className="w-full xl:w-[55%] flex flex-col justify-center px-6 py-16 md:p-20 xl:py-24 bg-slate-950 text-white relative z-10">
+                {/* SECCIÓN DERECHA (TEXTO) - APLICACIÓN COLOR: bg-[#1b252f] */}
+                <div className="w-full xl:w-[55%] flex flex-col justify-center px-6 py-16 md:p-20 xl:py-24 bg-[#1b252f] text-white relative z-10">
                     <div className="absolute top-0 right-0 p-10 opacity-[0.03] pointer-events-none">
                         <FaBuilding size={400} />
                     </div>
@@ -71,12 +78,12 @@ const About = () => {
                                 <h2 className="text-2xl font-bold text-white mb-6 border-l-4 border-orange-500 pl-4">
                                     Quiénes Somos
                                 </h2>
-                                <div className="text-lg md:text-xl text-slate-300 leading-relaxed font-light text-justify prose prose-invert max-w-none">
+                                <div className="text-lg md:text-xl text-slate-200 leading-relaxed font-light text-justify prose prose-invert max-w-none">
                                     {isLoading ? (
                                         <div className="space-y-3 animate-pulse">
-                                            <div className="h-4 bg-slate-800 rounded w-full"></div>
-                                            <div className="h-4 bg-slate-800 rounded w-5/6"></div>
-                                            <div className="h-4 bg-slate-800 rounded w-4/6"></div>
+                                            <div className="h-4 bg-white/10 rounded w-full"></div>
+                                            <div className="h-4 bg-white/10 rounded w-5/6"></div>
+                                            <div className="h-4 bg-white/10 rounded w-4/6"></div>
                                         </div>
                                     ) : (
                                         aboutUs?.description ||
@@ -86,18 +93,23 @@ const About = () => {
                             </div>
                         </FadeIn>
 
-                        <div className="w-full h-[1px] bg-slate-800/50"></div>
+                        {/* Separador sutil */}
+                        <div className="w-full h-[1px] bg-white/10"></div>
 
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                             <FadeIn direction="up" delay={0.2} fullWidth>
-                                <div className="group h-full p-8 bg-slate-900/50 rounded-2xl border border-slate-800 hover:border-orange-500/30 transition-all duration-500 hover:-translate-y-2 hover:shadow-2xl hover:shadow-orange-900/10 backdrop-blur-sm">
-                                    <div className="w-14 h-14 bg-slate-800 rounded-xl flex items-center justify-center text-emerald-500 mb-6 group-hover:bg-emerald-500/20 group-hover:scale-110 transition-all duration-300">
+                                {/* TARJETA MISIÓN: 
+                                   Usamos bg-white/5 para que sea un tono ligeramente más claro
+                                   que el #1b252f automáticamente.
+                                */}
+                                <div className="group h-full p-8 bg-white/5 rounded-2xl border border-white/10 hover:border-orange-500/30 transition-all duration-500 hover:-translate-y-2 hover:shadow-2xl hover:shadow-orange-900/10 backdrop-blur-sm">
+                                    <div className="w-14 h-14 bg-white/5 rounded-xl flex items-center justify-center text-emerald-400 mb-6 group-hover:bg-emerald-400/20 group-hover:scale-110 transition-all duration-300">
                                         <FaBullseye size={28} />
                                     </div>
-                                    <h3 className="text-xl font-bold text-white mb-4 group-hover:text-emerald-400 transition-colors">
+                                    <h3 className="text-xl font-bold text-white mb-4 group-hover:text-emerald-300 transition-colors">
                                         Nuestra Misión
                                     </h3>
-                                    <p className="text-slate-400 text-base leading-relaxed group-hover:text-slate-300 transition-colors">
+                                    <p className="text-slate-300 text-base leading-relaxed group-hover:text-slate-200 transition-colors">
                                         {isLoading
                                             ? 'Cargando...'
                                             : aboutUs?.mission ||
@@ -107,14 +119,15 @@ const About = () => {
                             </FadeIn>
 
                             <FadeIn direction="up" delay={0.3} fullWidth>
-                                <div className="group h-full p-8 bg-slate-900/50 rounded-2xl border border-slate-800 hover:border-blue-500/30 transition-all duration-500 hover:-translate-y-2 hover:shadow-2xl hover:shadow-blue-900/10 backdrop-blur-sm">
-                                    <div className="w-14 h-14 bg-slate-800 rounded-xl flex items-center justify-center text-blue-500 mb-6 group-hover:bg-blue-500/20 group-hover:scale-110 transition-all duration-300">
+                                {/* TARJETA VISIÓN */}
+                                <div className="group h-full p-8 bg-white/5 rounded-2xl border border-white/10 hover:border-sky-400/30 transition-all duration-500 hover:-translate-y-2 hover:shadow-2xl hover:shadow-sky-900/10 backdrop-blur-sm">
+                                    <div className="w-14 h-14 bg-white/5 rounded-xl flex items-center justify-center text-sky-400 mb-6 group-hover:bg-sky-400/20 group-hover:scale-110 transition-all duration-300">
                                         <FaEye size={28} />
                                     </div>
-                                    <h3 className="text-xl font-bold text-white mb-4 group-hover:text-blue-400 transition-colors">
+                                    <h3 className="text-xl font-bold text-white mb-4 group-hover:text-sky-300 transition-colors">
                                         Nuestra Visión
                                     </h3>
-                                    <p className="text-slate-400 text-base leading-relaxed group-hover:text-slate-300 transition-colors">
+                                    <p className="text-slate-300 text-base leading-relaxed group-hover:text-slate-200 transition-colors">
                                         {isLoading
                                             ? 'Cargando...'
                                             : aboutUs?.vision ||
@@ -125,7 +138,7 @@ const About = () => {
                         </div>
 
                         <FadeIn direction="up" delay={0.4}>
-                            <div className="bg-gradient-to-r from-orange-900/20 to-transparent p-8 md:p-10 rounded-3xl border border-white/5 border-l-4 border-l-orange-500 flex flex-col md:flex-row items-center justify-between gap-8 group hover:bg-white/5 transition-colors duration-500">
+                            <div className="bg-gradient-to-r from-orange-900/20 to-transparent p-8 md:p-10 rounded-3xl border border-white/10 border-l-4 border-l-orange-500 flex flex-col md:flex-row items-center justify-between gap-8 group hover:bg-white/5 transition-colors duration-500">
                                 <div className="text-center md:text-left">
                                     <p className="text-orange-200 font-medium text-lg mb-2">
                                         ¿Tienes un proyecto en mente?

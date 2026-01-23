@@ -28,11 +28,15 @@ const ClientsMarquee: React.FC = () => {
                 <div className="absolute inset-y-0 left-0 w-20 md:w-40 bg-gradient-to-r from-white to-transparent z-10 pointer-events-none"></div>
                 <div className="absolute inset-y-0 right-0 w-20 md:w-40 bg-gradient-to-l from-white to-transparent z-10 pointer-events-none"></div>
 
-                <div className="flex w-max animate-infinite-scroll hover:[animation-play-state:paused]">
+                <div className="flex w-max animate-infinite-scroll hover:[animation-play-state:paused] items-center">
                     {duplicatedClients.map((client, index) => (
                         <div
                             key={`${client.id}-${index}`}
-                            className="mx-8 md:mx-14 w-32 md:w-48 h-24 flex items-center justify-center transition-transform duration-300 hover:scale-110 cursor-pointer"
+                            /* CAMBIOS REALIZADOS:
+                               1. Menos separación: mx-4 md:mx-8 (Antes mx-8 md:mx-14)
+                               2. Más grandes: w-60 md:w-80 (Antes w-32 md:w-48) y h-40 (Antes h-24)
+                            */
+                            className="mx-4 md:mx-8 w-60 md:w-80 h-40 flex items-center justify-center transition-transform duration-300 hover:scale-110 cursor-pointer"
                         >
                             <img
                                 src={client.image}

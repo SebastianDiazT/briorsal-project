@@ -35,7 +35,8 @@ const PortfolioCard = ({
         <FadeIn delay={delay} direction="up">
             <Link
                 to={`/proyectos/${project.slug}`}
-                className="group relative block w-full overflow-hidden rounded-3xl bg-slate-900 shadow-lg aspect-[4/5] md:aspect-[3/4] hover:shadow-2xl hover:shadow-orange-500/10 transition-all duration-300"
+                // CAMBIO: bg-slate-900 -> bg-[#1b252f] (Color del tema)
+                className="group relative block w-full overflow-hidden rounded-3xl bg-[#1b252f] shadow-lg aspect-[4/5] md:aspect-[3/4] hover:shadow-2xl hover:shadow-orange-500/10 transition-all duration-300"
             >
                 {mainImage ? (
                     <img
@@ -45,12 +46,14 @@ const PortfolioCard = ({
                         loading="lazy"
                     />
                 ) : (
-                    <div className="absolute inset-0 flex items-center justify-center bg-slate-800 text-slate-600">
+                    // CAMBIO: bg-slate-800 -> bg-[#25303b]
+                    <div className="absolute inset-0 flex items-center justify-center bg-[#25303b] text-slate-600">
                         <FaBuilding size={40} />
                     </div>
                 )}
 
-                <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/40 to-transparent opacity-80 group-hover:opacity-90 transition-opacity duration-300"></div>
+                {/* Degradado sobre la tarjeta ajustado al tema */}
+                <div className="absolute inset-0 bg-gradient-to-t from-[#1b252f] via-[#1b252f]/40 to-transparent opacity-80 group-hover:opacity-90 transition-opacity duration-300"></div>
 
                 <div className="absolute bottom-0 left-0 w-full p-8 translate-y-4 group-hover:translate-y-0 transition-transform duration-300">
                     <span className="inline-block px-3 py-1 mb-3 text-xs font-bold text-white bg-orange-600 rounded-full shadow-lg shadow-orange-600/20">
@@ -136,18 +139,25 @@ const ProjectsPage = () => {
                 description="Explora nuestra colección de obras arquitectónicas y proyectos civiles."
             />
 
+            {/* CAMBIO: bg-slate-900 -> bg-[#1b252f] */}
             <section className="relative h-[60vh] min-h-[500px] flex items-center justify-center overflow-hidden bg-slate-900 pt-20">
                 <div className="absolute inset-0 z-0">
+                    {/* CAMBIO 1: Opacidad aumentada a 0.6 para que la imagen se vea más */}
                     <div
-                        className="absolute inset-0 bg-cover bg-center bg-no-repeat bg-fixed opacity-40"
+                        className="absolute inset-0 bg-cover bg-center bg-no-repeat bg-fixed opacity-60"
                         style={{ backgroundImage: `url(${heroBgImg})` }}
                     />
-                    <div className="absolute inset-0 bg-gradient-to-b from-slate-950 via-slate-950/80 to-slate-50"></div>
+
+                    {/* CAMBIO 2: Degradado mucho más suave.
+                        - via-[#1b252f]/30: El centro es solo 30% opaco (antes 80%).
+                        - to-slate-50: El final es blanco/slate-50 para fundirse con la lista de abajo.
+                    */}
+                    <div className="absolute inset-0 bg-gradient-to-b from-[#1b252f]/90 via-[#1b252f]/30 to-slate-50"></div>
                 </div>
 
                 <div className="container mx-auto px-4 relative z-10 text-center">
                     <FadeIn direction="down">
-                        <div className="flex items-center justify-center gap-2 text-slate-400 text-sm font-medium mb-6 uppercase tracking-wider">
+                        <div className="flex items-center justify-center gap-2 text-slate-300 text-sm font-medium mb-6 uppercase tracking-wider">
                             <Link
                                 to="/"
                                 className="hover:text-white transition-colors flex items-center gap-1"
@@ -160,7 +170,7 @@ const ProjectsPage = () => {
                     </FadeIn>
 
                     <FadeIn direction="up" delay={0.2}>
-                        <h1 className="text-4xl md:text-7xl font-black text-white mb-6 leading-tight">
+                        <h1 className="text-4xl md:text-7xl font-black text-white mb-6 leading-tight drop-shadow-lg">
                             Nuestros <br className="md:hidden" />
                             <span className="text-transparent bg-clip-text bg-gradient-to-r from-orange-400 to-orange-600">
                                 Proyectos.
@@ -169,7 +179,7 @@ const ProjectsPage = () => {
                     </FadeIn>
 
                     <FadeIn direction="up" delay={0.4}>
-                        <p className="text-lg md:text-xl text-slate-400 font-light max-w-2xl mx-auto leading-relaxed">
+                        <p className="text-lg md:text-xl text-slate-200 font-light max-w-2xl mx-auto leading-relaxed drop-shadow-md">
                             Una muestra de nuestra capacidad técnica y visión
                             arquitectónica. Cada obra refleja nuestro compromiso
                             con la calidad.
