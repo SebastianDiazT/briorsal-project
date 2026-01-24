@@ -4,9 +4,8 @@ import {
     FaArrowLeft,
     FaArrowRight,
     FaBuilding,
-    FaMagnifyingGlass,
-    FaFilter,
     FaHouse,
+    FaLayerGroup, // Icono para "Todos"
 } from 'react-icons/fa6';
 
 import { useGetProjectsQuery } from '@/features/projects/api/projectsApi';
@@ -14,11 +13,11 @@ import { useGetCategoriesQuery } from '@/features/categories/api/categoriesApi';
 
 import PageMeta from '@/components/common/PageMeta';
 import FadeIn from '@/components/common/FadeIn';
-import { CustomSelect } from '@/components/ui/CustomSelect';
 import { Project } from '@/features/projects/types';
 
 import heroBgImg from '@/assets/projects/hero.png';
 
+// --- COMPONENTE TARJETA DE PROYECTO (Sin cambios) ---
 const PortfolioCard = ({
     project,
     delay,
@@ -35,7 +34,6 @@ const PortfolioCard = ({
         <FadeIn delay={delay} direction="up">
             <Link
                 to={`/proyectos/${project.slug}`}
-                // CAMBIO: bg-slate-900 -> bg-[#1b252f] (Color del tema)
                 className="group relative block w-full overflow-hidden rounded-3xl bg-[#1b252f] shadow-lg aspect-[4/5] md:aspect-[3/4] hover:shadow-2xl hover:shadow-orange-500/10 transition-all duration-300"
             >
                 {mainImage ? (
@@ -46,15 +44,11 @@ const PortfolioCard = ({
                         loading="lazy"
                     />
                 ) : (
-                    // CAMBIO: bg-slate-800 -> bg-[#25303b]
                     <div className="absolute inset-0 flex items-center justify-center bg-[#25303b] text-slate-600">
                         <FaBuilding size={40} />
                     </div>
                 )}
-
-                {/* Degradado sobre la tarjeta ajustado al tema */}
                 <div className="absolute inset-0 bg-gradient-to-t from-[#1b252f] via-[#1b252f]/40 to-transparent opacity-80 group-hover:opacity-90 transition-opacity duration-300"></div>
-
                 <div className="absolute bottom-0 left-0 w-full p-8 translate-y-4 group-hover:translate-y-0 transition-transform duration-300">
                     <span className="inline-block px-3 py-1 mb-3 text-xs font-bold text-white bg-orange-600 rounded-full shadow-lg shadow-orange-600/20">
                         {project.category_name || 'General'}
@@ -72,6 +66,7 @@ const PortfolioCard = ({
     );
 };
 
+// --- SKELETON (Sin cambios) ---
 const ProjectSkeleton = () => (
     <div className="rounded-3xl aspect-[4/5] md:aspect-[3/4] bg-slate-100 animate-pulse relative overflow-hidden">
         <div className="absolute bottom-0 left-0 w-full p-8 space-y-3">
@@ -82,22 +77,20 @@ const ProjectSkeleton = () => (
 );
 
 const ProjectsPage = () => {
-    const [selectedCategory, setSelectedCategory] = useState<string>('');
-    const [search, setSearch] = useState('');
+    const [selectedCategory, setSelectedCategory] = useState<string>(''); // '' = Todos
     const [page, setPage] = useState(1);
     const PAGE_SIZE = 9;
 
-    const { data: categoriesResponse } = useGetCategoriesQuery({
-        no_page: true,
-    });
-    const categoryOptions = [
-        { value: '', label: 'Todas las Categorías' },
-        ...(categoriesResponse?.data || []).map((cat: any) => ({
-            value: cat.id,
-            label: cat.name,
-        })),
-    ];
+    // 1. Obtener categorías
+    const { data: categoriesResponse, isLoading: isLoadingCats } =
+        useGetCategoriesQuery({
+            no_page: true,
+        });
 
+    // Lista plana de categorías desde la API
+    const categories = categoriesResponse?.data || [];
+
+    // 2. Obtener Proyectos filtrados
     const {
         data: response,
         isLoading,
@@ -106,7 +99,6 @@ const ProjectsPage = () => {
         page,
         pageSize: PAGE_SIZE,
         category: selectedCategory,
-        search,
     });
 
     const projects = response?.data || [];
@@ -114,7 +106,7 @@ const ProjectsPage = () => {
 
     useEffect(() => {
         setPage(1);
-    }, [selectedCategory, search]);
+    }, [selectedCategory]);
 
     const scrollToGrid = () => {
         const gridElement = document.getElementById('projects-grid');
@@ -139,19 +131,13 @@ const ProjectsPage = () => {
                 description="Explora nuestra colección de obras arquitectónicas y proyectos civiles."
             />
 
-            {/* CAMBIO: bg-slate-900 -> bg-[#1b252f] */}
+            {/* HERO SECTION */}
             <section className="relative h-[60vh] min-h-[500px] flex items-center justify-center overflow-hidden bg-slate-900 pt-20">
                 <div className="absolute inset-0 z-0">
-                    {/* CAMBIO 1: Opacidad aumentada a 0.6 para que la imagen se vea más */}
                     <div
                         className="absolute inset-0 bg-cover bg-center bg-no-repeat bg-fixed opacity-60"
                         style={{ backgroundImage: `url(${heroBgImg})` }}
                     />
-
-                    {/* CAMBIO 2: Degradado mucho más suave.
-                        - via-[#1b252f]/30: El centro es solo 30% opaco (antes 80%).
-                        - to-slate-50: El final es blanco/slate-50 para fundirse con la lista de abajo.
-                    */}
                     <div className="absolute inset-0 bg-gradient-to-b from-[#1b252f]/90 via-[#1b252f]/30 to-slate-50"></div>
                 </div>
 
@@ -188,38 +174,74 @@ const ProjectsPage = () => {
                 </div>
             </section>
 
+            {/* GRID SECTION */}
             <section
                 id="projects-grid"
                 className="bg-slate-50 pb-24 min-h-screen -mt-20 relative z-20"
             >
                 <div className="container mx-auto px-4">
-                    <div className="bg-white rounded-3xl shadow-xl shadow-slate-200/50 border border-slate-100 p-6 mb-16 transform -translate-y-8 relative z-30">
-                        <div className="flex flex-col lg:flex-row gap-6 items-center">
-                            <div className="w-full lg:flex-1 relative group">
-                                <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-                                    <FaMagnifyingGlass className="text-slate-400 group-focus-within:text-orange-500 transition-colors" />
-                                </div>
-                                <input
-                                    type="text"
-                                    placeholder="Buscar por nombre, ubicación..."
-                                    value={search}
-                                    onChange={(e) => setSearch(e.target.value)}
-                                    className="w-full pl-11 pr-4 h-[42px] bg-white border border-slate-200 rounded-xl text-sm font-semibold text-slate-600 focus:outline-none focus:border-orange-500 focus:ring-2 focus:ring-orange-500/10 transition-all placeholder-slate-400"
-                                />
-                            </div>
+                    {/* --- NUEVA BARRA DE FILTROS: BOTONES DE CATEGORÍAS --- */}
+                    <div className="mb-12 transform -translate-y-8 relative z-30">
+                        <FadeIn direction="up" delay={0.5}>
+                            <div className="flex flex-wrap items-center justify-center gap-3">
+                                {/* Botón "TODOS" */}
+                                <button
+                                    onClick={() => setSelectedCategory('')}
+                                    className={`
+                                        px-6 py-2.5 rounded-full text-sm font-bold transition-all duration-300 border flex items-center gap-2
+                                        ${
+                                            selectedCategory === ''
+                                                ? 'bg-orange-600 text-white border-orange-600 shadow-lg shadow-orange-500/30 scale-105'
+                                                : 'bg-white text-slate-600 border-slate-200 hover:border-orange-300 hover:text-orange-500 hover:-translate-y-0.5 shadow-sm'
+                                        }
+                                    `}
+                                >
+                                    <FaLayerGroup
+                                        className={
+                                            selectedCategory === ''
+                                                ? 'text-white'
+                                                : 'text-slate-400'
+                                        }
+                                    />
+                                    Todos
+                                </button>
 
-                            <div className="w-full lg:w-1/3">
-                                <CustomSelect
-                                    value={selectedCategory}
-                                    onChange={setSelectedCategory}
-                                    options={categoryOptions}
-                                    placeholder="Filtrar por Categoría"
-                                    icon={FaFilter}
-                                />
+                                {/* Botones Dinámicos desde API */}
+                                {isLoadingCats ? (
+                                    // Skeleton de botones mientras cargan
+                                    <>
+                                        <div className="w-24 h-10 bg-white rounded-full animate-pulse opacity-50"></div>
+                                        <div className="w-32 h-10 bg-white rounded-full animate-pulse opacity-50"></div>
+                                        <div className="w-20 h-10 bg-white rounded-full animate-pulse opacity-50"></div>
+                                    </>
+                                ) : (
+                                    categories.map((cat: any) => (
+                                        <button
+                                            key={cat.id}
+                                            onClick={() =>
+                                                setSelectedCategory(
+                                                    String(cat.id)
+                                                )
+                                            }
+                                            className={`
+                                                px-6 py-2.5 rounded-full text-sm font-bold transition-all duration-300 border
+                                                ${
+                                                    selectedCategory ===
+                                                    String(cat.id)
+                                                        ? 'bg-orange-600 text-white border-orange-600 shadow-lg shadow-orange-500/30 scale-105'
+                                                        : 'bg-white text-slate-600 border-slate-200 hover:border-orange-300 hover:text-orange-500 hover:-translate-y-0.5 shadow-sm'
+                                                }
+                                            `}
+                                        >
+                                            {cat.name}
+                                        </button>
+                                    ))
+                                )}
                             </div>
-                        </div>
+                        </FadeIn>
                     </div>
 
+                    {/* CONTENIDO DEL GRID */}
                     {isLoading || isFetching ? (
                         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
                             {[1, 2, 3, 4, 5, 6].map((i) => (
@@ -242,24 +264,26 @@ const ProjectsPage = () => {
                                 <FaBuilding className="text-4xl text-slate-300" />
                             </div>
                             <h3 className="text-2xl font-bold text-slate-800 mb-2">
-                                Sin resultados
+                                Sin proyectos
                             </h3>
                             <p className="text-slate-500 mb-8 max-w-sm mx-auto">
-                                No encontramos proyectos que coincidan con tu
-                                búsqueda.
+                                No hay proyectos en la categoría "
+                                {categories.find(
+                                    (c: any) =>
+                                        String(c.id) === selectedCategory
+                                )?.name || 'seleccionada'}
+                                ".
                             </p>
                             <button
-                                onClick={() => {
-                                    setSearch('');
-                                    setSelectedCategory('');
-                                }}
+                                onClick={() => setSelectedCategory('')}
                                 className="text-orange-600 font-bold hover:text-orange-700 hover:underline transition-all"
                             >
-                                Limpiar filtros
+                                Ver todos los proyectos
                             </button>
                         </div>
                     )}
 
+                    {/* PAGINACIÓN */}
                     {showPagination && meta && (
                         <div className="flex flex-col md:flex-row items-center justify-between mt-16 pt-8 border-t border-slate-200 gap-6">
                             <span className="text-sm text-slate-500 font-medium order-2 md:order-1">
