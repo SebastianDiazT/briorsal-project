@@ -93,3 +93,24 @@ class AboutUs(models.Model):
 
     def __str__(self):
         return 'Información de Nosotros'
+
+class HomeHero(models.Model):
+    badge = models.CharField(max_length=100, default='Innovación y Solidez', verbose_name='Texto Superior (Badge)')
+    title = models.CharField(max_length=100, default='Construimos', verbose_name='Título Principal')
+    highlight = models.CharField(max_length=100, default='El Futuro.', verbose_name='Texto Destacado (Gradiente)')
+    description = models.TextField(verbose_name='Descripción')
+    image = models.ImageField(
+        upload_to='company/home/',
+        blank=True,
+        null=True,
+        verbose_name='Imagen de Fondo',
+        validators=[validate_image_size, FileExtensionValidator(allowed_extensions=['jpg', 'jpeg', 'png', 'webp'])],
+    )
+
+    class Meta:
+        db_table = 'home_hero'
+        verbose_name = 'Hero del Home'
+        verbose_name_plural = 'Hero del Home'
+
+    def __str__(self):
+        return 'Configuración del Home Hero'

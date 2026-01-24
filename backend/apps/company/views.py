@@ -1,11 +1,12 @@
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import filters, generics, permissions, viewsets
-from .models import AboutUs, ClientLogo, CompanyInfo, Service
+from .models import AboutUs, ClientLogo, CompanyInfo, Service, HomeHero
 from .serializers import (
     AboutUsSerializer,
     ClientLogoSerializer,
     CompanyInfoSerializer,
     ServiceSerializer,
+    HomeHeroSerializer,
 )
 
 class ClientLogoViewSet(viewsets.ModelViewSet):
@@ -22,7 +23,7 @@ class ClientLogoViewSet(viewsets.ModelViewSet):
     search_fields = ['name']
 
 class ServiceViewSet(viewsets.ModelViewSet):
-    queryset = Service.objects.all().order_by('-created_at')
+    queryset = Service.objects.all().order_by('created_at')
     serializer_class = ServiceSerializer
     permission_classes = [permissions.IsAuthenticatedOrReadOnly]
 
@@ -48,6 +49,29 @@ class AboutUsView(generics.RetrieveUpdateAPIView):
 
     def get_object(self):
         obj, created = AboutUs.objects.get_or_create(defaults={'description': ''})
+        return obj
+
+    def perform_update(self, serializer):
+        delete_image = self.request.data.get('delete_image')
+
+        if delete_image == 'true':
+            if serializer.instance.image:
+                serializer.instance.image.delete(save=False)
+
+            serializer.save(image=None)
+        else:
+            serializer.save()
+
+class HomeHeroView(generics.RetrieveUpdateAPIView):
+    serializer_class = HomeHeroSerializer
+    permission_classes = [permissions.IsAuthenticatedOrReadOnly]
+
+    def get_object(self):
+        obj, created = HomeHero.objects.get_or_create(pk=1, defaults={
+            'badge': 'Innovación y Solidez',
+            'title': 'Construimos',
+            'highlight': 'El Futuro.'
+        })
         return obj
 
     def perform_update(self, serializer):
