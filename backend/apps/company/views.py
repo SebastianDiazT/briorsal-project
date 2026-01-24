@@ -1,12 +1,13 @@
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import filters, generics, permissions, viewsets
-from .models import AboutUs, ClientLogo, CompanyInfo, Service, HomeHero
+from .models import AboutUs, ClientLogo, CompanyInfo, Service, HomeHero, ProjectsHero
 from .serializers import (
     AboutUsSerializer,
     ClientLogoSerializer,
     CompanyInfoSerializer,
     ServiceSerializer,
     HomeHeroSerializer,
+    ProjectsHeroSerializer,
 )
 
 class ClientLogoViewSet(viewsets.ModelViewSet):
@@ -82,6 +83,28 @@ class HomeHeroView(generics.RetrieveUpdateAPIView):
             if serializer.instance.image:
                 serializer.instance.image.delete(save=False)
 
+            serializer.save(image=None)
+        else:
+            serializer.save()
+
+class ProjectsHeroView(generics.RetrieveUpdateAPIView):
+    serializer_class = ProjectsHeroSerializer
+    permission_classes = [permissions.IsAuthenticatedOrReadOnly]
+
+    def get_object(self):
+        obj, created = ProjectsHero.objects.get_or_create(defaults={
+            'title': '',
+            'highlight': '',
+            'description': '',
+        })
+        return obj
+
+    def perform_update(self, serializer):
+        delete_image = self.request.data.get('delete_image')
+
+        if delete_image == 'true':
+            if serializer.instance.image:
+                serializer.instance.image.delete(save=False)
             serializer.save(image=None)
         else:
             serializer.save()

@@ -114,3 +114,23 @@ class HomeHero(models.Model):
 
     def __str__(self):
         return 'Configuración del Home Hero'
+
+class ProjectsHero(models.Model):
+    title = models.CharField(max_length=100, default='Nuestros', verbose_name='Título (Parte Blanca)')
+    highlight = models.CharField(max_length=100, default='Proyectos.', verbose_name='Texto Destacado (Naranja)')
+    description = models.TextField(verbose_name='Descripción', default='Una muestra de nuestra capacidad técnica y visión arquitectónica. Cada obra refleja nuestro compromiso con la calidad.')
+    image = models.ImageField(
+        upload_to='company/projects/',
+        blank=True,
+        null=True,
+        verbose_name='Imagen de Fondo',
+        validators=[validate_image_size, FileExtensionValidator(allowed_extensions=['jpg', 'jpeg', 'png', 'webp'])],
+    )
+
+    class Meta:
+        db_table = 'projects_hero'
+        verbose_name = 'Banner de Proyectos'
+        verbose_name_plural = 'Banner de Proyectos'
+
+    def __str__(self):
+        return 'Configuración del Banner de Proyectos'

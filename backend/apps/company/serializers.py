@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import ClientLogo, Service, CompanyInfo, AboutUs, HomeHero
+from .models import ClientLogo, Service, CompanyInfo, AboutUs, HomeHero, ProjectsHero
 
 class ClientLogoSerializer(serializers.ModelSerializer):
     class Meta:
@@ -24,4 +24,9 @@ class AboutUsSerializer(serializers.ModelSerializer):
 class HomeHeroSerializer(serializers.ModelSerializer):
     class Meta:
         model = HomeHero
+        fields = '__all__'
+
+class ProjectsHeroSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = ProjectsHero
         fields = '__all__'
