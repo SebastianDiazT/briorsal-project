@@ -34,6 +34,8 @@ THIRD_PARTY_APPS = [
     'drf_spectacular',
     'django_filters',
     'djoser',
+    'imagekit',
+    'adminsortable2',
 ]
 
 PROJECT_APPS = [

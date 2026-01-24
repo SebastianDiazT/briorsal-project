@@ -3,25 +3,67 @@ from rest_framework import serializers
 from .models import Project, Category, ProjectImage, ProjectVideo
 
 class CategorySerializer(serializers.ModelSerializer):
+    project_count = serializers.IntegerField(read_only=True)
+
     class Meta:
         model = Category
-        fields = '__all__'
+        fields = ['id', 'name', 'project_count']
 
 class ProjectImageSerializer(serializers.ModelSerializer):
+    image = serializers.SerializerMethodField()
+
     class Meta:
         model = ProjectImage
         fields = ['id', 'image']
+
+    def get_image(self, obj):
+        if hasattr(obj, 'image_large') and obj.image_large:
+            return obj.image_large.url
+        return obj.image.url
 
 class ProjectVideoSerializer(serializers.ModelSerializer):
     class Meta:
         model = ProjectVideo
         fields = ['id', 'video']
 
+class ProjectListSerializer(serializers.ModelSerializer):
+    cover_image = serializers.SerializerMethodField()
+    categories = CategorySerializer(many=True, read_only=True)
+
+    class Meta:
+        model = Project
+        fields = [
+            'id',
+            'name',
+            'slug',
+            'cover_image',
+            'categories',
+            'location',
+            'year',
+            'is_featured',
+            'sort_order',
+            'status'
+        ]
+
+    def get_cover_image(self, obj):
+        if obj.cover_thumbnail:
+            return obj.cover_thumbnail.url
+        return None
+
+
 class ProjectSerializer(serializers.ModelSerializer):
-    category_name = serializers.CharField(source='category.name', read_only=True)
+    categories = CategorySerializer(many=True, read_only=True)
+
+    category_ids = serializers.PrimaryKeyRelatedField(
+        queryset=Category.objects.all(), source='categories', write_only=True, many=True
+    )
 
     images = ProjectImageSerializer(many=True, read_only=True)
     videos = ProjectVideoSerializer(many=True, read_only=True)
+
+    cover_image_url = serializers.SerializerMethodField()
+
+    cover_image = serializers.ImageField(write_only=True, required=False)
 
     uploaded_images = serializers.ListField(
         child=serializers.ImageField(allow_empty_file=False, use_url=False),
@@ -46,8 +88,8 @@ class ProjectSerializer(serializers.ModelSerializer):
         fields = [
             'id',
             'slug',
-            'category',
-            'category_name',
+            'categories',
+            'category_ids',
             'name',
             'location',
             'description',
@@ -57,6 +99,8 @@ class ProjectSerializer(serializers.ModelSerializer):
             'area',
             'status',
             'extra_info',
+            'cover_image',
+            'cover_image_url',
             'images',
             'videos',
             'uploaded_images',
@@ -64,20 +108,31 @@ class ProjectSerializer(serializers.ModelSerializer):
             'delete_images',
             'delete_videos',
             'is_featured',
+            'sort_order',
             'created_at',
             'updated_at',
         ]
-        read_only_fields = ['id', 'slug', 'category_name', 'created_at', 'updated_at']
+        read_only_fields = ['id', 'slug', 'created_at', 'updated_at']
+
+    def get_cover_image_url(self, obj):
+        if obj.cover_image:
+            return obj.cover_image.url
+        return None
 
     def create(self, validated_data):
         uploaded_images = validated_data.pop('uploaded_images', [])
         uploaded_videos = validated_data.pop('uploaded_videos', [])
+        categories = validated_data.pop('categories', [])
 
         validated_data.pop('delete_images', None)
         validated_data.pop('delete_videos', None)
 
         with transaction.atomic():
             project = Project.objects.create(**validated_data)
+
+            if categories:
+                project.categories.set(categories)
+
             self._save_media(project, uploaded_images, uploaded_videos)
 
         return project
@@ -85,14 +140,18 @@ class ProjectSerializer(serializers.ModelSerializer):
     def update(self, instance, validated_data):
         uploaded_images = validated_data.pop('uploaded_images', [])
         uploaded_videos = validated_data.pop('uploaded_videos', [])
-
         delete_images_ids = validated_data.pop('delete_images', [])
         delete_videos_ids = validated_data.pop('delete_videos', [])
+
+        categories = validated_data.pop('categories', None)
 
         with transaction.atomic():
             for attr, value in validated_data.items():
                 setattr(instance, attr, value)
             instance.save()
+
+            if categories is not None:
+                instance.categories.set(categories)
 
             if delete_images_ids:
                 ProjectImage.objects.filter(

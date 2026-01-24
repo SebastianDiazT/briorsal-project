@@ -1,19 +1,21 @@
-from django.db.models import ProtectedError
+from django.db.models import Count
 from django_filters.rest_framework import DjangoFilterBackend
-from rest_framework import filters, parsers, permissions, status, viewsets
-from rest_framework.response import Response
+from rest_framework import filters, parsers, permissions, viewsets
 
 from .models import Category, Project, ProjectImage, ProjectVideo
 from .serializers import (
     CategorySerializer,
-    ProjectImageSerializer,
     ProjectSerializer,
+    ProjectListSerializer,
+    ProjectImageSerializer,
     ProjectVideoSerializer,
 )
 
 
 class CategoryViewSet(viewsets.ModelViewSet):
-    queryset = Category.objects.all()
+    queryset = Category.objects.annotate(
+        project_count=Count('projects')
+    )
     serializer_class = CategorySerializer
     permission_classes = [permissions.IsAuthenticatedOrReadOnly]
     lookup_field = 'id'
@@ -26,22 +28,10 @@ class CategoryViewSet(viewsets.ModelViewSet):
 
     filterset_fields = ['name']
     search_fields = ['name',]
-    ordering_fields = ['name', 'created_at']
-
-    def destroy(self, request, *args, **kwargs):
-        try:
-            return super().destroy(request, *args, **kwargs)
-        except ProtectedError:
-            return Response({
-                'status': 'error',
-                'code': 400,
-                'message': 'No se puede eliminar esta categoría porque tiene proyectos asociados.',
-                'errors': {'detail': 'ProtectedError: Integridad referencial violada'}
-            }, status=status.HTTP_400_BAD_REQUEST)
+    ordering_fields = ['name', 'created_at', 'project_count']
 
 class ProjectViewSet(viewsets.ModelViewSet):
-    queryset = Project.objects.select_related('category').all().order_by('-created_at')
-    serializer_class = ProjectSerializer
+    queryset = Project.objects.all().prefetch_related('categories', 'images', 'videos').order_by('sort_order', '-created_at')
     lookup_field = 'slug'
     permission_classes = [permissions.IsAuthenticatedOrReadOnly]
 
@@ -53,9 +43,20 @@ class ProjectViewSet(viewsets.ModelViewSet):
         filters.OrderingFilter,
     ]
 
-    filterset_fields = ['category', 'status', 'service_type', 'is_featured', 'year']
-    search_fields = ['name', 'location', 'service_type', 'area', 'status', 'description']
-    ordering_fields = ['created_at', 'name', 'year']
+    filterset_fields = {
+        'categories': ['exact'],
+        'status': ['exact'],
+        'service_type': ['exact'],
+        'is_featured': ['exact'],
+        'year': ['exact', 'gte', 'lte'],
+    }
+    search_fields = ['name', 'location', 'service_type', 'description', 'categories__name']
+    ordering_fields = ['sort_order', 'created_at', 'name', 'year']
+
+    def get_serializer_class(self):
+        if self.action == 'list':
+            return ProjectListSerializer
+        return ProjectSerializer
 
 class ProjectImageViewSet(viewsets.ModelViewSet):
     queryset = ProjectImage.objects.all()
