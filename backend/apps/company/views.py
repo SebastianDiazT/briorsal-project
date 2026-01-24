@@ -67,7 +67,7 @@ class HomeHeroView(generics.RetrieveUpdateAPIView):
     permission_classes = [permissions.IsAuthenticatedOrReadOnly]
 
     def get_object(self):
-        obj, created = HomeHero.objects.get_or_create(pk=1, defaults={
+        obj, created = HomeHero.objects.get_or_create(defaults={
             'badge': 'Innovación y Solidez',
             'title': 'Construimos',
             'highlight': 'El Futuro.'

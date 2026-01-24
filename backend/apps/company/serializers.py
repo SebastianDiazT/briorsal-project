@@ -21,7 +21,7 @@ class AboutUsSerializer(serializers.ModelSerializer):
         model = AboutUs
         fields = '__all__'
 
-class HomeHeroSerializer(serializers.Serializer):
+class HomeHeroSerializer(serializers.ModelSerializer):
     class Meta:
         model = HomeHero
-        fields = "__all__"
+        fields = '__all__'

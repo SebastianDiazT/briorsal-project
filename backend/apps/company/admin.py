@@ -1,6 +1,6 @@
 from django.contrib import admin
 from django.utils.html import format_html
-from .models import ClientLogo, Service, CompanyInfo, AboutUs
+from .models import ClientLogo, Service, CompanyInfo, AboutUs, HomeHero
 
 @admin.register(ClientLogo)
 class ClientLogoAdmin(admin.ModelAdmin):
@@ -47,6 +47,13 @@ class CompanyInfoAdmin(admin.ModelAdmin):
 
 @admin.register(AboutUs)
 class AboutUsAdmin(admin.ModelAdmin):
+    def has_add_permission(self, request):
+        if self.model.objects.exists():
+            return False
+        return super().has_add_permission(request)
+
+@admin.register(HomeHero)
+class HomeHeroAdmin(admin.ModelAdmin):
     def has_add_permission(self, request):
         if self.model.objects.exists():
             return False
