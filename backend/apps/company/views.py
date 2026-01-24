@@ -68,9 +68,10 @@ class HomeHeroView(generics.RetrieveUpdateAPIView):
 
     def get_object(self):
         obj, created = HomeHero.objects.get_or_create(defaults={
-            'badge': 'Innovación y Solidez',
-            'title': 'Construimos',
-            'highlight': 'El Futuro.'
+            'badge': '',
+            'title': '',
+            'highlight': '',
+            'description': '',
         })
         return obj
 
