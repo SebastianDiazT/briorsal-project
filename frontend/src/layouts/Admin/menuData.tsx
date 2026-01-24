@@ -5,8 +5,9 @@ import {
     FaHandshake,
     FaLayerGroup,
     FaHardHat,
-    FaInfoCircle, // Icono para Nosotros
-    FaMapMarkedAlt, // Icono para Contacto
+    FaInfoCircle,
+    FaMapMarkedAlt,
+    FaImage,
 } from 'react-icons/fa';
 
 export const menuGroups = [
@@ -48,6 +49,11 @@ export const menuGroups = [
     {
         name: 'GESTIÓN WEB',
         items: [
+            {
+                name: 'Portada Inicio',
+                path: '/admin/home-hero',
+                icon: <FaImage />,
+            },
             {
                 name: 'Nosotros',
                 path: '/admin/about',

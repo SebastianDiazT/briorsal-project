@@ -36,3 +36,20 @@ export interface AboutUsResponse {
     data: AboutUs;
     meta: any;
 }
+
+export interface HomeHero {
+    id: number;
+    badge: string;
+    title: string;
+    highlight: string;
+    description: string;
+    image: string | null;
+}
+
+export interface HomeHeroResponse {
+    status: string;
+    code: number;
+    message: string;
+    data: HomeHero;
+    meta: any;
+}

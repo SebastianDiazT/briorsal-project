@@ -1,5 +1,4 @@
 import React, { useEffect, useState, useCallback } from 'react';
-import { Link } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
 import {
     FaSave,
@@ -8,50 +7,59 @@ import {
     FaImage,
     FaUpload,
     FaAlignLeft,
-    FaBullseye,
-    FaLightbulb,
+    FaHeading,
+    FaHighlighter,
     FaTrash,
     FaCloudUploadAlt,
+    FaExclamationCircle,
     FaExternalLinkAlt,
 } from 'react-icons/fa';
 import toast from 'react-hot-toast';
 
 import {
-    useGetAboutUsQuery,
-    useUpdateAboutUsMutation,
+    useGetHomeHeroQuery,
+    useUpdateHomeHeroMutation,
 } from '@/features/company/api/companyApi';
-import { AboutUs } from '@/features/company/types';
+import { HomeHero } from '@/features/company/types';
 
-import PageMeta from '@components/common/PageMeta';
-import { PageHeader } from '@components/ui/PageHeader';
+import PageMeta from '@/components/common/PageMeta';
+import { PageHeader } from '@/components/ui/PageHeader';
+import { Link } from 'react-router';
 
-interface AboutUsForm extends Omit<AboutUs, 'image'> {
+interface HomeHeroForm extends Omit<HomeHero, 'image' | 'id'> {
     image?: FileList | string | null;
 }
 
-export const AboutUsPage = () => {
+export const HomeHeroPage = () => {
     const {
         data: response,
         isLoading: isLoadingData,
         isError,
-    } = useGetAboutUsQuery();
-    const [updateAboutUs, { isLoading: isUpdating }] =
-        useUpdateAboutUsMutation();
+    } = useGetHomeHeroQuery();
+    const [updateHero, { isLoading: isUpdating }] = useUpdateHomeHeroMutation();
 
     const [previewImage, setPreviewImage] = useState<string | null>(null);
     const [deleteImageFlag, setDeleteImageFlag] = useState(false);
     const [isDragging, setIsDragging] = useState(false);
 
-    const { register, handleSubmit, reset, watch, setValue } =
-        useForm<AboutUsForm>();
+    const {
+        register,
+        handleSubmit,
+        reset,
+        watch,
+        setValue,
+        formState: { errors },
+    } = useForm<HomeHeroForm>();
+
     const selectedFile = watch('image');
 
     useEffect(() => {
         if (response?.data) {
             reset({
+                badge: response.data.badge || '',
+                title: response.data.title || '',
+                highlight: response.data.highlight || '',
                 description: response.data.description || '',
-                mission: response.data.mission || '',
-                vision: response.data.vision || '',
             });
             setPreviewImage(response.data.image);
             setDeleteImageFlag(false);
@@ -93,14 +101,11 @@ export const AboutUsPage = () => {
             const files = e.dataTransfer.files;
             if (files && files.length > 0) {
                 const file = files[0];
-
                 if (!file.type.startsWith('image/')) {
                     toast.error('Solo puedes subir archivos de imagen');
                     return;
                 }
-
                 setValue('image', files, { shouldValidate: true });
-
                 const objectUrl = URL.createObjectURL(file);
                 setPreviewImage(objectUrl);
                 setDeleteImageFlag(false);
@@ -117,12 +122,13 @@ export const AboutUsPage = () => {
         toast('Imagen marcada para eliminar', { icon: '🗑️' });
     };
 
-    const onSubmit = async (data: AboutUsForm) => {
+    const onSubmit = async (data: HomeHeroForm) => {
         try {
             const formData = new FormData();
+            formData.append('badge', data.badge);
+            formData.append('title', data.title);
+            formData.append('highlight', data.highlight);
             formData.append('description', data.description);
-            formData.append('mission', data.mission);
-            formData.append('vision', data.vision);
 
             if (deleteImageFlag) {
                 formData.append('delete_image', 'true');
@@ -134,13 +140,70 @@ export const AboutUsPage = () => {
                 formData.append('image', data.image[0]);
             }
 
-            await updateAboutUs(formData).unwrap();
-            toast.success('Sección "Nosotros" actualizada');
+            await updateHero(formData).unwrap();
+            toast.success('Portada actualizada correctamente');
             setDeleteImageFlag(false);
         } catch (error) {
-            toast.error('Error al actualizar');
+            console.error(error);
+            toast.error('Error al actualizar la portada');
         }
     };
+
+    const InputField = ({
+        label,
+        name,
+        icon: Icon,
+        placeholder,
+        hint,
+        className,
+        register,
+        required = false,
+        error,
+        ...rest
+    }: any) => (
+        <div className="space-y-2">
+            <label className="text-sm font-bold text-slate-800 ml-1 flex items-center gap-1">
+                {label}
+                {required && <span className="text-red-500">*</span>}
+            </label>
+            <div className="relative group">
+                <div
+                    className={`absolute top-1/2 -translate-y-1/2 left-0 pl-3 flex pointer-events-none transition-colors ${
+                        error
+                            ? 'text-red-400'
+                            : 'text-orange-500/70 group-focus-within:text-orange-600'
+                    }`}
+                >
+                    <Icon />
+                </div>
+                <input
+                    type="text"
+                    {...register}
+                    placeholder={placeholder}
+                    className={`w-full pl-10 pr-4 py-3 bg-slate-50 border rounded-xl focus:outline-none focus:ring-2 transition-all text-sm font-medium text-slate-800 placeholder:text-slate-400 shadow-sm
+                    ${
+                        error
+                            ? 'border-red-300 focus:border-red-500 focus:ring-red-200 bg-red-50/30'
+                            : 'border-slate-200 focus:border-orange-500 focus:ring-orange-500/20 focus:bg-orange-50/30'
+                    }
+                    ${className}`}
+                    {...rest}
+                />
+            </div>
+            {error ? (
+                <p className="text-xs text-red-500 ml-1 flex items-center gap-1 font-medium animate-fade-in">
+                    <FaExclamationCircle /> {error.message}
+                </p>
+            ) : (
+                hint && (
+                    <p className="text-xs text-slate-500 ml-1 italic flex items-center gap-1">
+                        <FaInfoCircle size={10} className="text-blue-400" />{' '}
+                        {hint}
+                    </p>
+                )
+            )}
+        </div>
+    );
 
     const TextAreaField = ({
         label,
@@ -149,26 +212,50 @@ export const AboutUsPage = () => {
         placeholder,
         rows = 4,
         hint,
+        register,
+        required = false,
+        error,
+        ...rest
     }: any) => (
         <div className="space-y-2">
-            <label className="text-sm font-bold text-slate-800 ml-1 flex items-center gap-2">
+            <label className="text-sm font-bold text-slate-800 ml-1 flex items-center gap-1">
                 {label}
+                {required && <span className="text-red-500">*</span>}
             </label>
             <div className="relative group">
-                <div className="absolute top-3 left-0 pl-3 flex pointer-events-none text-orange-500/70 group-focus-within:text-orange-600 transition-colors">
+                <div
+                    className={`absolute top-3 left-0 pl-3 flex pointer-events-none transition-colors ${
+                        error
+                            ? 'text-red-400'
+                            : 'text-orange-500/70 group-focus-within:text-orange-600'
+                    }`}
+                >
                     <Icon />
                 </div>
                 <textarea
-                    {...register(name)}
+                    {...register}
                     rows={rows}
                     placeholder={placeholder}
-                    className="w-full pl-10 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500 focus:bg-orange-50/30 transition-all text-sm font-medium text-slate-800 placeholder:text-slate-400 resize-none leading-relaxed shadow-sm"
+                    className={`w-full pl-10 pr-4 py-3 bg-slate-50 border rounded-xl focus:outline-none focus:ring-2 transition-all text-sm font-medium text-slate-800 placeholder:text-slate-400 resize-none leading-relaxed shadow-sm
+                    ${
+                        error
+                            ? 'border-red-300 focus:border-red-500 focus:ring-red-200 bg-red-50/30'
+                            : 'border-slate-200 focus:border-orange-500 focus:ring-orange-500/20 focus:bg-orange-50/30'
+                    }`}
+                    {...rest}
                 />
             </div>
-            {hint && (
-                <p className="text-xs text-slate-500 ml-1 italic flex items-center gap-1">
-                    <FaInfoCircle size={10} className="text-blue-400" /> {hint}
+            {error ? (
+                <p className="text-xs text-red-500 ml-1 flex items-center gap-1 font-medium animate-fade-in">
+                    <FaExclamationCircle /> {error.message}
                 </p>
+            ) : (
+                hint && (
+                    <p className="text-xs text-slate-500 ml-1 italic flex items-center gap-1">
+                        <FaInfoCircle size={10} className="text-blue-400" />{' '}
+                        {hint}
+                    </p>
+                )
             )}
         </div>
     );
@@ -184,7 +271,7 @@ export const AboutUsPage = () => {
     if (isError) {
         return (
             <div className="p-10 text-center text-red-500">
-                Error al cargar datos.
+                Error al cargar datos. Por favor recarga la página.
             </div>
         );
     }
@@ -192,27 +279,23 @@ export const AboutUsPage = () => {
     return (
         <>
             <PageMeta
-                title="NOSOTROS"
-                description="Gestión de Misión y Visión"
+                title="PORTADA INICIO"
+                description="Gestión del Hero (Banner Principal)"
             />
 
             <div className="w-full animate-fade-in-up pb-20">
                 <PageHeader
-                    title="Gestión: Nosotros"
-                    breadcrumbs={[
-                        'Administración',
-                        'Contenido Web',
-                        'Nosotros',
-                    ]}
-                    icon={FaInfoCircle}
+                    title="Gestión: Portada Inicio"
+                    breadcrumbs={['Administración', 'Empresa', 'Portada']}
+                    icon={FaImage}
                 >
                     <div className="flex items-center gap-3">
                         <Link
-                            to="/nosotros"
+                            to="/"
                             target="_blank"
                             rel="noopener noreferrer"
                             className="flex items-center justify-center gap-2 px-5 py-2.5 rounded-xl bg-white border border-slate-200 text-slate-600 text-sm font-bold shadow-sm hover:bg-slate-50 hover:text-orange-600 hover:border-orange-200 hover:-translate-y-0.5 transition-all duration-300"
-                            title="Ver página en nueva pestaña"
+                            title="Ver página de inicio en nueva pestaña"
                         >
                             <FaExternalLinkAlt size={14} />
                             <span className="hidden sm:inline">Ver en Web</span>
@@ -221,7 +304,7 @@ export const AboutUsPage = () => {
                         <button
                             onClick={handleSubmit(onSubmit)}
                             disabled={isUpdating}
-                            className="flex-1 md:flex-none flex items-center justify-center gap-2 px-6 py-2.5 rounded-xl bg-slate-900 text-white text-sm font-bold shadow-lg shadow-slate-900/20 hover:bg-orange-600 hover:shadow-orange-600/30 hover:-translate-y-0.5 transition-all duration-300 active:scale-95 disabled:opacity-70 disabled:cursor-not-allowed"
+                            className="flex items-center justify-center gap-2 px-6 py-2.5 rounded-xl bg-slate-900 text-white text-sm font-bold shadow-lg shadow-slate-900/20 hover:bg-orange-600 hover:shadow-orange-600/30 hover:-translate-y-0.5 transition-all duration-300 active:scale-95 disabled:opacity-70 disabled:cursor-not-allowed"
                         >
                             {isUpdating ? (
                                 <FaSpinner className="animate-spin" />
@@ -247,33 +330,60 @@ export const AboutUsPage = () => {
                             </h2>
 
                             <div className="space-y-8">
-                                <TextAreaField
-                                    label="Historia / Quiénes Somos"
-                                    name="description"
-                                    icon={FaAlignLeft}
-                                    placeholder="Ej: Somos una empresa constructora fundada en Arequipa..."
-                                    rows={5}
-                                    hint="Aparecerá en la sección principal de la página web."
-                                />
-
-                                <div className="grid grid-cols-1 gap-8 bg-slate-50/50 p-6 rounded-2xl border border-slate-100">
-                                    <TextAreaField
-                                        label="Nuestra Misión"
-                                        name="mission"
-                                        icon={FaBullseye}
-                                        placeholder="Ej: Ofrecer soluciones inmobiliarias innovadoras..."
-                                        rows={3}
-                                        hint="El propósito fundamental de la empresa."
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                    <InputField
+                                        label="Etiqueta Superior (Badge)"
+                                        icon={FaHighlighter}
+                                        placeholder="Ej: Innovación y Solidez"
+                                        hint="Texto pequeño encima del título."
+                                        register={register('badge', {
+                                            required:
+                                                'La etiqueta es obligatoria',
+                                        })}
+                                        error={errors.badge}
+                                        required
                                     />
-                                    <TextAreaField
-                                        label="Nuestra Visión"
-                                        name="vision"
-                                        icon={FaLightbulb}
-                                        placeholder="Ej: Ser la constructora líder en el sur del país..."
-                                        rows={3}
-                                        hint="Hacia dónde se dirige la empresa en el futuro."
+                                    <InputField
+                                        label="Título Principal"
+                                        icon={FaHeading}
+                                        placeholder="Ej: Construimos"
+                                        hint="Primera línea del título grande."
+                                        register={register('title', {
+                                            required:
+                                                'El título es obligatorio',
+                                        })}
+                                        error={errors.title}
+                                        required
                                     />
                                 </div>
+
+                                <InputField
+                                    label="Texto Destacado (Gradiente)"
+                                    icon={FaHighlighter}
+                                    placeholder="Ej: El Futuro."
+                                    className="font-bold text-orange-600"
+                                    hint="Segunda línea con efecto de color degradado."
+                                    register={register('highlight', {
+                                        required:
+                                            'El texto destacado es obligatorio',
+                                    })}
+                                    error={errors.highlight}
+                                    required
+                                />
+
+                                <TextAreaField
+                                    label="Descripción Corta"
+                                    icon={FaAlignLeft}
+                                    placeholder="Ej: Transformamos visiones en estructuras tangibles..."
+                                    rows={4}
+                                    hint="Párrafo explicativo debajo del título."
+                                    register={register('description', {
+                                        required:
+                                            'La descripción es obligatoria',
+                                    })}
+                                    error={errors.description}
+                                    required
+                                />
                             </div>
                         </div>
                     </div>
@@ -284,11 +394,11 @@ export const AboutUsPage = () => {
                                 <span className="bg-blue-100 text-blue-600 p-2.5 rounded-xl shadow-sm">
                                     <FaImage size={18} />
                                 </span>
-                                Imagen de Portada
+                                Imagen de Fondo
                             </h2>
 
                             <div className="flex flex-col gap-6 flex-grow">
-                                <div className="relative w-full aspect-[3/4] md:aspect-square lg:aspect-[3/4]">
+                                <div className="relative w-full aspect-video md:aspect-square lg:aspect-video">
                                     {previewImage && !deleteImageFlag && (
                                         <button
                                             type="button"
@@ -322,12 +432,11 @@ export const AboutUsPage = () => {
                                                     alt="Preview"
                                                     className="w-full h-full object-cover pointer-events-none"
                                                 />
-
                                                 <div
                                                     className={`
-                                                    absolute inset-0 bg-black/50 transition-opacity flex flex-col items-center justify-center text-white p-4 text-center
-                                                    ${isDragging ? 'opacity-100' : 'opacity-0 hover:opacity-100'}
-                                                `}
+                                                        absolute inset-0 bg-black/50 transition-opacity flex flex-col items-center justify-center text-white p-4 text-center
+                                                        ${isDragging ? 'opacity-100' : 'opacity-0 hover:opacity-100'}
+                                                    `}
                                                 >
                                                     {isDragging ? (
                                                         <>
@@ -405,15 +514,12 @@ export const AboutUsPage = () => {
                                             Información de visualización:
                                         </p>
                                         <p>
-                                            Esta imagen aparecerá{' '}
-                                            <span className="font-semibold">
-                                                fija a la izquierda
-                                            </span>{' '}
-                                            en la sección "Nosotros".
+                                            Esta imagen ocupará todo el fondo de
+                                            la pantalla de inicio.
                                         </p>
                                         <p className="opacity-80">
-                                            Sugerido: Formato vertical
-                                            (JPG/PNG).
+                                            Recomendado: 1920x1080px (Alta
+                                            calidad).
                                         </p>
                                     </div>
                                 </div>
@@ -426,4 +532,4 @@ export const AboutUsPage = () => {
     );
 };
 
-export default AboutUsPage;
+export default HomeHeroPage;
