@@ -53,3 +53,19 @@ export interface HomeHeroResponse {
     data: HomeHero;
     meta: any;
 }
+
+export interface ProjectsHero {
+    id: number;
+    title: string;
+    highlight: string;
+    description: string;
+    image: string | null;
+}
+
+export interface ProjectsHeroResponse {
+    status: string;
+    code: number;
+    message: string;
+    data: ProjectsHero;
+    meta: any;
+}

@@ -13,30 +13,33 @@ import {
     FaCloudUploadAlt,
     FaExclamationCircle,
     FaExternalLinkAlt,
+    FaBriefcase,
 } from 'react-icons/fa';
 import toast from 'react-hot-toast';
 
 import {
-    useGetHomeHeroQuery,
-    useUpdateHomeHeroMutation,
+    useGetProjectsHeroQuery,
+    useUpdateProjectsHeroMutation,
 } from '@/features/company/api/companyApi';
-import { HomeHero } from '@/features/company/types';
+import { ProjectsHero } from '@/features/company/types';
 
 import PageMeta from '@/components/common/PageMeta';
 import { PageHeader } from '@/components/ui/PageHeader';
-import { Link } from 'react-router';
+import { Link } from 'react-router-dom';
 
-interface HomeHeroForm extends Omit<HomeHero, 'image' | 'id'> {
+interface ProjectsHeroForm extends Omit<ProjectsHero, 'image' | 'id'> {
     image?: FileList | string | null;
 }
 
-export const HomeHeroPage = () => {
+const ProjectsHeroPage = () => {
     const {
         data: response,
         isLoading: isLoadingData,
         isError,
-    } = useGetHomeHeroQuery();
-    const [updateHero, { isLoading: isUpdating }] = useUpdateHomeHeroMutation();
+    } = useGetProjectsHeroQuery();
+
+    const [updateHero, { isLoading: isUpdating }] =
+        useUpdateProjectsHeroMutation();
 
     const [previewImage, setPreviewImage] = useState<string | null>(null);
     const [deleteImageFlag, setDeleteImageFlag] = useState(false);
@@ -49,14 +52,13 @@ export const HomeHeroPage = () => {
         watch,
         setValue,
         formState: { errors },
-    } = useForm<HomeHeroForm>();
+    } = useForm<ProjectsHeroForm>();
 
     const selectedFile = watch('image');
 
     useEffect(() => {
         if (response?.data) {
             reset({
-                badge: response.data.badge || '',
                 title: response.data.title || '',
                 highlight: response.data.highlight || '',
                 description: response.data.description || '',
@@ -107,6 +109,7 @@ export const HomeHeroPage = () => {
                     'image/webp',
                     'image/jpg',
                 ];
+
                 if (!validTypes.includes(file.type)) {
                     toast.error('Formato no válido. Solo JPG, PNG o WEBP.');
                     return;
@@ -128,10 +131,9 @@ export const HomeHeroPage = () => {
         toast('Imagen marcada para eliminar', { icon: '🗑️' });
     };
 
-    const onSubmit = async (data: HomeHeroForm) => {
+    const onSubmit = async (data: ProjectsHeroForm) => {
         try {
             const formData = new FormData();
-            formData.append('badge', data.badge);
             formData.append('title', data.title);
             formData.append('highlight', data.highlight);
             formData.append('description', data.description);
@@ -147,7 +149,7 @@ export const HomeHeroPage = () => {
             }
 
             await updateHero(formData).unwrap();
-            toast.success('Portada actualizada correctamente');
+            toast.success('Portada de Proyectos actualizada');
             setDeleteImageFlag(false);
         } catch (error) {
             console.error(error);
@@ -285,23 +287,27 @@ export const HomeHeroPage = () => {
     return (
         <>
             <PageMeta
-                title="PORTADA INICIO"
-                description="Gestión del Hero (Banner Principal)"
+                title="PORTADA PROYECTOS"
+                description="Gestión del Hero (Banner) de la página de proyectos."
             />
 
             <div className="w-full animate-fade-in-up pb-20">
                 <PageHeader
-                    title="Gestión: Portada Inicio"
-                    breadcrumbs={['Administración', 'Empresa', 'Portada']}
-                    icon={FaImage}
+                    title="Gestión: Portada Proyectos"
+                    breadcrumbs={[
+                        'Administración',
+                        'Gestión Web',
+                        'Portada Proyectos',
+                    ]}
+                    icon={FaBriefcase}
                 >
                     <div className="flex items-center gap-3">
                         <Link
-                            to="/"
+                            to="/proyectos"
                             target="_blank"
                             rel="noopener noreferrer"
                             className="flex items-center justify-center gap-2 px-5 py-2.5 rounded-xl bg-white border border-slate-200 text-slate-600 text-sm font-bold shadow-sm hover:bg-slate-50 hover:text-orange-600 hover:border-orange-200 hover:-translate-y-0.5 transition-all duration-300"
-                            title="Ver página de inicio en nueva pestaña"
+                            title="Ver página de proyectos en nueva pestaña"
                         >
                             <FaExternalLinkAlt size={14} />
                             <span className="hidden sm:inline">Ver en Web</span>
@@ -338,22 +344,10 @@ export const HomeHeroPage = () => {
                             <div className="space-y-8">
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                                     <InputField
-                                        label="Etiqueta Superior (Badge)"
-                                        icon={FaHighlighter}
-                                        placeholder="Ej: Innovación y Solidez"
-                                        hint="Texto pequeño encima del título."
-                                        register={register('badge', {
-                                            required:
-                                                'La etiqueta es obligatoria',
-                                        })}
-                                        error={errors.badge}
-                                        required
-                                    />
-                                    <InputField
                                         label="Título Principal"
                                         icon={FaHeading}
-                                        placeholder="Ej: Construimos"
-                                        hint="Primera línea del título grande."
+                                        placeholder="Ej: Nuestros"
+                                        hint="Texto en color blanco."
                                         register={register('title', {
                                             required:
                                                 'El título es obligatorio',
@@ -361,26 +355,26 @@ export const HomeHeroPage = () => {
                                         error={errors.title}
                                         required
                                     />
+
+                                    <InputField
+                                        label="Texto Destacado (Naranja)"
+                                        icon={FaHighlighter}
+                                        placeholder="Ej: Proyectos."
+                                        className="font-bold text-orange-600"
+                                        hint="Texto con el color corporativo."
+                                        register={register('highlight', {
+                                            required:
+                                                'El texto destacado es obligatorio',
+                                        })}
+                                        error={errors.highlight}
+                                        required
+                                    />
                                 </div>
 
-                                <InputField
-                                    label="Texto Destacado (Gradiente)"
-                                    icon={FaHighlighter}
-                                    placeholder="Ej: El Futuro."
-                                    className="font-bold text-orange-600"
-                                    hint="Segunda línea con efecto de color degradado."
-                                    register={register('highlight', {
-                                        required:
-                                            'El texto destacado es obligatorio',
-                                    })}
-                                    error={errors.highlight}
-                                    required
-                                />
-
                                 <TextAreaField
-                                    label="Descripción Corta"
+                                    label="Descripción"
                                     icon={FaAlignLeft}
-                                    placeholder="Ej: Transformamos visiones en estructuras tangibles..."
+                                    placeholder="Ej: Una muestra de nuestra capacidad técnica..."
                                     rows={4}
                                     hint="Párrafo explicativo debajo del título."
                                     register={register('description', {
@@ -520,8 +514,9 @@ export const HomeHeroPage = () => {
                                             Información de visualización:
                                         </p>
                                         <p>
-                                            Esta imagen ocupará todo el fondo de
-                                            la pantalla de inicio.
+                                            Esta imagen ocupará el fondo del
+                                            banner superior en la sección
+                                            "Portafolio".
                                         </p>
                                         <p className="opacity-80">
                                             Formatos: JPG, PNG, WEBP. <br />
@@ -538,4 +533,4 @@ export const HomeHeroPage = () => {
     );
 };
 
-export default HomeHeroPage;
+export default ProjectsHeroPage;

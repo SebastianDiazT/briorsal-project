@@ -20,6 +20,7 @@ import ProjectEdit from '@pages/admin/projects/ProjectEdit';
 
 import CompanyInfoPage from '@pages/admin/company/CompanyInfoPage';
 import HomeHeroPage from '@pages/admin/company/HomeHeroPage';
+import ProjectsHeroPage from '@pages/admin/company/ProjectsHeroPage';
 import AboutUsPage from '@pages/admin/company/AboutUsPage';
 
 import ServicesList from '@pages/admin/services/ServicesList';
@@ -73,6 +74,7 @@ export default function App() {
 
                         <Route path="company" element={<CompanyInfoPage />} />
                         <Route path="home-hero" element={<HomeHeroPage />} />
+                        <Route path="hero-projects" element={<ProjectsHeroPage />} />
                         <Route path="about" element={<AboutUsPage />} />
 
                         <Route path="services" element={<ServicesList />} />

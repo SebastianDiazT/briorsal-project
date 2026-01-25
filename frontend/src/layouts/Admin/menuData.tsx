@@ -8,6 +8,7 @@ import {
     FaInfoCircle,
     FaMapMarkedAlt,
     FaImage,
+    FaBriefcase,
 } from 'react-icons/fa';
 
 export const menuGroups = [
@@ -53,6 +54,11 @@ export const menuGroups = [
                 name: 'Portada Inicio',
                 path: '/admin/home-hero',
                 icon: <FaImage />,
+            },
+            {
+                name: 'Portada Proyectos',
+                path: '/admin/hero-projects',
+                icon: <FaBriefcase />,
             },
             {
                 name: 'Nosotros',

@@ -133,17 +133,12 @@ const ServicesList: React.FC = () => {
                     <Link
                         to="/servicios"
                         target="_blank"
-                        className="group flex-1 md:flex-none flex items-center justify-center gap-2 px-5 py-2.5
-                            bg-white border border-slate-200 rounded-xl text-slate-600 text-sm font-bold
-                            shadow-sm hover:shadow-md hover:border-slate-300 hover:text-slate-900 hover:bg-slate-50
-                            transition-all active:scale-95 duration-200"
+                        rel="noopener noreferrer"
+                        className="flex items-center justify-center gap-2 px-5 py-2.5 rounded-xl bg-white border border-slate-200 text-slate-600 text-sm font-bold shadow-sm hover:bg-slate-50 hover:text-orange-600 hover:border-orange-200 hover:-translate-y-0.5 transition-all duration-300"
+                        title="Ver página de servicios en nueva pestaña"
                     >
-                        <FaExternalLinkAlt
-                            size={12}
-                            className="text-slate-400 group-hover:text-orange-500 transition-colors"
-                        />
+                        <FaExternalLinkAlt size={14} />
                         <span className="hidden sm:inline">Ver en Web</span>
-                        <span className="sm:hidden">Ver</span>
                     </Link>
 
                     <button

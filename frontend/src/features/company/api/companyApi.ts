@@ -1,5 +1,5 @@
 import { apiSlice } from '@/store/api/apiSlice';
-import { CompanyInfo, CompanyResponse, AboutUsResponse, HomeHeroResponse } from '../types';
+import { CompanyInfo, CompanyResponse, AboutUsResponse, HomeHeroResponse, ProjectsHeroResponse } from '../types';
 
 export const companyApi = apiSlice.injectEndpoints({
     endpoints: (builder) => ({
@@ -44,6 +44,19 @@ export const companyApi = apiSlice.injectEndpoints({
             }),
             invalidatesTags: ['Company'],
         }),
+
+        getProjectsHero: builder.query<ProjectsHeroResponse, void>({
+            query: () => 'company/projects-hero/',
+            providesTags: ['Company'],
+        }),
+        updateProjectsHero: builder.mutation<ProjectsHeroResponse, FormData>({
+            query: (formData) => ({
+                url: 'company/projects-hero/',
+                method: 'PATCH',
+                body: formData,
+            }),
+            invalidatesTags: ['Company'],
+        }),
     }),
 });
 
@@ -54,4 +67,6 @@ export const {
     useUpdateAboutUsMutation,
     useGetHomeHeroQuery,
     useUpdateHomeHeroMutation,
+    useGetProjectsHeroQuery,
+    useUpdateProjectsHeroMutation,
 } = companyApi;

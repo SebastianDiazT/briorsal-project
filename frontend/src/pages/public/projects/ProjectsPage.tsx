@@ -17,7 +17,6 @@ import { Project } from '@/features/projects/types';
 
 import heroBgImg from '@/assets/projects/hero.png';
 
-// --- COMPONENTE TARJETA DE PROYECTO (Sin cambios) ---
 const PortfolioCard = ({
     project,
     delay,
@@ -66,7 +65,6 @@ const PortfolioCard = ({
     );
 };
 
-// --- SKELETON (Sin cambios) ---
 const ProjectSkeleton = () => (
     <div className="rounded-3xl aspect-[4/5] md:aspect-[3/4] bg-slate-100 animate-pulse relative overflow-hidden">
         <div className="absolute bottom-0 left-0 w-full p-8 space-y-3">
@@ -81,16 +79,13 @@ const ProjectsPage = () => {
     const [page, setPage] = useState(1);
     const PAGE_SIZE = 9;
 
-    // 1. Obtener categorías
     const { data: categoriesResponse, isLoading: isLoadingCats } =
         useGetCategoriesQuery({
             no_page: true,
         });
 
-    // Lista plana de categorías desde la API
     const categories = categoriesResponse?.data || [];
 
-    // 2. Obtener Proyectos filtrados
     const {
         data: response,
         isLoading,
@@ -131,7 +126,6 @@ const ProjectsPage = () => {
                 description="Explora nuestra colección de obras arquitectónicas y proyectos civiles."
             />
 
-            {/* HERO SECTION */}
             <section className="relative h-[60vh] min-h-[500px] flex items-center justify-center overflow-hidden bg-slate-900 pt-20">
                 <div className="absolute inset-0 z-0">
                     <div
@@ -174,17 +168,14 @@ const ProjectsPage = () => {
                 </div>
             </section>
 
-            {/* GRID SECTION */}
             <section
                 id="projects-grid"
                 className="bg-slate-50 pb-24 min-h-screen -mt-20 relative z-20"
             >
                 <div className="container mx-auto px-4">
-                    {/* --- NUEVA BARRA DE FILTROS: BOTONES DE CATEGORÍAS --- */}
                     <div className="mb-12 transform -translate-y-8 relative z-30">
                         <FadeIn direction="up" delay={0.5}>
                             <div className="flex flex-wrap items-center justify-center gap-3">
-                                {/* Botón "TODOS" */}
                                 <button
                                     onClick={() => setSelectedCategory('')}
                                     className={`
@@ -206,9 +197,7 @@ const ProjectsPage = () => {
                                     Todos
                                 </button>
 
-                                {/* Botones Dinámicos desde API */}
                                 {isLoadingCats ? (
-                                    // Skeleton de botones mientras cargan
                                     <>
                                         <div className="w-24 h-10 bg-white rounded-full animate-pulse opacity-50"></div>
                                         <div className="w-32 h-10 bg-white rounded-full animate-pulse opacity-50"></div>
@@ -241,7 +230,6 @@ const ProjectsPage = () => {
                         </FadeIn>
                     </div>
 
-                    {/* CONTENIDO DEL GRID */}
                     {isLoading || isFetching ? (
                         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
                             {[1, 2, 3, 4, 5, 6].map((i) => (
@@ -283,7 +271,6 @@ const ProjectsPage = () => {
                         </div>
                     )}
 
-                    {/* PAGINACIÓN */}
                     {showPagination && meta && (
                         <div className="flex flex-col md:flex-row items-center justify-between mt-16 pt-8 border-t border-slate-200 gap-6">
                             <span className="text-sm text-slate-500 font-medium order-2 md:order-1">
