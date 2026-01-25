@@ -1,11 +1,20 @@
 import { apiSlice } from '@store/api/apiSlice';
 import { ApiResponse } from '@/types/api';
-import { Project, ProjectImage, ProjectVideo, GetProjectsArgs, CreateProjectRequest, UpdateProjectRequest } from '../types';
+import { Project, ProjectImage, ProjectVideo, GetProjectsArgs, CreateProjectRequest, UpdateProjectRequest, ReorderProjectsRequest } from '../types';
 
 export const projectsApi = apiSlice.injectEndpoints({
     endpoints: (builder) => ({
         getProjects: builder.query<ApiResponse<Project[]>, GetProjectsArgs>({
-            query: ({ page = 1, pageSize = 10, search, category, status, is_featured, no_page }) => {
+            query: ({
+                page = 1,
+                pageSize = 10,
+                search,
+                categories,
+                status,
+                is_featured,
+                no_page,
+                ordering,
+            }) => {
                 const params = new URLSearchParams();
 
                 if (no_page) {
@@ -16,9 +25,11 @@ export const projectsApi = apiSlice.injectEndpoints({
                 }
 
                 if (search) params.append('search', search);
-                if (category) params.append('category', category);
+                if (categories) params.append('categories', categories);
                 if (status) params.append('status', status);
-                if (is_featured) params.append('is_featured', is_featured.toString());
+                if (is_featured)
+                    params.append('is_featured', is_featured.toString());
+                if (ordering) params.append('ordering', ordering);
 
                 return `projects/?${params.toString()}`;
             },
@@ -48,6 +59,15 @@ export const projectsApi = apiSlice.injectEndpoints({
                 url: `projects/${slug}/`,
                 method: 'PATCH',
                 body: data,
+            }),
+            invalidatesTags: ['Projects'],
+        }),
+
+        reorderProjects: builder.mutation<void, ReorderProjectsRequest>({
+            query: (reorderData) => ({
+                url: 'projects/reorder/',
+                method: 'POST',
+                body: reorderData,
             }),
             invalidatesTags: ['Projects'],
         }),
@@ -84,7 +104,10 @@ export const projectsApi = apiSlice.injectEndpoints({
             invalidatesTags: ['Projects'],
         }),
 
-        updateProjectVideo: builder.mutation<ProjectVideo, { id: number; file: File }>({
+        updateProjectVideo: builder.mutation<
+            ProjectVideo,
+            { id: number; file: File }
+        >({
             query: ({ id, file }) => {
                 const formData = new FormData();
                 formData.append('video', file);
@@ -112,6 +135,7 @@ export const {
     useGetProjectBySlugQuery,
     useCreateProjectMutation,
     useUpdateProjectMutation,
+    useReorderProjectsMutation,
     useDeleteProjectMutation,
     useDeleteProjectImageMutation,
     useDeleteProjectVideoMutation,

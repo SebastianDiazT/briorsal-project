@@ -1,3 +1,8 @@
+export interface CategoryShort {
+    id: number;
+    name: string;
+}
+
 export interface ProjectImage {
     id: number;
     image: string;
@@ -12,9 +17,10 @@ export interface Project {
     id: number;
     slug: string;
     name: string;
-    description: string;
-    category: number;
-    category_name?: string;
+    description?: string;
+    categories: CategoryShort[];
+    cover_image: string | null;
+    sort_order: number;
     year: number | null;
     location: string;
     service_type: string | null;
@@ -33,11 +39,20 @@ export interface GetProjectsArgs {
     page?: number;
     pageSize?: number;
     search?: string;
-    category?: string;
+    categories?: string;
     status?: string;
     is_featured?: boolean;
     no_page?: boolean;
+    ordering?: string;
 }
 
 export type CreateProjectRequest = FormData;
 export type UpdateProjectRequest = { slug: string; data: FormData };
+
+export interface ReorderProjectItem {
+    id: number;
+    sort_order: number;
+}
+export interface ReorderProjectsRequest {
+    items: ReorderProjectItem[];
+}

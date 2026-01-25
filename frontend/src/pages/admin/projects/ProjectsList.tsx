@@ -1,16 +1,26 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { FaPlus, FaBuilding, FaExternalLinkAlt } from 'react-icons/fa';
+import {
+    FaPlus,
+    FaBuilding,
+    FaExternalLinkAlt,
+    FaSortAmountDown,
+    FaSave,
+    FaSpinner,
+    FaGripVertical,
+} from 'react-icons/fa';
 import toast from 'react-hot-toast';
 
 import {
     useGetProjectsQuery,
     useDeleteProjectMutation,
+    useReorderProjectsMutation,
 } from '@features/projects/api/projectsApi';
 import { useGetCategoriesQuery } from '@features/categories/api/categoriesApi';
+import { Project } from '@features/projects/types';
+
 import PageMeta from '@components/common/PageMeta';
 import { ConfirmModal } from '@components/ui/ConfirmModal';
-
 import { EmptyState } from '@components/ui/EmptyState';
 import { PageHeader } from '@components/ui/PageHeader';
 import { PaginationFooter } from '@components/ui/PaginationFooter';
@@ -21,55 +31,122 @@ import { ProjectsMobileList } from '@features/projects/components/admin/Projects
 const ProjectsList: React.FC = () => {
     const navigate = useNavigate();
 
+    // --- STATES ---
     const [page, setPage] = useState(1);
     const [pageSize, setPageSize] = useState(10);
     const [searchTerm, setSearchTerm] = useState('');
     const [filterCategory, setFilterCategory] = useState('');
     const [filterStatus, setFilterStatus] = useState('');
-    const [projectToDelete, setProjectToDelete] = useState<string | null>(null);
     const [filterFeatured, setFilterFeatured] = useState(false);
+
+    // Control states
+    const [projectToDelete, setProjectToDelete] = useState<string | null>(null);
+    const [isReordering, setIsReordering] = useState(false);
+    const [localProjects, setLocalProjects] = useState<Project[]>([]);
+
     const isShowingAll = pageSize === -1;
 
+    const hasActiveFilters = !!(
+        searchTerm ||
+        filterCategory ||
+        filterStatus ||
+        filterFeatured
+    );
+
+    // --- API QUERIES ---
     const {
         data: response,
         isLoading: isLoadingProjects,
         isFetching,
         isError,
+        refetch,
     } = useGetProjectsQuery({
-        page,
-        pageSize: isShowingAll ? 1000 : pageSize,
-        no_page: isShowingAll,
-        search: searchTerm,
-        category: filterCategory,
-        status: filterStatus,
-        is_featured: filterFeatured,
+        page: isReordering ? undefined : page,
+        pageSize: isReordering ? undefined : pageSize,
+        no_page: isReordering,
+        search: isReordering ? '' : searchTerm,
+        categories: isReordering ? '' : filterCategory,
+        status: isReordering ? '' : filterStatus,
+        is_featured: isReordering ? undefined : filterFeatured,
+        ordering: !hasActiveFilters ? 'sort_order' : undefined,
     });
 
     const { data: categoriesResponse } = useGetCategoriesQuery({
         no_page: true,
     });
     const categories = categoriesResponse?.data || [];
+
     const [deleteProject, { isLoading: isDeleting }] =
         useDeleteProjectMutation();
+    const [reorderProjects, { isLoading: isSavingOrder }] =
+        useReorderProjectsMutation();
 
-    const projects = response?.data || [];
+    const projectsFromApi = response?.data || [];
     const meta = response?.meta;
 
+    // --- SYNCHRONIZATION ---
+    useEffect(() => {
+        if (projectsFromApi) {
+            setLocalProjects(projectsFromApi);
+        }
+    }, [projectsFromApi]);
+
+    // --- SMART PAGINATION LOGIC (From CategoriesList) ---
+    // If the list becomes empty after loading (e.g., deleted last item on page), go back one page.
     useEffect(() => {
         if (
             !isFetching &&
             !isLoadingProjects &&
             !isError &&
-            projects.length === 0 &&
+            projectsFromApi.length === 0 &&
             page > 1
         ) {
-            setPage((prev) => prev - 1);
+            setPage((prev) => Math.max(prev - 1, 1));
         }
 
+        // Also handle error case like in CategoriesList
         if (isError && page > 1) {
-            setPage((prev) => prev - 1);
+            setPage((prev) => Math.max(prev - 1, 1));
         }
-    }, [projects.length, isFetching, isLoadingProjects, isError, page]);
+    }, [projectsFromApi.length, isFetching, isLoadingProjects, isError, page]);
+
+    // --- HANDLERS ---
+    const handleStartReorder = () => {
+        setSearchTerm('');
+        setFilterCategory('');
+        setFilterStatus('');
+        setFilterFeatured(false);
+        setPage(1);
+        setIsReordering(true);
+        toast('Modo reordenar activado. Arrastra las filas.', { icon: '✋' });
+    };
+
+    const handleCancelReorder = () => {
+        setIsReordering(false);
+        refetch();
+        toast('Cambios descartados');
+    };
+
+    const handleSaveOrder = async () => {
+        const offset = (page - 1) * (isShowingAll ? 1000 : pageSize);
+        const itemsToUpdate = localProjects.map((project, index) => ({
+            id: project.id,
+            sort_order: offset + index + 1,
+        }));
+
+        try {
+            await reorderProjects({ items: itemsToUpdate }).unwrap();
+            toast.success('Nuevo orden guardado correctamente');
+            setIsReordering(false);
+        } catch (error) {
+            console.error(error);
+            toast.error('Error al guardar el orden');
+        }
+    };
+
+    const handleLocalReorder = (newOrder: Project[]) => {
+        setLocalProjects(newOrder);
+    };
 
     const handleSearch = (val: string) => {
         setSearchTerm(val);
@@ -87,9 +164,16 @@ const ProjectsList: React.FC = () => {
         setFilterFeatured(val);
         setPage(1);
     };
-
     const handlePageSize = (e: React.ChangeEvent<HTMLSelectElement>) => {
         setPageSize(Number(e.target.value));
+        setPage(1);
+    };
+
+    const clearFilters = () => {
+        setSearchTerm('');
+        setFilterCategory('');
+        setFilterStatus('');
+        setFilterFeatured(false);
         setPage(1);
     };
 
@@ -105,33 +189,23 @@ const ProjectsList: React.FC = () => {
         }
     };
 
-    const clearFilters = () => {
-        setSearchTerm('');
-        setFilterCategory('');
-        setFilterStatus('');
-        setFilterFeatured(false);
-        setPage(1);
-    };
-
-    const hasActiveFilters = !!(searchTerm || filterCategory || filterStatus || filterFeatured);
     const showLoading = isLoadingProjects || isFetching || isDeleting;
 
     const emptyStateProps = hasActiveFilters
         ? {
-            title: 'No se encontraron resultados',
-            description:
-                'No encontramos proyectos que coincidan con los filtros aplicados. Intenta con otros términos.',
-            isFiltered: true,
-            onClear: clearFilters,
-        }
+              title: 'No se encontraron resultados',
+              description:
+                  'No encontramos proyectos que coincidan con los filtros aplicados.',
+              isFiltered: true,
+              onClear: clearFilters,
+          }
         : {
-            title: 'El portafolio está vacío',
-            description:
-                'Aún no has agregado ningún proyecto a tu base de datos. Crea el primero para comenzar.',
-            isFiltered: false,
-            createLink: '/admin/projects/new',
-            createText: 'Crear Proyecto',
-        };
+              title: 'El portafolio está vacío',
+              description: 'Aún no has agregado ningún proyecto.',
+              isFiltered: false,
+              createLink: '/admin/projects/new',
+              createText: 'Crear Proyecto',
+          };
 
     return (
         <>
@@ -140,71 +214,139 @@ const ProjectsList: React.FC = () => {
                 description="Panel Administrativo"
             />
 
-            <div className="w-full animate-fade-in-up">
+            <div className="w-full animate-fade-in-up pb-20">
                 <PageHeader
-                    title="Portafolio de Proyectos"
+                    title={
+                        isReordering
+                            ? 'Reordenando Proyectos'
+                            : 'Portafolio de Proyectos'
+                    }
                     breadcrumbs={['Administración', 'Proyectos']}
-                    icon={FaBuilding}
-                    totalRecords={meta?.total_records || 0}
+                    icon={isReordering ? FaSortAmountDown : FaBuilding}
+                    totalRecords={
+                        isReordering
+                            ? localProjects.length
+                            : meta?.total_records || 0
+                    }
                 >
-                    <Link
-                        to="/proyectos"
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="flex items-center justify-center gap-2 px-5 py-2.5 rounded-xl bg-white border border-slate-200 text-slate-600 text-sm font-bold shadow-sm hover:bg-slate-50 hover:text-orange-600 hover:border-orange-200 hover:-translate-y-0.5 transition-all duration-300"
-                        title="Ver página de proyectos en nueva pestaña"
-                    >
-                        <FaExternalLinkAlt size={14} />
-                        <span className="hidden sm:inline">Ver en Web</span>
-                    </Link>
+                    {isReordering ? (
+                        <div className="flex items-center gap-3 animate-fade-in">
+                            <button
+                                onClick={handleCancelReorder}
+                                disabled={isSavingOrder}
+                                className="px-5 py-2.5 rounded-xl bg-white border border-slate-200 text-slate-600 text-sm font-bold shadow-sm hover:bg-slate-50 transition-all disabled:opacity-50"
+                            >
+                                Cancelar
+                            </button>
+                            <button
+                                onClick={handleSaveOrder}
+                                disabled={isSavingOrder}
+                                className="flex items-center gap-2 px-6 py-2.5 rounded-xl bg-orange-600 text-white text-sm font-bold shadow-lg shadow-orange-600/30 hover:bg-orange-700 hover:-translate-y-0.5 transition-all active:scale-95 disabled:opacity-70 disabled:cursor-not-allowed"
+                            >
+                                {isSavingOrder ? (
+                                    <FaSpinner className="animate-spin" />
+                                ) : (
+                                    <FaSave />
+                                )}
+                                Guardar Orden
+                            </button>
+                        </div>
+                    ) : (
+                        <div className="flex items-center gap-3">
+                            <Link
+                                to="/proyectos"
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="hidden lg:flex items-center justify-center gap-2 px-5 py-2.5 rounded-xl bg-white border border-slate-200 text-slate-600 text-sm font-bold shadow-sm hover:bg-slate-50 hover:text-orange-600 hover:border-orange-200 hover:-translate-y-0.5 transition-all"
+                                title="Ver en Web"
+                            >
+                                <FaExternalLinkAlt size={14} />
+                            </Link>
 
-                    <Link
-                        to="/admin/projects/new"
-                        className="flex-1 md:flex-none flex items-center justify-center gap-2 px-6 py-2.5
-                            rounded-xl bg-slate-900 text-white text-sm font-bold
-                            shadow-lg shadow-slate-900/20
-                            hover:bg-orange-600 hover:shadow-orange-600/30 hover:-translate-y-0.5
-                            transition-all duration-300 active:scale-95"
-                    >
-                        <FaPlus size={12} className="opacity-80" />
-                        <span className="hidden sm:inline">Nuevo Proyecto</span>
-                        <span className="sm:hidden">Nuevo</span>
-                    </Link>
+                            <button
+                                onClick={handleStartReorder}
+                                className="flex items-center justify-center gap-2 px-5 py-2.5 rounded-xl bg-white border border-slate-200 text-slate-600 text-sm font-bold shadow-sm hover:bg-slate-50 hover:text-blue-600 hover:border-blue-200 hover:-translate-y-0.5 transition-all"
+                                title="Cambiar el orden visual de los proyectos"
+                            >
+                                <FaSortAmountDown size={14} />
+                                <span className="hidden sm:inline">
+                                    Ordenar
+                                </span>
+                            </button>
+
+                            <Link
+                                to="/admin/projects/new"
+                                className="flex items-center justify-center gap-2 px-6 py-2.5 rounded-xl bg-slate-900 text-white text-sm font-bold shadow-lg shadow-slate-900/20 hover:bg-orange-600 hover:shadow-orange-600/30 hover:-translate-y-0.5 transition-all active:scale-95"
+                            >
+                                <FaPlus size={12} className="opacity-80" />
+                                <span className="hidden sm:inline">Nuevo</span>
+                            </Link>
+                        </div>
+                    )}
                 </PageHeader>
 
-                <ProjectFilters
-                    searchTerm={searchTerm}
-                    onSearchChange={handleSearch}
-                    filterCategory={filterCategory}
-                    onCategoryChange={handleCategory}
-                    filterStatus={filterStatus}
-                    onStatusChange={handleStatus}
-                    categories={categories}
-                    hasActiveFilters={!!hasActiveFilters}
-                    onClear={clearFilters}
-                    pageSize={pageSize}
-                    onPageSizeChange={handlePageSize}
-                    filterFeatured={filterFeatured}
-                    onFeaturedChange={handleFeatured}
-                />
+                {!isReordering && (
+                    <div className="animate-fade-in-down">
+                        <ProjectFilters
+                            searchTerm={searchTerm}
+                            onSearchChange={handleSearch}
+                            filterCategory={filterCategory}
+                            onCategoryChange={handleCategory}
+                            filterStatus={filterStatus}
+                            onStatusChange={handleStatus}
+                            categories={categories}
+                            hasActiveFilters={hasActiveFilters}
+                            onClear={clearFilters}
+                            pageSize={pageSize}
+                            onPageSizeChange={handlePageSize}
+                            filterFeatured={filterFeatured}
+                            onFeaturedChange={handleFeatured}
+                        />
+                    </div>
+                )}
+
+                {isReordering && (
+                    <div className="bg-orange-50 border border-orange-100 rounded-xl p-4 mb-6 flex items-center gap-3 text-orange-800 animate-fade-in-up">
+                        <FaSortAmountDown className="text-xl" />
+                        <div>
+                            <p className="font-bold text-sm">
+                                Modo de Organización Activo
+                            </p>
+                            <p className="text-xs opacity-80">
+                                Arrastra las filas usando el icono{' '}
+                                <FaGripVertical className="inline" /> para
+                                cambiar su posición. Los filtros están
+                                desactivados temporalmente.
+                            </p>
+                        </div>
+                    </div>
+                )}
 
                 <ProjectsTable
-                    projects={projects}
+                    projects={localProjects}
                     isLoading={showLoading}
                     onEdit={(slug) => navigate(`/admin/projects/edit/${slug}`)}
                     onDelete={setProjectToDelete}
+                    isReordering={isReordering}
+                    onReorderChange={handleLocalReorder}
                     EmptyState={() => <EmptyState {...emptyStateProps} />}
                 />
 
-                <ProjectsMobileList
-                    projects={projects}
-                    isLoading={showLoading}
-                    onEdit={(slug) => navigate(`/admin/projects/edit/${slug}`)}
-                    onDelete={setProjectToDelete}
-                    EmptyState={() => <EmptyState {...emptyStateProps} />}
-                />
+                <div className={isReordering ? 'hidden' : 'block'}>
+                    <ProjectsMobileList
+                        projects={localProjects}
+                        isLoading={showLoading}
+                        onEdit={(slug) =>
+                            navigate(`/admin/projects/edit/${slug}`)
+                        }
+                        onDelete={setProjectToDelete}
+                        EmptyState={() => <EmptyState {...emptyStateProps} />}
+                    />
+                </div>
 
-                <PaginationFooter meta={meta} onPageChange={setPage} />
+                {!isReordering && (
+                    <PaginationFooter meta={meta} onPageChange={setPage} />
+                )}
 
                 <ConfirmModal
                     isOpen={!!projectToDelete}

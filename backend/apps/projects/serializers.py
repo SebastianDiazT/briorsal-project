@@ -173,3 +173,10 @@ class ProjectSerializer(serializers.ModelSerializer):
 
         for vid in videos:
             ProjectVideo.objects.create(project=project, video=vid)
+
+class ProjectReorderSerializer(serializers.Serializer):
+    id = serializers.IntegerField()
+    sort_order = serializers.IntegerField()
+
+class ProjectReorderListSerializer(serializers.Serializer):
+    items = ProjectReorderSerializer(many=True)
