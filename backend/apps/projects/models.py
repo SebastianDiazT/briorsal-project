@@ -47,7 +47,7 @@ class Project(models.Model):
 
     cover_thumbnail = ImageSpecField(
         source='cover_image',
-        processors=[ResizeToFill(600, 800)],
+        processors=[ResizeToFill(800, 800)],
         format='WEBP',
         options={'quality': 85},
     )

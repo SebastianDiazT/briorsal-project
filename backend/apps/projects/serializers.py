@@ -10,7 +10,7 @@ class CategorySerializer(serializers.ModelSerializer):
         fields = ['id', 'name', 'project_count']
 
 class ProjectImageSerializer(serializers.ModelSerializer):
-    image = serializers.SerializerMethodField()
+    image = serializers.ImageField(use_url=True)
 
     class Meta:
         model = ProjectImage
@@ -27,7 +27,7 @@ class ProjectVideoSerializer(serializers.ModelSerializer):
         fields = ['id', 'video']
 
 class ProjectListSerializer(serializers.ModelSerializer):
-    cover_image = serializers.SerializerMethodField()
+    cover_image = serializers.ImageField(use_url=True)
     categories = CategorySerializer(many=True, read_only=True)
 
     class Meta:
@@ -61,9 +61,7 @@ class ProjectSerializer(serializers.ModelSerializer):
     images = ProjectImageSerializer(many=True, read_only=True)
     videos = ProjectVideoSerializer(many=True, read_only=True)
 
-    cover_image_url = serializers.SerializerMethodField()
-
-    cover_image = serializers.ImageField(write_only=True, required=False)
+    cover_image = serializers.ImageField(use_url=True)
 
     uploaded_images = serializers.ListField(
         child=serializers.ImageField(allow_empty_file=False, use_url=False),
@@ -100,7 +98,6 @@ class ProjectSerializer(serializers.ModelSerializer):
             'status',
             'extra_info',
             'cover_image',
-            'cover_image_url',
             'images',
             'videos',
             'uploaded_images',
@@ -113,11 +110,6 @@ class ProjectSerializer(serializers.ModelSerializer):
             'updated_at',
         ]
         read_only_fields = ['id', 'slug', 'created_at', 'updated_at']
-
-    def get_cover_image_url(self, obj):
-        if obj.cover_image:
-            return obj.cover_image.url
-        return None
 
     def create(self, validated_data):
         uploaded_images = validated_data.pop('uploaded_images', [])

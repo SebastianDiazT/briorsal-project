@@ -112,14 +112,16 @@ export const ProjectForm: React.FC<ProjectFormProps> = ({
     const [errors, setErrors] = useState<Record<string, string>>({});
 
     const [name, setName] = useState('');
-    const [categoryId, setCategoryId] = useState<string>('');
+    const [categoryIds, setCategoryIds] = useState<string[]>([]);
     const [location, setLocation] = useState('');
-
     const [status, setStatus] = useState<string>('');
     const [year, setYear] = useState<string>('');
-
     const [description, setDescription] = useState('');
     const [isFeatured, setIsFeatured] = useState(false);
+
+    const [coverImage, setCoverImage] = useState<File | null>(null);
+    const [coverPreview, setCoverPreview] = useState<string>('');
+    const [isDragOverCover, setIsDragOverCover] = useState(false);
 
     const [serviceType, setServiceType] = useState('');
     const [levels, setLevels] = useState('');
@@ -155,13 +157,21 @@ export const ProjectForm: React.FC<ProjectFormProps> = ({
 
     const imgInputRef = useRef<HTMLInputElement>(null);
     const vidInputRef = useRef<HTMLInputElement>(null);
+    const coverInputRef = useRef<HTMLInputElement>(null);
     const replaceServerImgRef = useRef<HTMLInputElement>(null);
     const replaceNewFileRef = useRef<HTMLInputElement>(null);
+
+    const statusOptions = [
+        { value: 'en_proceso', label: 'En Ejecución' },
+        { value: 'entregado', label: 'Entregado' },
+    ];
 
     useEffect(() => {
         if (initialData) {
             setName(initialData.name);
-            setCategoryId(String(initialData.category));
+            setCategoryIds(
+                initialData.categories?.map((c: any) => String(c.id || c)) || []
+            );
             setLocation(initialData.location);
             setStatus(initialData.status || '');
             setDescription(initialData.description || '');
@@ -170,6 +180,7 @@ export const ProjectForm: React.FC<ProjectFormProps> = ({
             setServiceType(initialData.service_type || '');
             setLevels(initialData.levels || '');
             setArea(initialData.area || '');
+            setCoverPreview(initialData.cover_image || '');
 
             if (
                 initialData.extra_info &&
@@ -188,71 +199,36 @@ export const ProjectForm: React.FC<ProjectFormProps> = ({
         }
     }, [initialData]);
 
-    const blockInvalidChar = (e: React.KeyboardEvent<HTMLInputElement>) => {
-        if (['e', 'E', '+', '-'].includes(e.key)) e.preventDefault();
-    };
-    const getFileName = (url: string) => {
-        try {
-            return decodeURIComponent(url.split('/').pop() || 'Video');
-        } catch {
-            return 'Video';
+    const processCoverFile = (file: File | undefined) => {
+        if (!file) return;
+        if (!file.type.startsWith('image/')) {
+            toast.error('Por favor sube un archivo de imagen válido.');
+            return;
         }
+        setCoverImage(file);
+        setCoverPreview(URL.createObjectURL(file));
     };
 
-    const handleAttributeChange = (
-        index: number,
-        field: 'key' | 'value',
-        val: string
-    ) => {
-        const newAttributes = [...attributes];
-        newAttributes[index][field] = val;
-        setAttributes(newAttributes);
-    };
-    const addAttributeRow = () =>
-        setAttributes([...attributes, { key: '', value: '' }]);
-    const removeAttributeRow = (index: number) =>
-        setAttributes(attributes.filter((_, i) => i !== index));
-
-    const processFiles = (files: FileList, type: 'image' | 'video') => {
-        const validFiles: File[] = [];
-        const validPreviews: string[] = [];
-        let hasInvalidFiles = false;
-
-        Array.from(files).forEach((file) => {
-            if (file.type.startsWith(`${type}/`)) {
-                validFiles.push(file);
-                validPreviews.push(URL.createObjectURL(file));
-            } else {
-                hasInvalidFiles = true;
-            }
-        });
-
-        if (hasInvalidFiles) {
-            toast.error(
-                `Algunos archivos no son formatos de ${type === 'image' ? 'imagen' : 'video'} válidos y fueron ignorados.`
-            );
-        }
-
-        if (type === 'image') {
-            setNewImages((p) => [...p, ...validFiles]);
-            setImagePreviews((p) => [...p, ...validPreviews]);
-            setErrors((prev) => ({ ...prev, uploaded_images: '' }));
-        } else {
-            setNewVideos((p) => [...p, ...validFiles]);
-            setVideoPreviews((p) => [...p, ...validPreviews]);
-            setErrors((prev) => ({ ...prev, uploaded_videos: '' }));
-        }
+    const handleCoverChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files?.[0];
+        processCoverFile(file);
     };
 
-    const handleDrop = (e: React.DragEvent, type: 'image' | 'video') => {
+    const handleCoverDrop = (e: React.DragEvent) => {
         e.preventDefault();
-        e.stopPropagation();
-        type === 'image'
-            ? setIsDragActiveImg(false)
-            : setIsDragActiveVid(false);
-        if (e.dataTransfer.files?.length)
-            processFiles(e.dataTransfer.files, type);
+        setIsDragOverCover(false);
+        const file = e.dataTransfer.files?.[0];
+        processCoverFile(file);
     };
+
+    const toggleCategory = (id: string) => {
+        setCategoryIds((prev) =>
+            prev.includes(id) ? prev.filter((i) => i !== id) : [...prev, id]
+        );
+        if (errors.category_ids)
+            setErrors((prev) => ({ ...prev, category_ids: '' }));
+    };
+
     const removeNewFile = (idx: number, type: 'image' | 'video') => {
         if (type === 'image') {
             setNewImages((p) => p.filter((_, i) => i !== idx));
@@ -262,42 +238,16 @@ export const ProjectForm: React.FC<ProjectFormProps> = ({
             setVideoPreviews((p) => p.filter((_, i) => i !== idx));
         }
     };
-    const confirmDelete = () => {
-        if (!itemToDelete) return;
-        if (itemToDelete.type === 'image') {
-            setImagesToDelete((p) => [...p, itemToDelete.id]);
-            setExistingImages((p) =>
-                p.filter((img) => img.id !== itemToDelete.id)
-            );
-            toast.success('Imagen eliminada');
-        } else {
-            setVideosToDelete((p) => [...p, itemToDelete.id]);
-            setExistingVideos((p) =>
-                p.filter((vid) => vid.id !== itemToDelete.id)
-            );
-            toast.success('Video eliminado');
-        }
-        setItemToDelete(null);
-    };
+
     const handleReplaceNewClick = (index: number, type: 'image' | 'video') => {
         setNewFileToReplace({ index, type });
-        replaceNewFileRef.current?.click();
+        setTimeout(() => replaceNewFileRef.current?.click(), 100);
     };
+
     const handleReplaceNewChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const file = e.target.files?.[0];
         if (file && newFileToReplace) {
             const { index, type } = newFileToReplace;
-
-            if (!file.type.startsWith(`${type}/`)) {
-                toast.error(
-                    `El archivo seleccionado no es un formato de ${type === 'image' ? 'imagen' : 'video'} válido.`
-                );
-                if (replaceNewFileRef.current)
-                    replaceNewFileRef.current.value = '';
-                setNewFileToReplace(null);
-                return;
-            }
-
             const preview = URL.createObjectURL(file);
             if (type === 'image') {
                 const files = [...newImages];
@@ -314,28 +264,20 @@ export const ProjectForm: React.FC<ProjectFormProps> = ({
                 previews[index] = preview;
                 setVideoPreviews(previews);
             }
-            toast.success('Reemplazado');
         }
-        if (replaceNewFileRef.current) replaceNewFileRef.current.value = '';
         setNewFileToReplace(null);
     };
+
     const handleReplaceServerClick = (id: number) => {
         setImgToReplaceId(id);
-        replaceServerImgRef.current?.click();
+        setTimeout(() => replaceServerImgRef.current?.click(), 100);
     };
+
     const handleReplaceServerChange = async (
         e: React.ChangeEvent<HTMLInputElement>
     ) => {
         const file = e.target.files?.[0];
         if (file && imgToReplaceId) {
-            if (!file.type.startsWith('image/')) {
-                toast.error('El archivo seleccionado no es una imagen válida.');
-                if (replaceServerImgRef.current)
-                    replaceServerImgRef.current.value = '';
-                setImgToReplaceId(null);
-                return;
-            }
-
             const toastId = toast.loading('Actualizando...');
             try {
                 const result = await updateProjectImage({
@@ -345,100 +287,40 @@ export const ProjectForm: React.FC<ProjectFormProps> = ({
                 setExistingImages((p) =>
                     p.map((img) => (img.id === imgToReplaceId ? result : img))
                 );
-                toast.success('Actualizado', { id: toastId });
-            } catch (error) {
+                toast.success('Actualizado con éxito', { id: toastId });
+            } catch {
                 toast.error('Error al actualizar', { id: toastId });
             }
         }
-        if (replaceServerImgRef.current) replaceServerImgRef.current.value = '';
         setImgToReplaceId(null);
-    };
-
-    const parseBackendErrors = (err: any) => {
-        if (err?.data?.errors) {
-            const apiErrors = err.data.errors;
-            const newErrors: Record<string, string> = {};
-
-            Object.keys(apiErrors).forEach((key) => {
-                const errorContent = apiErrors[key];
-                if (Array.isArray(errorContent)) {
-                    newErrors[key] = errorContent[0];
-                } else if (
-                    typeof errorContent === 'object' &&
-                    errorContent !== null
-                ) {
-                    const firstKey = Object.keys(errorContent)[0];
-                    if (firstKey && Array.isArray(errorContent[firstKey])) {
-                        newErrors[key] = errorContent[firstKey][0];
-                    }
-                }
-            });
-
-            setErrors(newErrors);
-            toast.error(err.data.message || 'Error al guardar el proyecto');
-
-            if (newErrors.uploaded_images || newErrors.uploaded_videos)
-                setActiveTab('media');
-            else if (
-                newErrors.service_type ||
-                newErrors.area ||
-                newErrors.levels
-            )
-                setActiveTab('details');
-            else setActiveTab('general');
-        } else {
-            toast.error('Ocurrió un error inesperado');
-        }
-    };
-
-    const validateClientSide = () => {
-        const newErrors: Record<string, string> = {};
-        if (!name.trim())
-            newErrors.name = 'El nombre del proyecto es obligatorio.';
-        if (!categoryId)
-            newErrors.category = 'Debes seleccionar una categoría.';
-        if (!location.trim()) newErrors.location = 'La ubicación es requerida.';
-        if (!status)
-            newErrors.status = 'Debes seleccionar el estado del proyecto.';
-
-        setErrors(newErrors);
-        if (Object.keys(newErrors).length > 0) {
-            setActiveTab('general');
-            toast.error('Por favor completa los campos requeridos.');
-            return false;
-        }
-        return true;
     };
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         if (!validateClientSide()) return;
-        setErrors({});
 
         const formData = new FormData();
         formData.append('name', name);
-        formData.append('category', categoryId);
         formData.append('location', location);
         formData.append('status', status);
-        formData.append('is_featured', isFeatured ? 'true' : 'false');
+        formData.append('is_featured', String(isFeatured));
         formData.append('description', description);
         formData.append('service_type', serviceType);
         formData.append('levels', levels);
         formData.append('area', area);
         formData.append('year', year);
 
-        if (attributes.length > 0) {
-            const extraInfoObj = attributes.reduce(
-                (acc, curr) => {
-                    if (curr.key.trim())
-                        acc[curr.key.trim()] = curr.value.trim();
-                    return acc;
-                },
-                {} as Record<string, string>
-            );
-            if (Object.keys(extraInfoObj).length > 0)
-                formData.append('extra_info', JSON.stringify(extraInfoObj));
-        }
+        categoryIds.forEach((id) => formData.append('category_ids', id));
+        if (coverImage) formData.append('cover_image', coverImage);
+
+        const extraInfoObj = attributes.reduce(
+            (acc, curr) => {
+                if (curr.key.trim()) acc[curr.key.trim()] = curr.value.trim();
+                return acc;
+            },
+            {} as Record<string, string>
+        );
+        formData.append('extra_info', JSON.stringify(extraInfoObj));
 
         newImages.forEach((img) => formData.append('uploaded_images', img));
         newVideos.forEach((vid) => formData.append('uploaded_videos', vid));
@@ -456,62 +338,97 @@ export const ProjectForm: React.FC<ProjectFormProps> = ({
         }
     };
 
-    const categoryOptions = categories.map((c) => ({
-        value: c.id,
-        label: c.name,
-    }));
-    const statusOptions = [
-        { value: 'en_proceso', label: 'En Ejecución' },
-        { value: 'entregado', label: 'Entregado' },
-    ];
+    const validateClientSide = () => {
+        const newErrors: Record<string, string> = {};
+        if (!name.trim()) newErrors.name = 'El nombre es obligatorio.';
+        if (categoryIds.length === 0)
+            newErrors.category_ids = 'Selecciona al menos una categoría.';
+        if (!location.trim()) newErrors.location = 'La ubicación es requerida.';
+        if (!status) newErrors.status = 'El estado es obligatorio.';
+
+        setErrors(newErrors);
+        if (Object.keys(newErrors).length > 0) {
+            setActiveTab('general');
+            return false;
+        }
+        return true;
+    };
+
+    const parseBackendErrors = (err: any) => {
+        if (err?.data?.errors) {
+            const apiErrors = err.data.errors;
+            const newErrors: Record<string, string> = {};
+            Object.keys(apiErrors).forEach((key) => {
+                newErrors[key] = Array.isArray(apiErrors[key])
+                    ? apiErrors[key][0]
+                    : String(apiErrors[key]);
+            });
+            setErrors(newErrors);
+            toast.error(err.data.message || 'Error al guardar el proyecto');
+        }
+    };
+
+    const processFiles = (files: FileList, type: 'image' | 'video') => {
+        const validFiles: File[] = [];
+        const validPreviews: string[] = [];
+        Array.from(files).forEach((file) => {
+            if (file.type.startsWith(`${type}/`)) {
+                validFiles.push(file);
+                validPreviews.push(URL.createObjectURL(file));
+            }
+        });
+        if (type === 'image') {
+            setNewImages((p) => [...p, ...validFiles]);
+            setImagePreviews((p) => [...p, ...validPreviews]);
+        } else {
+            setNewVideos((p) => [...p, ...validFiles]);
+            setVideoPreviews((p) => [...p, ...validPreviews]);
+        }
+    };
+
+    const handleDrop = (e: React.DragEvent, type: 'image' | 'video') => {
+        e.preventDefault();
+        type === 'image'
+            ? setIsDragActiveImg(false)
+            : setIsDragActiveVid(false);
+        if (e.dataTransfer.files?.length)
+            processFiles(e.dataTransfer.files, type);
+    };
+
+    const confirmDelete = () => {
+        if (!itemToDelete) return;
+        if (itemToDelete.type === 'image') {
+            setImagesToDelete((p) => [...p, itemToDelete.id]);
+            setExistingImages((p) =>
+                p.filter((img) => img.id !== itemToDelete.id)
+            );
+        } else {
+            setVideosToDelete((p) => [...p, itemToDelete.id]);
+            setExistingVideos((p) =>
+                p.filter((vid) => vid.id !== itemToDelete.id)
+            );
+        }
+        setItemToDelete(null);
+    };
 
     const getInputClass = (errKey: string) => `
         w-full px-4 py-3 bg-slate-50 border rounded-xl outline-none transition-all font-medium text-slate-700 placeholder-slate-400 text-sm focus:bg-white
-        ${errors[errKey] ? 'border-red-300 focus:border-red-500 focus:ring-4 focus:ring-red-500/10 bg-red-50/30' : 'border-slate-200 focus:border-orange-500'}
+        ${errors[errKey] ? 'border-red-300 focus:border-red-500 bg-red-50/30' : 'border-slate-200 focus:border-orange-500'}
     `;
+
     const labelClass =
         'block text-xs font-bold text-slate-600 uppercase tracking-widest mb-2 ml-1';
 
-    const TabButton = ({
-        tab,
-        label,
-        icon: Icon,
-    }: {
-        tab: TabType;
-        label: string;
-        icon: React.ElementType;
-    }) => (
-        <button
-            type="button"
-            onClick={() => setActiveTab(tab)}
-            className={`flex-1 flex items-center justify-center gap-2 py-4 text-sm font-bold transition-all relative
-                ${activeTab === tab ? 'text-orange-600 bg-orange-50/50' : 'text-slate-500 hover:text-slate-700 hover:bg-slate-50'}`}
-        >
-            <Icon
-                className={
-                    activeTab === tab ? 'text-orange-500' : 'text-slate-400'
-                }
-            />
-            <span className="hidden sm:inline">{label}</span>
-            {activeTab === tab && (
-                <span className="absolute bottom-0 left-0 right-0 h-0.5 bg-orange-500 rounded-t-full"></span>
-            )}
-            {tab === 'general' &&
-                (errors.name ||
-                    errors.category ||
-                    errors.location ||
-                    errors.status) && (
-                    <span className="absolute top-3 right-3 w-2 h-2 bg-red-500 rounded-full animate-pulse shadow-md shadow-red-500/50"></span>
-                )}
-            {tab === 'media' &&
-                (errors.uploaded_images || errors.uploaded_videos) && (
-                    <span className="absolute top-3 right-3 w-2 h-2 bg-red-500 rounded-full animate-pulse shadow-md shadow-red-500/50"></span>
-                )}
-        </button>
-    );
-
     return (
         <form onSubmit={handleSubmit} className="animate-fade-in-up pb-10">
+            {/* Inputs Ocultos */}
+            <input
+                type="file"
+                ref={coverInputRef}
+                className="hidden"
+                accept="image/*"
+                onChange={handleCoverChange}
+            />
             <input
                 type="file"
                 ref={replaceServerImgRef}
@@ -531,102 +448,178 @@ export const ProjectForm: React.FC<ProjectFormProps> = ({
 
             <div className="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden mb-8">
                 <div className="flex border-b border-slate-100 bg-white sticky top-0 z-20">
-                    <TabButton tab="general" label="Esenciales" icon={FaPen} />
-                    <TabButton
-                        tab="details"
-                        label="Detalles Técnicos"
-                        icon={FaListUl}
-                    />
-                    <TabButton tab="media" label="Multimedia" icon={FaImage} />
+                    <button
+                        type="button"
+                        onClick={() => setActiveTab('general')}
+                        className={`flex-1 flex items-center justify-center gap-2 py-4 text-sm font-bold transition-all relative ${activeTab === 'general' ? 'text-orange-600 bg-orange-50/50' : 'text-slate-500'}`}
+                    >
+                        <FaPen size={14} />{' '}
+                        <span className="hidden sm:inline">Esenciales</span>
+                        {activeTab === 'general' && (
+                            <span className="absolute bottom-0 left-0 right-0 h-0.5 bg-orange-500 rounded-t-full"></span>
+                        )}
+                    </button>
+                    <button
+                        type="button"
+                        onClick={() => setActiveTab('details')}
+                        className={`flex-1 flex items-center justify-center gap-2 py-4 text-sm font-bold transition-all relative ${activeTab === 'details' ? 'text-orange-600 bg-orange-50/50' : 'text-slate-500'}`}
+                    >
+                        <FaListUl size={14} />{' '}
+                        <span className="hidden sm:inline">
+                            Detalles Técnicos
+                        </span>
+                        {activeTab === 'details' && (
+                            <span className="absolute bottom-0 left-0 right-0 h-0.5 bg-orange-500 rounded-t-full"></span>
+                        )}
+                    </button>
+                    <button
+                        type="button"
+                        onClick={() => setActiveTab('media')}
+                        className={`flex-1 flex items-center justify-center gap-2 py-4 text-sm font-bold transition-all relative ${activeTab === 'media' ? 'text-orange-600 bg-orange-50/50' : 'text-slate-500'}`}
+                    >
+                        <FaImage size={14} />{' '}
+                        <span className="hidden sm:inline">Multimedia</span>
+                        {activeTab === 'media' && (
+                            <span className="absolute bottom-0 left-0 right-0 h-0.5 bg-orange-500 rounded-t-full"></span>
+                        )}
+                    </button>
                 </div>
 
-                <div className="p-6 md:p-8">
+                <div className="p-4 md:p-8">
                     {activeTab === 'general' && (
                         <div className="space-y-8 animate-fade-in">
-                            {Object.keys(errors).length > 0 && (
-                                <div className="bg-red-50 border border-red-100 text-red-600 px-4 py-3 rounded-xl flex items-center gap-3 text-sm font-medium">
-                                    <FaExclamationCircle className="text-xl" />
-                                    <div>
-                                        <p>
-                                            Se encontraron errores. Por favor
-                                            revisa los campos marcados.
-                                        </p>
-                                    </div>
+                            {/* PORTADA CON DRAG & DROP */}
+                            <div
+                                onDragOver={(e) => {
+                                    e.preventDefault();
+                                    setIsDragOverCover(true);
+                                }}
+                                onDragLeave={() => setIsDragOverCover(false)}
+                                onDrop={handleCoverDrop}
+                                className={`flex flex-col md:flex-row gap-6 items-center p-6 rounded-2xl border-2 border-dashed transition-all ${isDragOverCover ? 'border-orange-500 bg-orange-50' : 'border-slate-300 bg-slate-50'}`}
+                            >
+                                <div className="relative w-40 h-52 bg-white rounded-xl overflow-hidden border shadow-sm shrink-0">
+                                    {coverPreview ? (
+                                        <img
+                                            src={coverPreview}
+                                            className="w-full h-full object-cover"
+                                            alt="Portada"
+                                        />
+                                    ) : (
+                                        <div className="w-full h-full flex flex-col items-center justify-center text-slate-400 p-4 text-center">
+                                            <FaCloudUploadAlt
+                                                size={32}
+                                                className="mb-2 opacity-50"
+                                            />
+                                            <span className="text-[10px] font-bold uppercase tracking-tighter">
+                                                Arrastrar Portada
+                                            </span>
+                                        </div>
+                                    )}
                                 </div>
-                            )}
+                                <div className="flex-1 space-y-3 text-center md:text-left">
+                                    <h4 className="font-bold text-slate-800">
+                                        Imagen de Portada Principal
+                                    </h4>
+                                    <p className="text-xs text-slate-500">
+                                        Imagen destacada del catálogo. Puedes
+                                        arrastrar un archivo aquí.
+                                    </p>
+                                    <button
+                                        type="button"
+                                        onClick={() =>
+                                            coverInputRef.current?.click()
+                                        }
+                                        className="inline-flex items-center gap-2 px-4 py-2 bg-white border border-slate-200 rounded-lg text-xs font-bold text-slate-700 hover:bg-slate-50 transition-colors shadow-sm"
+                                    >
+                                        <FaPlus className="text-orange-500" />{' '}
+                                        {coverPreview
+                                            ? 'Cambiar Imagen'
+                                            : 'Subir Portada'}
+                                    </button>
+                                </div>
+                            </div>
 
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                                 <div className="md:col-span-2">
                                     <label className={labelClass}>
-                                        Nombre Oficial del Proyecto{' '}
+                                        Nombre Oficial{' '}
                                         <span className="text-red-500">*</span>
                                     </label>
                                     <input
                                         type="text"
                                         value={name}
-                                        onChange={(e) => {
-                                            setName(e.target.value);
-                                            if (errors.name)
-                                                setErrors({
-                                                    ...errors,
-                                                    name: '',
-                                                });
-                                        }}
-                                        placeholder="Ej: Residencial Mirador de Yanahuara II"
+                                        onChange={(e) =>
+                                            setName(e.target.value)
+                                        }
+                                        placeholder="Ej: Residencial Mirador"
                                         className={getInputClass('name')}
                                     />
                                     <FieldError msg={errors.name} />
                                 </div>
 
-                                <div className="relative z-20">
-                                    <label className={labelClass}>
-                                        Categoría del Proyecto{' '}
+                                <div className="md:col-span-2">
+                                    <label
+                                        className={`${labelClass} flex items-center gap-2`}
+                                    >
+                                        <FaLayerGroup className="text-slate-400" />{' '}
+                                        Categorías{' '}
                                         <span className="text-red-500">*</span>
                                     </label>
-                                    <CustomSelect
-                                        value={categoryId}
-                                        onChange={(val) => {
-                                            setCategoryId(val);
-                                            if (errors.category)
-                                                setErrors({
-                                                    ...errors,
-                                                    category: '',
-                                                });
-                                        }}
-                                        options={categoryOptions}
-                                        placeholder="Seleccione el tipo de proyecto..."
-                                        icon={FaLayerGroup}
-                                        className={`bg-slate-50 ${errors.category ? 'ring-1 ring-red-500 rounded-xl' : ''}`}
-                                    />
-                                    <FieldError msg={errors.category} />
+                                    <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3 bg-slate-50 p-4 rounded-xl border border-slate-100">
+                                        {categories.map((cat) => {
+                                            const isActive =
+                                                categoryIds.includes(
+                                                    String(cat.id)
+                                                );
+                                            return (
+                                                <button
+                                                    key={cat.id}
+                                                    type="button"
+                                                    onClick={() =>
+                                                        toggleCategory(
+                                                            String(cat.id)
+                                                        )
+                                                    }
+                                                    className={`flex items-center gap-3 p-3 rounded-xl border text-left transition-all group ${isActive ? 'bg-orange-500 border-orange-600 text-white shadow-md' : 'bg-white border-slate-200 text-slate-600 hover:border-orange-300'}`}
+                                                >
+                                                    <div
+                                                        className={`shrink-0 w-5 h-5 rounded-md border flex items-center justify-center transition-colors ${isActive ? 'bg-white border-white text-orange-600' : 'bg-slate-50 border-slate-300 group-hover:border-orange-200'}`}
+                                                    >
+                                                        {isActive && (
+                                                            <FaCheckCircle
+                                                                size={12}
+                                                            />
+                                                        )}
+                                                    </div>
+                                                    <span className="text-xs font-bold truncate">
+                                                        {cat.name}
+                                                    </span>
+                                                </button>
+                                            );
+                                        })}
+                                    </div>
+                                    <FieldError msg={errors.category_ids} />
                                 </div>
 
                                 <div className="relative z-10">
                                     <label className={labelClass}>
-                                        Estado de Ejecución{' '}
+                                        Estado de Obra{' '}
                                         <span className="text-red-500">*</span>
                                     </label>
                                     <CustomSelect
                                         value={status}
-                                        onChange={(val) => {
-                                            setStatus(val);
-                                            if (errors.status)
-                                                setErrors({
-                                                    ...errors,
-                                                    status: '',
-                                                });
-                                        }}
+                                        onChange={setStatus}
                                         options={statusOptions}
-                                        placeholder="Seleccione el estado actual..."
+                                        placeholder="Seleccione..."
                                         icon={FaCheckCircle}
-                                        className={`bg-slate-50 ${errors.status ? 'ring-1 ring-red-500 rounded-xl' : ''}`}
                                     />
                                     <FieldError msg={errors.status} />
                                 </div>
 
                                 <div>
                                     <label className={labelClass}>
-                                        Ubicación Geográfica{' '}
+                                        Ubicación{' '}
                                         <span className="text-red-500">*</span>
                                     </label>
                                     <div className="relative">
@@ -634,55 +627,32 @@ export const ProjectForm: React.FC<ProjectFormProps> = ({
                                         <input
                                             type="text"
                                             value={location}
-                                            onChange={(e) => {
-                                                setLocation(e.target.value);
-                                                if (errors.location)
-                                                    setErrors({
-                                                        ...errors,
-                                                        location: '',
-                                                    });
-                                            }}
+                                            onChange={(e) =>
+                                                setLocation(e.target.value)
+                                            }
                                             className={`${getInputClass('location')} pl-10`}
-                                            placeholder="Ej: Av. Ejército 123, Cayma, Arequipa"
+                                            placeholder="Ciudad, Distrito"
                                         />
                                     </div>
                                     <FieldError msg={errors.location} />
                                 </div>
 
-                                <div>
-                                    <label className={labelClass}>
-                                        Año de Finalización
-                                    </label>
-                                    <div className="relative">
-                                        <FaCalendarAlt className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" />
-                                        <input
-                                            type="number"
-                                            value={year}
-                                            onChange={(e) =>
-                                                setYear(e.target.value)
-                                            }
-                                            className={`${getInputClass('')} pl-10`}
-                                            placeholder="Ej: 2025"
-                                        />
-                                    </div>
-                                </div>
-
                                 <div className="md:col-span-2">
                                     <label className={labelClass}>
-                                        Memoria Descriptiva / Resumen
+                                        Resumen del Proyecto
                                     </label>
                                     <textarea
                                         value={description}
                                         onChange={(e) =>
                                             setDescription(e.target.value)
                                         }
-                                        rows={5}
-                                        className={`${getInputClass('')} resize-y min-h-[120px] leading-relaxed`}
-                                        placeholder="Escribe una descripción atractiva para la web. Incluye el concepto arquitectónico, materiales principales y propuesta de valor..."
+                                        rows={4}
+                                        className={`${getInputClass('')} resize-none`}
+                                        placeholder="Describe el concepto arquitectónico..."
                                     />
                                 </div>
 
-                                <div className="md:col-span-2 bg-orange-50/50 border border-orange-100 p-4 rounded-xl flex items-center justify-between">
+                                <div className="md:col-span-2 bg-orange-50/50 p-4 rounded-xl flex items-center justify-between border border-orange-100">
                                     <div className="flex items-center gap-3">
                                         <div
                                             className={`w-10 h-10 rounded-full flex items-center justify-center ${isFeatured ? 'bg-orange-500 text-white' : 'bg-slate-200 text-slate-400'}`}
@@ -690,13 +660,12 @@ export const ProjectForm: React.FC<ProjectFormProps> = ({
                                             <FaStar />
                                         </div>
                                         <div>
-                                            <h4 className="font-bold text-slate-800">
+                                            <h4 className="font-bold text-slate-800 text-sm">
                                                 Destacar Proyecto
                                             </h4>
-                                            <p className="text-xs text-slate-500">
-                                                Si se activa, el proyecto
-                                                aparecerá en el carrusel
-                                                principal del inicio.
+                                            <p className="text-[10px] text-slate-500">
+                                                Se mostrará con prioridad en el
+                                                inicio.
                                             </p>
                                         </div>
                                     </div>
@@ -709,7 +678,7 @@ export const ProjectForm: React.FC<ProjectFormProps> = ({
                                                 setIsFeatured(!isFeatured)
                                             }
                                         />
-                                        <div className="w-11 h-6 bg-slate-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-orange-500"></div>
+                                        <div className="w-11 h-6 bg-slate-200 rounded-full peer peer-checked:bg-orange-500 after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:after:translate-x-full shadow-inner"></div>
                                     </label>
                                 </div>
                             </div>
@@ -721,7 +690,7 @@ export const ProjectForm: React.FC<ProjectFormProps> = ({
                             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                                 <div>
                                     <label className={labelClass}>
-                                        Tipología de Edificación
+                                        Tipología
                                     </label>
                                     <div className="relative">
                                         <FaBuilding className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" />
@@ -731,137 +700,137 @@ export const ProjectForm: React.FC<ProjectFormProps> = ({
                                             onChange={(e) =>
                                                 setServiceType(e.target.value)
                                             }
-                                            placeholder="Ej: Edificio Multifamiliar"
+                                            placeholder="Ej: Multifamiliar"
                                             className={`${getInputClass('')} pl-10`}
                                         />
                                     </div>
                                 </div>
                                 <div>
                                     <label className={labelClass}>
-                                        Área Techada Total (m²)
+                                        Área (m²)
                                     </label>
                                     <div className="relative">
                                         <FaRulerCombined className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" />
                                         <input
-                                            type="number"
-                                            min="0"
-                                            step="0.01"
-                                            onKeyDown={blockInvalidChar}
+                                            type="text"
                                             value={area}
                                             onChange={(e) =>
                                                 setArea(e.target.value)
                                             }
-                                            placeholder="Ej: 250.50"
+                                            placeholder="Ej: 500"
                                             className={`${getInputClass('')} pl-10`}
                                         />
                                     </div>
                                 </div>
                                 <div>
                                     <label className={labelClass}>
-                                        Número de Niveles / Pisos
+                                        Año / Niveles
                                     </label>
-                                    <input
-                                        type="text"
-                                        value={levels}
-                                        onChange={(e) =>
-                                            setLevels(e.target.value)
-                                        }
-                                        placeholder="Ej: 5 Pisos + Azotea + Sótano"
-                                        className={getInputClass('')}
-                                    />
+                                    <div className="relative">
+                                        <FaCalendarAlt className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" />
+                                        <div className="flex gap-2">
+                                            <input
+                                                type="number"
+                                                value={year}
+                                                onChange={(e) =>
+                                                    setYear(e.target.value)
+                                                }
+                                                placeholder="Año"
+                                                className={`${getInputClass('')} pl-10 w-24 shrink-0`}
+                                            />
+                                            <input
+                                                type="text"
+                                                value={levels}
+                                                onChange={(e) =>
+                                                    setLevels(e.target.value)
+                                                }
+                                                placeholder="Pisos"
+                                                className={getInputClass('')}
+                                            />
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
 
-                            <div className="bg-slate-50 rounded-2xl p-6 border border-slate-200">
-                                <div className="flex justify-between items-center mb-4">
-                                    <div>
-                                        <h4 className="font-bold text-slate-800 flex items-center gap-2">
-                                            <FaListUl className="text-slate-400" />{' '}
-                                            Ficha Técnica Adicional
-                                        </h4>
-                                        <p className="text-xs text-slate-500">
-                                            Agrega detalles técnicos específicos
-                                            en formato clave-valor.
-                                        </p>
-                                    </div>
+                            <div className="bg-slate-50 p-4 md:p-6 rounded-2xl border border-slate-200">
+                                <div className="flex justify-between items-center mb-6">
+                                    <h4 className="font-bold text-slate-800 text-sm flex items-center gap-2">
+                                        <FaInfoCircle className="text-slate-400" />{' '}
+                                        Ficha Técnica Adicional
+                                    </h4>
                                     <button
                                         type="button"
-                                        onClick={addAttributeRow}
-                                        className="px-3 py-1.5 text-xs font-bold text-white bg-slate-800 rounded-lg hover:bg-slate-700 flex items-center gap-1 transition-colors"
+                                        onClick={() =>
+                                            setAttributes([
+                                                ...attributes,
+                                                { key: '', value: '' },
+                                            ])
+                                        }
+                                        className="px-3 py-1.5 bg-slate-800 text-white rounded-lg text-[10px] font-bold flex items-center gap-1 hover:bg-slate-700 transition-colors"
                                     >
-                                        <FaPlus /> Agregar Fila
+                                        <FaPlus /> Agregar campo
                                     </button>
                                 </div>
 
-                                <div className="space-y-4 sm:space-y-3 bg-white p-4 rounded-xl border border-slate-100">
+                                <div className="space-y-4">
                                     {attributes.map((attr, idx) => (
                                         <div
                                             key={idx}
-                                            className="relative flex flex-col sm:flex-row gap-3 items-start sm:items-center p-4 sm:p-0 bg-slate-50 sm:bg-transparent border sm:border-none border-slate-200 rounded-xl transition-all group"
+                                            className="flex flex-col md:flex-row gap-3 bg-white p-4 rounded-xl border border-slate-200 shadow-sm animate-fade-in relative group"
                                         >
+                                            <div className="flex-1">
+                                                <span className="md:hidden block text-[10px] font-bold text-slate-400 uppercase mb-1">
+                                                    Nombre del Atributo
+                                                </span>
+                                                <input
+                                                    type="text"
+                                                    value={attr.key}
+                                                    onChange={(e) => {
+                                                        const n = [
+                                                            ...attributes,
+                                                        ];
+                                                        n[idx].key =
+                                                            e.target.value;
+                                                        setAttributes(n);
+                                                    }}
+                                                    placeholder="Ej: Arquitecto"
+                                                    className="w-full px-4 py-2 bg-slate-50 border border-slate-100 rounded-lg text-sm outline-none focus:border-orange-500"
+                                                />
+                                            </div>
+                                            <div className="flex-1">
+                                                <span className="md:hidden block text-[10px] font-bold text-slate-400 uppercase mb-1">
+                                                    Valor / Detalle
+                                                </span>
+                                                <input
+                                                    type="text"
+                                                    value={attr.value}
+                                                    onChange={(e) => {
+                                                        const n = [
+                                                            ...attributes,
+                                                        ];
+                                                        n[idx].value =
+                                                            e.target.value;
+                                                        setAttributes(n);
+                                                    }}
+                                                    placeholder="Ej: Juan Pérez"
+                                                    className="w-full px-4 py-2 bg-slate-50 border border-slate-100 rounded-lg text-sm outline-none focus:border-orange-500"
+                                                />
+                                            </div>
                                             <button
                                                 type="button"
                                                 onClick={() =>
-                                                    removeAttributeRow(idx)
+                                                    setAttributes(
+                                                        attributes.filter(
+                                                            (_, i) => i !== idx
+                                                        )
+                                                    )
                                                 }
-                                                className="absolute top-2 right-2 sm:static sm:order-3 p-2 text-slate-400 hover:text-red-500 hover:bg-red-50 rounded-lg transition-colors z-10"
-                                                title="Eliminar fila"
+                                                className="absolute -top-2 -right-2 md:static p-2 bg-red-50 text-red-500 rounded-full md:rounded-lg hover:bg-red-500 hover:text-white transition-all shadow-sm"
                                             >
-                                                <FaTimes size={14} />
+                                                <FaTrash size={14} />
                                             </button>
-
-                                            <div className="w-full sm:flex-1">
-                                                <label className="block sm:hidden text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1 ml-1">
-                                                    Atributo
-                                                </label>
-                                                <input
-                                                    type="text"
-                                                    placeholder="Atributo (Ej: Arquitecto a Cargo)"
-                                                    value={attr.key}
-                                                    onChange={(e) =>
-                                                        handleAttributeChange(
-                                                            idx,
-                                                            'key',
-                                                            e.target.value
-                                                        )
-                                                    }
-                                                    className="w-full text-sm px-4 py-3 bg-white sm:bg-slate-50 border border-slate-200 rounded-xl focus:border-orange-500 outline-none transition-all"
-                                                />
-                                            </div>
-
-                                            <div className="w-full sm:flex-1">
-                                                <label className="block sm:hidden text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1 ml-1">
-                                                    Detalle
-                                                </label>
-                                                <input
-                                                    type="text"
-                                                    placeholder="Detalle (Ej: Arq. Juan Pérez)"
-                                                    value={attr.value}
-                                                    onChange={(e) =>
-                                                        handleAttributeChange(
-                                                            idx,
-                                                            'value',
-                                                            e.target.value
-                                                        )
-                                                    }
-                                                    className="w-full text-sm px-4 py-3 bg-white sm:bg-slate-50 border border-slate-200 rounded-xl focus:border-orange-500 outline-none transition-all"
-                                                />
-                                            </div>
                                         </div>
                                     ))}
-
-                                    {attributes.length === 0 && (
-                                        <div className="text-center py-6 border-2 border-dashed border-slate-100 rounded-xl">
-                                            <p className="text-sm text-slate-400 italic">
-                                                No hay especificaciones
-                                                adicionales.
-                                            </p>
-                                            <p className="text-xs text-slate-300 mt-1">
-                                                Haz clic en "Agregar Fila" para
-                                                comenzar.
-                                            </p>
-                                        </div>
-                                    )}
                                 </div>
                             </div>
                         </div>
@@ -870,42 +839,29 @@ export const ProjectForm: React.FC<ProjectFormProps> = ({
                     {activeTab === 'media' && (
                         <div className="space-y-10 animate-fade-in">
                             <div>
-                                <div className="flex items-center justify-between mb-4">
-                                    <h4 className="font-bold text-slate-800 flex items-center gap-2">
-                                        <FaImage className="text-orange-500" />{' '}
-                                        Galería de Imágenes
-                                    </h4>
-                                    <div className="flex items-center gap-2 text-xs text-slate-500 bg-slate-100 px-3 py-1.5 rounded-full">
-                                        <FaInfoCircle /> JPG, PNG, WEBP
-                                    </div>
-                                </div>
-                                {errors.uploaded_images && (
-                                    <div className="mb-4">
-                                        <FieldError
-                                            msg={errors.uploaded_images}
-                                        />
-                                    </div>
-                                )}
-                                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-4">
+                                <h4 className="font-bold text-slate-800 mb-4 flex items-center gap-2">
+                                    <FaImage className="text-orange-500" />{' '}
+                                    Galería de Imágenes
+                                </h4>
+                                <div className="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-5 gap-4">
                                     <div
                                         onClick={() =>
                                             imgInputRef.current?.click()
                                         }
-                                        onDragEnter={(e) => {
-                                            e.preventDefault();
-                                            setIsDragActiveImg(true);
-                                        }}
-                                        onDragLeave={(e) => {
-                                            e.preventDefault();
-                                            setIsDragActiveImg(false);
-                                        }}
                                         onDragOver={(e) => {
                                             e.preventDefault();
                                             setIsDragActiveImg(true);
                                         }}
+                                        onDragLeave={() =>
+                                            setIsDragActiveImg(false)
+                                        }
                                         onDrop={(e) => handleDrop(e, 'image')}
-                                        className={`aspect-square rounded-2xl border-2 border-dashed flex flex-col items-center justify-center cursor-pointer transition-all hover:scale-[1.02] ${isDragActiveImg ? 'border-orange-500 bg-orange-50' : 'border-slate-300 hover:border-orange-400 hover:bg-slate-50'}`}
+                                        className={`aspect-square border-2 border-dashed rounded-2xl flex flex-col items-center justify-center cursor-pointer transition-all ${isDragActiveImg ? 'border-orange-500 bg-orange-50' : 'border-slate-300 hover:border-orange-400 hover:bg-slate-50'}`}
                                     >
+                                        <FaCloudUploadAlt className="text-2xl text-orange-500 mb-1" />
+                                        <span className="text-[10px] font-bold text-slate-500 text-center px-2 uppercase tracking-tighter">
+                                            Subir Fotos
+                                        </span>
                                         <input
                                             ref={imgInputRef}
                                             type="file"
@@ -920,40 +876,21 @@ export const ProjectForm: React.FC<ProjectFormProps> = ({
                                                 )
                                             }
                                         />
-                                        <div className="w-12 h-12 mb-2 rounded-full bg-white shadow-sm flex items-center justify-center">
-                                            <FaCloudUploadAlt className="text-2xl text-orange-500" />
-                                        </div>
-                                        <span className="text-xs font-bold text-slate-600">
-                                            Subir Imágenes
-                                        </span>
                                     </div>
                                     {imagePreviews.map((src, idx) => (
                                         <div
-                                            key={`new-${idx}`}
-                                            className="relative aspect-square rounded-2xl overflow-hidden group border-2 border-green-500 shadow-sm"
+                                            key={`new-img-${idx}`}
+                                            className="relative aspect-square rounded-2xl overflow-hidden border-2 border-green-500 group shadow-md animate-fade-in"
                                         >
                                             <img
                                                 src={src}
                                                 className="w-full h-full object-cover"
                                                 alt=""
                                             />
-                                            <div className="absolute top-2 left-2 bg-green-500 text-white text-[10px] font-bold px-2 py-1 rounded-full z-10">
+                                            <div className="absolute top-2 left-2 bg-green-500 text-white text-[8px] font-bold px-1.5 py-0.5 rounded shadow-sm">
                                                 NUEVA
                                             </div>
-                                            <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2 backdrop-blur-sm">
-                                                <button
-                                                    type="button"
-                                                    onClick={() =>
-                                                        setPreviewMedia({
-                                                            type: 'image',
-                                                            url: src,
-                                                        })
-                                                    }
-                                                    className="p-2 bg-white rounded-full text-slate-700 hover:text-orange-500 shadow-lg hover:scale-110 transition-transform"
-                                                    title="Ver"
-                                                >
-                                                    <FaExpand size={12} />
-                                                </button>
+                                            <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 flex items-center justify-center gap-2 transition-all duration-300 backdrop-blur-[2px]">
                                                 <button
                                                     type="button"
                                                     onClick={() =>
@@ -962,7 +899,7 @@ export const ProjectForm: React.FC<ProjectFormProps> = ({
                                                             'image'
                                                         )
                                                     }
-                                                    className="p-2 bg-white rounded-full text-blue-500 shadow-lg hover:scale-110 transition-transform"
+                                                    className="p-2 bg-white rounded-full text-blue-500 shadow-xl hover:scale-110 active:scale-95 transition-transform"
                                                     title="Reemplazar"
                                                 >
                                                     <FaExchangeAlt size={12} />
@@ -975,8 +912,8 @@ export const ProjectForm: React.FC<ProjectFormProps> = ({
                                                             'image'
                                                         )
                                                     }
-                                                    className="p-2 bg-white rounded-full text-red-500 shadow-lg hover:scale-110 transition-transform"
-                                                    title="Borrar"
+                                                    className="p-2 bg-white rounded-full text-red-500 shadow-xl hover:scale-110 active:scale-95 transition-transform"
+                                                    title="Eliminar"
                                                 >
                                                     <FaTrash size={12} />
                                                 </button>
@@ -986,14 +923,14 @@ export const ProjectForm: React.FC<ProjectFormProps> = ({
                                     {existingImages.map((img) => (
                                         <div
                                             key={img.id}
-                                            className="relative aspect-square rounded-2xl overflow-hidden group border border-slate-200 shadow-sm"
+                                            className="relative aspect-square rounded-2xl overflow-hidden border border-slate-200 group shadow-sm hover:shadow-lg transition-all duration-300"
                                         >
                                             <img
                                                 src={img.image}
                                                 className="w-full h-full object-cover"
                                                 alt=""
                                             />
-                                            <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2 backdrop-blur-sm">
+                                            <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 flex items-center justify-center gap-2 transition-all duration-300 backdrop-blur-[2px]">
                                                 <button
                                                     type="button"
                                                     onClick={() =>
@@ -1002,8 +939,7 @@ export const ProjectForm: React.FC<ProjectFormProps> = ({
                                                             url: img.image,
                                                         })
                                                     }
-                                                    className="p-2 bg-white rounded-full text-slate-700 hover:text-orange-500 shadow-lg hover:scale-110 transition-transform"
-                                                    title="Ver"
+                                                    className="p-2 bg-white rounded-full text-slate-700 hover:scale-110 active:scale-95 transition-transform"
                                                 >
                                                     <FaExpand size={12} />
                                                 </button>
@@ -1014,8 +950,7 @@ export const ProjectForm: React.FC<ProjectFormProps> = ({
                                                             img.id
                                                         )
                                                     }
-                                                    className="p-2 bg-white rounded-full text-blue-500 shadow-lg hover:scale-110 transition-transform"
-                                                    title="Reemplazar"
+                                                    className="p-2 bg-white rounded-full text-blue-500 hover:scale-110 active:scale-95 transition-transform"
                                                 >
                                                     <FaExchangeAlt size={12} />
                                                 </button>
@@ -1027,8 +962,7 @@ export const ProjectForm: React.FC<ProjectFormProps> = ({
                                                             id: img.id,
                                                         })
                                                     }
-                                                    className="p-2 bg-white rounded-full text-red-500 shadow-lg hover:scale-110 transition-transform"
-                                                    title="Borrar"
+                                                    className="p-2 bg-white rounded-full text-red-500 hover:scale-110 active:scale-95 transition-transform"
                                                 >
                                                     <FaTrash size={12} />
                                                 </button>
@@ -1039,42 +973,28 @@ export const ProjectForm: React.FC<ProjectFormProps> = ({
                             </div>
 
                             <div>
-                                <div className="flex items-center justify-between mb-4">
-                                    <h4 className="font-bold text-slate-800 flex items-center gap-2">
-                                        <FaVideo className="text-blue-500" />{' '}
-                                        Videos del Proyecto
-                                    </h4>
-                                    <div className="flex items-center gap-2 text-xs text-slate-500 bg-slate-100 px-3 py-1.5 rounded-full">
-                                        <FaInfoCircle /> MP4 (Máx 50MB)
-                                    </div>
-                                </div>
-                                {errors.uploaded_videos && (
-                                    <div className="mb-4">
-                                        <FieldError
-                                            msg={errors.uploaded_videos}
-                                        />
-                                    </div>
-                                )}
+                                <h4 className="font-bold text-slate-800 mb-4 flex items-center gap-2">
+                                    <FaVideo className="text-blue-500" /> Videos
+                                </h4>
                                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                                     <div
                                         onClick={() =>
                                             vidInputRef.current?.click()
                                         }
-                                        onDragEnter={(e) => {
-                                            e.preventDefault();
-                                            setIsDragActiveVid(true);
-                                        }}
-                                        onDragLeave={(e) => {
-                                            e.preventDefault();
-                                            setIsDragActiveVid(false);
-                                        }}
                                         onDragOver={(e) => {
                                             e.preventDefault();
                                             setIsDragActiveVid(true);
                                         }}
+                                        onDragLeave={() =>
+                                            setIsDragActiveVid(false)
+                                        }
                                         onDrop={(e) => handleDrop(e, 'video')}
-                                        className={`aspect-video rounded-2xl border-2 border-dashed flex flex-col items-center justify-center cursor-pointer transition-all hover:scale-[1.02] ${isDragActiveVid ? 'border-blue-500 bg-blue-50' : 'border-slate-300 hover:border-blue-400 hover:bg-slate-50'}`}
+                                        className={`aspect-video border-2 border-dashed rounded-2xl flex flex-col items-center justify-center cursor-pointer transition-all ${isDragActiveVid ? 'border-blue-500 bg-blue-50' : 'border-slate-300 hover:border-blue-400 hover:bg-slate-50'}`}
                                     >
+                                        <FaCloudUploadAlt className="text-2xl text-blue-500 mb-1" />
+                                        <span className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">
+                                            Subir Recorrido
+                                        </span>
                                         <input
                                             ref={vidInputRef}
                                             type="file"
@@ -1089,41 +1009,20 @@ export const ProjectForm: React.FC<ProjectFormProps> = ({
                                                 )
                                             }
                                         />
-                                        <div className="w-12 h-12 mb-2 rounded-full bg-white shadow-sm flex items-center justify-center">
-                                            <FaCloudUploadAlt className="text-2xl text-blue-500" />
-                                        </div>
-                                        <span className="text-xs font-bold text-slate-600">
-                                            Subir Videos
-                                        </span>
                                     </div>
                                     {videoPreviews.map((src, idx) => (
                                         <div
-                                            key={idx}
-                                            className="aspect-video bg-slate-900 rounded-2xl border-2 border-green-500 relative overflow-hidden group shadow-sm"
+                                            key={`new-vid-${idx}`}
+                                            className="relative aspect-video rounded-2xl overflow-hidden bg-slate-900 border-2 border-green-500 group shadow-lg animate-fade-in"
                                         >
                                             <video
                                                 src={src}
-                                                className="w-full h-full object-cover opacity-80"
+                                                className="w-full h-full object-cover opacity-60"
                                             />
-                                            <div className="absolute top-2 left-2 bg-green-500 text-white text-[10px] font-bold px-2 py-1 rounded-full z-10">
+                                            <div className="absolute top-3 left-3 bg-green-500 text-white text-[8px] font-black px-2 py-1 rounded-lg z-10 shadow-sm">
                                                 NUEVO
                                             </div>
-                                            <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2 backdrop-blur-sm z-20">
-                                                <button
-                                                    type="button"
-                                                    onClick={() =>
-                                                        setPreviewMedia({
-                                                            type: 'video',
-                                                            url: src,
-                                                        })
-                                                    }
-                                                    className="p-2 bg-white rounded-full text-slate-700 hover:text-orange-500 shadow-lg hover:scale-110 transition-transform"
-                                                >
-                                                    <FaPlay
-                                                        size={12}
-                                                        className="ml-0.5"
-                                                    />
-                                                </button>
+                                            <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 flex items-center justify-center gap-3 transition-all duration-300 backdrop-blur-sm">
                                                 <button
                                                     type="button"
                                                     onClick={() =>
@@ -1132,9 +1031,9 @@ export const ProjectForm: React.FC<ProjectFormProps> = ({
                                                             'video'
                                                         )
                                                     }
-                                                    className="p-2 bg-white rounded-full text-blue-500 shadow-lg hover:scale-110 transition-transform"
+                                                    className="p-3 bg-white rounded-full text-blue-500 hover:scale-110 active:scale-95 transition-transform"
                                                 >
-                                                    <FaExchangeAlt size={12} />
+                                                    <FaExchangeAlt size={16} />
                                                 </button>
                                                 <button
                                                     type="button"
@@ -1144,29 +1043,23 @@ export const ProjectForm: React.FC<ProjectFormProps> = ({
                                                             'video'
                                                         )
                                                     }
-                                                    className="p-2 bg-white rounded-full text-red-500 shadow-lg hover:scale-110 transition-transform"
+                                                    className="p-3 bg-white rounded-full text-red-500 hover:scale-110 active:scale-95 transition-transform"
                                                 >
-                                                    <FaTrash size={12} />
+                                                    <FaTrash size={16} />
                                                 </button>
-                                            </div>
-                                            <div className="absolute bottom-0 left-0 right-0 p-3 bg-gradient-to-t from-black/80 to-transparent text-white flex items-center gap-2">
-                                                <FaFileVideo className="text-white/70" />
-                                                <span className="text-xs truncate">
-                                                    {getFileName(src)}
-                                                </span>
                                             </div>
                                         </div>
                                     ))}
                                     {existingVideos.map((vid) => (
                                         <div
                                             key={vid.id}
-                                            className="aspect-video bg-slate-900 rounded-2xl border border-slate-200 relative overflow-hidden group shadow-sm"
+                                            className="relative aspect-video rounded-2xl overflow-hidden bg-slate-950 group shadow-lg border border-slate-200 transition-all duration-300"
                                         >
                                             <video
                                                 src={vid.video}
-                                                className="w-full h-full object-cover opacity-80"
+                                                className="w-full h-full object-cover opacity-50"
                                             />
-                                            <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2 backdrop-blur-sm z-20">
+                                            <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 flex items-center justify-center gap-3 transition-all duration-300 backdrop-blur-[1px]">
                                                 <button
                                                     type="button"
                                                     onClick={() =>
@@ -1175,10 +1068,10 @@ export const ProjectForm: React.FC<ProjectFormProps> = ({
                                                             url: vid.video,
                                                         })
                                                     }
-                                                    className="p-2 bg-white rounded-full text-slate-700 hover:text-orange-500 shadow-lg hover:scale-110 transition-transform"
+                                                    className="p-3 bg-white rounded-full text-slate-700 hover:scale-110 active:scale-95 transition-transform"
                                                 >
                                                     <FaPlay
-                                                        size={12}
+                                                        size={16}
                                                         className="ml-0.5"
                                                     />
                                                 </button>
@@ -1190,15 +1083,15 @@ export const ProjectForm: React.FC<ProjectFormProps> = ({
                                                             id: vid.id,
                                                         })
                                                     }
-                                                    className="p-2 bg-white rounded-full text-red-500 shadow-lg hover:scale-110 transition-transform"
+                                                    className="p-3 bg-white rounded-full text-red-500 hover:scale-110 active:scale-95 transition-transform"
                                                 >
-                                                    <FaTrash size={12} />
+                                                    <FaTrash size={16} />
                                                 </button>
                                             </div>
-                                            <div className="absolute bottom-0 left-0 right-0 p-3 bg-gradient-to-t from-black/80 to-transparent text-white flex items-center gap-2">
+                                            <div className="absolute bottom-0 left-0 right-0 p-3 bg-gradient-to-t from-black/80 to-transparent flex items-center gap-2">
                                                 <FaFileVideo className="text-white/70" />
-                                                <span className="text-xs truncate">
-                                                    {getFileName(vid.video)}
+                                                <span className="text-[10px] text-white font-medium truncate shrink-0 max-w-[150px]">
+                                                    Media {vid.id}
                                                 </span>
                                             </div>
                                         </div>
@@ -1210,38 +1103,35 @@ export const ProjectForm: React.FC<ProjectFormProps> = ({
                 </div>
             </div>
 
-            <div className="mt-8 flex justify-end gap-4 border-t border-slate-100 pt-6">
+            <div className="flex justify-end gap-4 border-t border-slate-100 pt-6">
                 <button
                     type="button"
                     onClick={onCancel}
-                    disabled={isLoading}
-                    className="px-6 py-3 rounded-xl text-slate-600 font-bold hover:bg-slate-100 transition-all disabled:opacity-50 text-sm"
+                    className="px-6 py-3 font-bold text-slate-500 hover:bg-slate-100 rounded-xl transition-colors"
                 >
                     Cancelar
                 </button>
                 <button
                     type="submit"
                     disabled={isLoading}
-                    className="flex items-center justify-center gap-2 px-8 py-3 rounded-xl bg-gradient-to-r from-slate-900 to-slate-800 text-white font-bold hover:from-orange-600 hover:to-orange-500 shadow-lg shadow-slate-900/10 hover:shadow-orange-500/20 hover:-translate-y-0.5 transition-all disabled:opacity-70 disabled:translate-y-0 disabled:shadow-none text-sm"
+                    className="px-8 py-3 bg-slate-900 text-white font-bold rounded-xl hover:bg-orange-600 transition-all shadow-lg flex items-center gap-2 disabled:opacity-50"
                 >
                     {isLoading ? (
-                        'Guardando...'
+                        <FaPlus className="animate-spin" />
                     ) : (
-                        <>
-                            <FaSave /> Guardar Proyecto
-                        </>
-                    )}
+                        <FaSave />
+                    )}{' '}
+                    {isLoading ? 'Guardando...' : 'Guardar Proyecto'}
                 </button>
             </div>
 
             <ConfirmModal
                 isOpen={!!itemToDelete}
-                title="Confirmar eliminación"
-                message="Este archivo se eliminará al guardar los cambios."
-                confirmText="Eliminar"
-                isDestructive={true}
+                title="Confirmar Eliminación"
+                message="Este archivo se eliminará permanentemente al guardar los cambios."
                 onConfirm={confirmDelete}
                 onCancel={() => setItemToDelete(null)}
+                isDestructive
             />
             <MediaPreviewModal
                 file={previewMedia}

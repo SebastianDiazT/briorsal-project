@@ -35,7 +35,7 @@ export const ProjectCard: React.FC<{ project: Project }> = ({ project }) => {
 
             <div className="absolute top-4 left-4 flex gap-2 z-10">
                 <span className="px-3 py-1 text-xs font-bold uppercase tracking-wider text-white bg-orange-600 rounded-full shadow-lg">
-                    {project.category_name}
+                    {project.categories[0].name}
                 </span>
                 {project.status === 'en_proceso' && (
                     <span className="px-3 py-1 text-xs font-bold uppercase tracking-wider text-blue-900 bg-blue-100 rounded-full shadow-lg">

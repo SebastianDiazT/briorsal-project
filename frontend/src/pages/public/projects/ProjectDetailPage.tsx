@@ -1,9 +1,5 @@
 import { useParams, Link } from 'react-router-dom';
-import {
-    FaLocationDot,
-    FaArrowLeft,
-    FaBuilding,
-} from 'react-icons/fa6';
+import { FaLocationDot, FaArrowLeft, FaBuilding } from 'react-icons/fa6';
 
 import { useGetProjectBySlugQuery } from '@/features/projects/api/projectsApi';
 import { ProjectSpecs } from '@/features/projects/components/public/ProjectSpecs';
@@ -49,13 +45,14 @@ const ProjectDetailPage = () => {
         );
     }
 
-    const coverImage =
-        project.images.length > 0
-            ? project.images[0].image
-            : '/placeholder.jpg';
+    const coverImage = project.cover_image;
+
     const hasDescription =
         project.description && project.description.trim().length > 0;
-    const hasMedia = project.images.length > 0 || project.videos.length > 0;
+
+    const hasMedia =
+        (project.images && project.images.length > 0) ||
+        (project.videos && project.videos.length > 0);
 
     return (
         <>
@@ -93,9 +90,22 @@ const ProjectDetailPage = () => {
                         <div className="max-w-4xl">
                             <FadeIn delay={0.1} direction="up">
                                 <div className="flex flex-wrap gap-3 mb-6">
-                                    <span className="px-4 py-1.5 bg-orange-600 text-white text-xs font-bold uppercase tracking-widest rounded-full shadow-lg shadow-orange-900/20">
-                                        {project.category_name || 'Proyecto'}
-                                    </span>
+                                    {project.categories &&
+                                    project.categories.length > 0 ? (
+                                        project.categories.map((cat) => (
+                                            <span
+                                                key={cat.id}
+                                                className="px-4 py-1.5 bg-orange-600 text-white text-xs font-bold uppercase tracking-widest rounded-full shadow-lg shadow-orange-900/20"
+                                            >
+                                                {cat.name}
+                                            </span>
+                                        ))
+                                    ) : (
+                                        <span className="px-4 py-1.5 bg-orange-600 text-white text-xs font-bold uppercase tracking-widest rounded-full shadow-lg shadow-orange-900/20">
+                                            Proyecto
+                                        </span>
+                                    )}
+
                                     {project.status === 'en_proceso' && (
                                         <span className="px-4 py-1.5 bg-blue-600 text-white text-xs font-bold uppercase tracking-widest rounded-full shadow-lg">
                                             En Construcción
@@ -130,7 +140,7 @@ const ProjectDetailPage = () => {
                                         Sobre el Proyecto
                                     </h2>
                                     <div className="prose prose-lg prose-slate max-w-none text-slate-600 leading-relaxed text-justify">
-                                        {project.description.split('\n').map(
+                                        {project.description!.split('\n').map(
                                             (p, idx) =>
                                                 p.trim() && (
                                                     <p

@@ -29,8 +29,20 @@ import {
 } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 
+interface SortableRowProps {
+    project: Project;
+    onEdit: (slug: string) => void;
+    onDelete: (slug: string) => void;
+    isReordering: boolean;
+}
+
 // --- Fila Ordenable ---
-const SortableRow = ({ project, onEdit, onDelete, isReordering }: any) => {
+const SortableRow = ({
+    project,
+    onEdit,
+    onDelete,
+    isReordering,
+}: SortableRowProps) => {
     const {
         attributes,
         listeners,
@@ -38,7 +50,7 @@ const SortableRow = ({ project, onEdit, onDelete, isReordering }: any) => {
         transform,
         transition,
         isDragging,
-    } = useSortable({ id: project.id, disabled: !isReordering }); // Desactivar si no estamos reordenando
+    } = useSortable({ id: project.id, disabled: !isReordering });
 
     const style = {
         transform: CSS.Transform.toString(transform),
@@ -48,6 +60,7 @@ const SortableRow = ({ project, onEdit, onDelete, isReordering }: any) => {
         opacity: isDragging ? 0.5 : 1,
     } as React.CSSProperties;
 
+    // Lógica de imagen: 1. Portada, 2. Primera de Galería, 3. Null
     const displayImage =
         project.cover_image ||
         (project.images && project.images.length > 0
@@ -60,7 +73,7 @@ const SortableRow = ({ project, onEdit, onDelete, isReordering }: any) => {
             style={style}
             className={`group transition-colors duration-200 ${isDragging ? 'bg-orange-50 shadow-inner' : 'hover:bg-slate-50/60 bg-white'}`}
         >
-            {/* Columna Drag Handle: Solo visible en modo reordenar */}
+            {/* Columna Drag Handle */}
             {isReordering && (
                 <td className="py-3 px-2 align-middle text-center w-[40px] border-r border-slate-100 bg-slate-50">
                     <button
@@ -135,25 +148,27 @@ const SortableRow = ({ project, onEdit, onDelete, isReordering }: any) => {
                 </div>
             </td>
 
-            {/* Categorías */}
-            <td className="py-3 px-4 align-middle hidden lg:table-cell w-[15%]">
+            {/* Múltiples Categorías */}
+            <td className="py-3 px-4 align-middle hidden lg:table-cell w-[20%]">
                 <div className="flex flex-wrap gap-1">
-                    {project.categories.length > 0 ? (
-                        project.categories.slice(0, 2).map((cat: any) => (
-                            <span
-                                key={cat.id}
-                                className="inline-flex items-center gap-1 px-2 py-0.5 rounded bg-slate-100 text-slate-600 text-[10px] font-semibold border border-slate-200"
-                            >
-                                {cat.name}
-                            </span>
-                        ))
+                    {project.categories && project.categories.length > 0 ? (
+                        <>
+                            {project.categories.slice(0, 2).map((cat: any) => (
+                                <span
+                                    key={cat.id}
+                                    className="inline-flex items-center px-2 py-0.5 rounded bg-slate-100 text-slate-600 text-[10px] font-bold border border-slate-200 uppercase tracking-tight"
+                                >
+                                    {cat.name}
+                                </span>
+                            ))}
+                            {project.categories.length > 2 && (
+                                <span className="text-[10px] font-bold text-slate-400 ml-1">
+                                    +{project.categories.length - 2}
+                                </span>
+                            )}
+                        </>
                     ) : (
                         <span className="text-slate-400 text-xs italic">—</span>
-                    )}
-                    {project.categories.length > 2 && (
-                        <span className="text-[10px] text-slate-400">
-                            +{project.categories.length - 2}
-                        </span>
                     )}
                 </div>
             </td>
@@ -183,6 +198,7 @@ const SortableRow = ({ project, onEdit, onDelete, isReordering }: any) => {
                         onClick={() => onEdit(project.slug)}
                         disabled={isReordering}
                         className="w-8 h-8 flex items-center justify-center rounded-full bg-white text-slate-500 hover:text-blue-600 hover:bg-blue-50 border border-slate-200 hover:border-blue-200 transition-all active:scale-95 shadow-sm disabled:opacity-30 disabled:cursor-not-allowed"
+                        title="Editar Proyecto"
                     >
                         <FaEdit size={12} />
                     </button>
@@ -190,6 +206,7 @@ const SortableRow = ({ project, onEdit, onDelete, isReordering }: any) => {
                         onClick={() => onDelete(project.slug)}
                         disabled={isReordering}
                         className="w-8 h-8 flex items-center justify-center rounded-full bg-white text-slate-500 hover:text-red-600 hover:bg-red-50 border border-slate-200 hover:border-red-200 transition-all active:scale-95 shadow-sm disabled:opacity-30 disabled:cursor-not-allowed"
+                        title="Eliminar Proyecto"
                     >
                         <FaTrash size={12} />
                     </button>
@@ -204,8 +221,8 @@ interface ProjectsTableProps {
     isLoading: boolean;
     onEdit: (slug: string) => void;
     onDelete: (slug: string) => void;
-    onReorderChange?: (newOrder: Project[]) => void; // Solo actualiza localmente
-    isReordering: boolean; // <--- NUEVA PROP
+    onReorderChange?: (newOrder: Project[]) => void;
+    isReordering: boolean;
     EmptyState: React.FC;
 }
 
@@ -231,7 +248,7 @@ export const ProjectsTable: React.FC<ProjectsTableProps> = ({
             const oldIndex = projects.findIndex((p) => p.id === active.id);
             const newIndex = projects.findIndex((p) => p.id === over.id);
             const newOrder = arrayMove(projects, oldIndex, newIndex);
-            onReorderChange(newOrder); // Actualizar estado local del padre
+            onReorderChange(newOrder);
         }
     };
 
@@ -247,6 +264,7 @@ export const ProjectsTable: React.FC<ProjectsTableProps> = ({
                             <div className="w-16 h-12 bg-slate-100 rounded-lg shrink-0"></div>
                             <div className="flex-1 space-y-2">
                                 <div className="h-4 bg-slate-100 rounded w-1/3"></div>
+                                <div className="h-3 bg-slate-50 rounded w-1/4"></div>
                             </div>
                         </div>
                     ))}
@@ -312,7 +330,7 @@ export const ProjectsTable: React.FC<ProjectsTableProps> = ({
                                             project={project}
                                             onEdit={onEdit}
                                             onDelete={onDelete}
-                                            isReordering={isReordering} // Pasar estado
+                                            isReordering={isReordering}
                                         />
                                     ))}
                                 </SortableContext>

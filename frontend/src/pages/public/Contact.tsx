@@ -15,7 +15,6 @@ import { useGetCompanyInfoQuery } from '@/features/company/api/companyApi';
 import { useCreateContactMessageMutation } from '@/features/contact/api/contactApi';
 import { ContactMessageRequest } from '@/features/contact/types';
 
-// Componente de Input Reutilizable con colores ajustados al tema #1b252f
 const FormInput = ({
     label,
     id,
@@ -32,11 +31,6 @@ const FormInput = ({
         >
             {label} {required && <span className="text-orange-500">*</span>}
         </label>
-        {/* DISEÑO DE COLORES:
-           - Fondo: bg-white/5 (Crea un tono #25303b sobre la base #1b252f)
-           - Borde: border-white/10 (Sutil) -> border-orange-500 (Foco)
-           - Texto: text-slate-200 (Mejor lectura que blanco puro)
-        */}
         <input
             id={id}
             name={id}
@@ -327,7 +321,7 @@ const Contact = () => {
                             height="100%"
                             loading="lazy"
                             referrerPolicy="no-referrer-when-downgrade"
-                            className="w-full h-full border-0 grayscale hover:grayscale-0 transition-all duration-700"
+                            className="w-full h-full border-0"
                         ></iframe>
                     </div>
                 )}

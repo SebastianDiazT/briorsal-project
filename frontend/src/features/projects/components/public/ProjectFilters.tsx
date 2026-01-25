@@ -1,6 +1,6 @@
 import React from 'react';
 import { FaSearch } from 'react-icons/fa';
-import { Category } from '@/features/categories/api/categoriesApi';
+import { Category } from '@/features/categories/types';
 
 interface PublicProjectFiltersProps {
     categories: Category[];
