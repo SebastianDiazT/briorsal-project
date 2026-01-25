@@ -39,20 +39,87 @@ export const ServiceForm: React.FC<ServiceFormProps> = ({
         }
     }, [initialData]);
 
+    useEffect(() => {
+        return () => {
+            if (previewImage && previewImage.startsWith('blob:')) {
+                URL.revokeObjectURL(previewImage);
+            }
+        };
+    }, [previewImage]);
+
+    const validateFile = (file: File): boolean => {
+        const validTypes = [
+            'image/jpeg',
+            'image/png',
+            'image/webp',
+            'image/jpg',
+        ];
+        if (!validTypes.includes(file.type)) {
+            toast.error('Formato no válido. Solo JPG, PNG o WEBP.');
+            return false;
+        }
+
+        const maxSizeInBytes = 5 * 1024 * 1024;
+        if (file.size > maxSizeInBytes) {
+            toast.error('El archivo es demasiado grande (Máx 5MB).');
+            return false;
+        }
+
+        return true;
+    };
+
+    const processFile = (file: File) => {
+        if (!validateFile(file)) return;
+
+        if (previewImage && previewImage.startsWith('blob:')) {
+            URL.revokeObjectURL(previewImage);
+        }
+
+        const objectUrl = URL.createObjectURL(file);
+        setPreviewImage(objectUrl);
+        setImageFile(file);
+    };
+
+    const handleDragOver = useCallback((e: React.DragEvent) => {
+        e.preventDefault();
+        e.stopPropagation();
+        setIsDragActive(true);
+    }, []);
+
+    const handleDragLeave = useCallback((e: React.DragEvent) => {
+        e.preventDefault();
+        e.stopPropagation();
+        setIsDragActive(false);
+    }, []);
+
     const handleDrop = useCallback((e: React.DragEvent) => {
         e.preventDefault();
         e.stopPropagation();
         setIsDragActive(false);
-        if (e.dataTransfer.files?.length) processFile(e.dataTransfer.files[0]);
+
+        const files = e.dataTransfer.files;
+        if (files && files.length > 0) {
+            processFile(files[0]);
+        }
     }, []);
 
-    const processFile = (file: File) => {
-        if (!file.type.startsWith('image/'))
-            return toast.error(
-                'Solo se permiten archivos de imagen (JPG, PNG, WEBP)'
-            );
-        setPreviewImage(URL.createObjectURL(file));
-        setImageFile(file);
+    const handleFileInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const files = e.target.files;
+        if (files && files.length > 0) {
+            processFile(files[0]);
+        }
+    };
+
+    const handleDeleteImage = (e: React.MouseEvent) => {
+        e.stopPropagation();
+        if (previewImage && previewImage.startsWith('blob:')) {
+            URL.revokeObjectURL(previewImage);
+        }
+        setPreviewImage(null);
+        setImageFile(null);
+        if (fileInputRef.current) {
+            fileInputRef.current.value = '';
+        }
     };
 
     const handleSubmit = async (e: React.FormEvent) => {
@@ -142,28 +209,19 @@ export const ServiceForm: React.FC<ServiceFormProps> = ({
                         </div>
 
                         <div
-                            onDragOver={(e) => {
-                                e.preventDefault();
-                                setIsDragActive(true);
-                            }}
-                            onDragLeave={(e) => {
-                                e.preventDefault();
-                                setIsDragActive(false);
-                            }}
+                            onDragOver={handleDragOver}
+                            onDragLeave={handleDragLeave}
                             onDrop={handleDrop}
                             onClick={() => fileInputRef.current?.click()}
                             className={`relative w-full aspect-video md:aspect-[21/9] rounded-2xl border-2 border-dashed flex flex-col items-center justify-center cursor-pointer transition-all overflow-hidden group
-                                ${isDragActive ? 'border-orange-500 bg-orange-50' : 'border-slate-300 hover:border-orange-400 hover:bg-slate-50'}`}
+                                ${isDragActive ? 'border-orange-500 bg-orange-50 scale-[1.01] shadow-lg' : 'border-slate-300 hover:border-orange-400 hover:bg-slate-50'}`}
                         >
                             <input
                                 ref={fileInputRef}
                                 type="file"
                                 className="hidden"
-                                accept="image/*"
-                                onChange={(e) =>
-                                    e.target.files &&
-                                    processFile(e.target.files[0])
-                                }
+                                accept="image/png, image/jpeg, image/jpg, image/webp"
+                                onChange={handleFileInputChange}
                             />
 
                             {previewImage ? (
@@ -173,38 +231,58 @@ export const ServiceForm: React.FC<ServiceFormProps> = ({
                                         alt="Preview"
                                         className="w-full h-full object-cover"
                                     />
-                                    <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-3 backdrop-blur-sm">
-                                        <span className="text-white font-bold bg-white/20 px-4 py-2 rounded-lg backdrop-blur-md">
-                                            Cambiar Imagen
-                                        </span>
-                                        <button
-                                            type="button"
-                                            onClick={(e) => {
-                                                e.stopPropagation();
-                                                setPreviewImage(null);
-                                                setImageFile(null);
-                                                if (fileInputRef.current)
-                                                    fileInputRef.current.value =
-                                                        '';
-                                            }}
-                                            className="p-3 bg-red-500 text-white rounded-lg hover:bg-red-600 transition-colors shadow-lg"
-                                            title="Eliminar imagen"
-                                        >
-                                            <FaTrash />
-                                        </button>
+                                    <div
+                                        className={`absolute inset-0 bg-black/50 transition-opacity flex items-center justify-center gap-3 backdrop-blur-sm
+                                        ${isDragActive ? 'opacity-100' : 'opacity-0 group-hover:opacity-100'}`}
+                                    >
+                                        {isDragActive ? (
+                                            <div className="flex flex-col items-center text-white animate-bounce">
+                                                <FaCloudUploadAlt size={32} />
+                                                <span className="font-bold">
+                                                    Soltar para reemplazar
+                                                </span>
+                                            </div>
+                                        ) : (
+                                            <>
+                                                <span className="text-white font-bold bg-white/20 px-4 py-2 rounded-lg backdrop-blur-md">
+                                                    Cambiar Imagen
+                                                </span>
+                                                <button
+                                                    type="button"
+                                                    onClick={handleDeleteImage}
+                                                    className="p-3 bg-red-500 text-white rounded-lg hover:bg-red-600 transition-colors shadow-lg hover:scale-105"
+                                                    title="Eliminar imagen"
+                                                >
+                                                    <FaTrash />
+                                                </button>
+                                            </>
+                                        )}
                                     </div>
                                 </>
                             ) : (
-                                <div className="text-center p-6">
-                                    <div className="w-16 h-16 bg-white rounded-full flex items-center justify-center shadow-sm mx-auto mb-3 group-hover:scale-110 transition-transform">
-                                        <FaCloudUploadAlt className="text-3xl text-orange-500" />
-                                    </div>
-                                    <span className="text-sm font-bold text-slate-600 block">
-                                        Haz clic o arrastra una imagen aquí
-                                    </span>
-                                    <span className="text-xs text-slate-400 mt-1 block">
-                                        Formatos: JPG, PNG, WEBP (Max 5MB)
-                                    </span>
+                                <div className="text-center p-6 pointer-events-none">
+                                    {isDragActive ? (
+                                        <div className="flex flex-col items-center animate-bounce">
+                                            <FaCloudUploadAlt className="text-5xl text-orange-500 mb-2" />
+                                            <span className="text-lg font-bold text-orange-600">
+                                                ¡Suelta aquí!
+                                            </span>
+                                        </div>
+                                    ) : (
+                                        <>
+                                            <div className="w-16 h-16 bg-white rounded-full flex items-center justify-center shadow-sm mx-auto mb-3 group-hover:scale-110 transition-transform">
+                                                <FaCloudUploadAlt className="text-3xl text-orange-500" />
+                                            </div>
+                                            <span className="text-sm font-bold text-slate-600 block">
+                                                Haz clic o arrastra una imagen
+                                                aquí
+                                            </span>
+                                            <span className="text-xs text-slate-400 mt-1 block">
+                                                Formatos: JPG, PNG, WEBP (Max
+                                                5MB)
+                                            </span>
+                                        </>
+                                    )}
                                 </div>
                             )}
                         </div>

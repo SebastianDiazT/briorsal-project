@@ -1,6 +1,7 @@
 export interface Category {
     id: number;
     name: string;
+    project_count: number;
 }
 export interface CreateCategoryRequest {
     name: string;

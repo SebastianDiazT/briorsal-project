@@ -1,5 +1,5 @@
 import React from 'react';
-import { FaEdit, FaTrash, FaTag } from 'react-icons/fa';
+import { FaEdit, FaTrash, FaTag, FaLayerGroup } from 'react-icons/fa';
 import { Category } from '../../types';
 
 interface CategoriesTableProps {
@@ -28,6 +28,7 @@ export const CategoriesTable: React.FC<CategoriesTableProps> = ({
                         >
                             <div className="w-10 h-10 bg-slate-100 rounded-lg shrink-0"></div>
                             <div className="flex-1 h-4 bg-slate-100 rounded w-1/3"></div>
+                            <div className="w-16 h-6 bg-slate-100 rounded-full"></div>{' '}
                             <div className="w-20 h-8 bg-slate-100 rounded-full"></div>
                         </div>
                     ))}
@@ -45,6 +46,9 @@ export const CategoriesTable: React.FC<CategoriesTableProps> = ({
                             <th className="py-4 px-6 text-[11px] font-extrabold text-slate-400 uppercase tracking-widest w-auto">
                                 Nombre de Categoría
                             </th>
+                            <th className="py-4 px-6 text-[11px] font-extrabold text-slate-400 uppercase tracking-widest w-[150px] text-center">
+                                Nº Proyectos
+                            </th>
                             <th className="py-4 px-6 text-[11px] font-extrabold text-slate-400 uppercase tracking-widest w-[120px] text-right">
                                 Acciones
                             </th>
@@ -53,7 +57,7 @@ export const CategoriesTable: React.FC<CategoriesTableProps> = ({
                     <tbody className="divide-y divide-slate-50">
                         {categories.length === 0 ? (
                             <tr>
-                                <td colSpan={2} className="p-0">
+                                <td colSpan={3} className="p-0">
                                     <EmptyState />
                                 </td>
                             </tr>
@@ -63,6 +67,7 @@ export const CategoriesTable: React.FC<CategoriesTableProps> = ({
                                     key={category.id}
                                     className="group hover:bg-slate-50/60 transition-colors duration-150"
                                 >
+                                    {/* NOMBRE */}
                                     <td className="py-4 px-6 align-middle">
                                         <div className="flex items-center gap-3">
                                             <div className="w-8 h-8 rounded-lg bg-orange-50 text-orange-500 flex items-center justify-center border border-orange-100 group-hover:bg-orange-500 group-hover:text-white transition-all">
@@ -70,6 +75,26 @@ export const CategoriesTable: React.FC<CategoriesTableProps> = ({
                                             </div>
                                             <span className="text-sm font-bold text-slate-700 group-hover:text-orange-600 transition-colors">
                                                 {category.name}
+                                            </span>
+                                        </div>
+                                    </td>
+
+                                    <td className="py-4 px-6 align-middle text-center">
+                                        <div className="flex justify-center">
+                                            <span
+                                                className={`
+                                                    inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold border
+                                                    ${
+                                                        category.project_count >
+                                                        0
+                                                            ? 'bg-blue-50 text-blue-600 border-blue-100'
+                                                            : 'bg-slate-100 text-slate-400 border-slate-200'
+                                                    }
+                                                `}
+                                                title={`${category.project_count} proyectos asociados`}
+                                            >
+                                                <FaLayerGroup size={10} />
+                                                {category.project_count}
                                             </span>
                                         </div>
                                     </td>
