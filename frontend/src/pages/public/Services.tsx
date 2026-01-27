@@ -13,8 +13,6 @@ const Services = () => {
 
     const services = response?.data || [];
 
-    // Color Base: #1b252f
-
     return (
         <>
             <PageMeta
@@ -22,16 +20,13 @@ const Services = () => {
                 description="Soluciones integrales en construcción, diseño arquitectónico y gestión de proyectos."
             />
 
-            {/* APLICACIÓN COLOR: bg-[#1b252f] */}
             <div className="min-h-screen bg-[#1b252f] w-full flex flex-col lg:flex-row lg:items-center relative overflow-hidden font-sans selection:bg-orange-500/30 selection:text-orange-200">
-                {/* Elementos decorativos de fondo (Blobs) */}
                 <div className="absolute top-0 left-0 w-full h-full overflow-hidden pointer-events-none z-0">
                     <div className="absolute -top-[10%] -left-[5%] w-[60vw] h-[60vw] bg-blue-600/10 rounded-full blur-[120px] mix-blend-screen animate-pulse"></div>
                     <div className="absolute bottom-0 right-0 w-[50vw] h-[50vw] bg-orange-600/5 rounded-full blur-[100px] mix-blend-screen"></div>
                     <div className="absolute inset-0 opacity-[0.03] bg-[url('https://www.transparenttextures.com/patterns/stardust.png')]"></div>
                 </div>
 
-                {/* --- SECCIÓN IZQUIERDA: TEXTO --- */}
                 <div className="w-full lg:w-[40%] p-8 md:p-16 lg:p-24 flex flex-col justify-center z-10 relative self-center">
                     <FadeIn direction="down" delay={0.1}>
                         <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-orange-500/30 bg-orange-500/10 text-orange-400 text-xs font-bold tracking-wider uppercase mb-8">
@@ -49,7 +44,6 @@ const Services = () => {
                     </FadeIn>
 
                     <FadeIn direction="right" delay={0.3}>
-                        {/* Texto en slate-300 para contraste óptimo sobre #1b252f */}
                         <p className="text-slate-300 text-lg md:text-xl leading-relaxed max-w-md mb-12 font-light text-justify">
                             Transformamos ideas complejas en estructuras
                             tangibles. Cada servicio está respaldado por años de
@@ -71,7 +65,6 @@ const Services = () => {
                     </FadeIn>
                 </div>
 
-                {/* --- SECCIÓN DERECHA: GRID --- */}
                 <div className="w-full lg:w-[60%] p-6 md:p-12 lg:p-24 z-10">
                     {isLoading ? (
                         <ServicesSkeletonGrid />
@@ -108,12 +101,10 @@ const Services = () => {
     );
 };
 
-// Skeleton ajustado con bg-white/5 para que brille sutilmente sobre el fondo oscuro
 const ServicesSkeletonGrid = () => (
     <div className="grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-20">
         {[1, 2, 3, 4].map((i) => (
             <div key={i} className="flex flex-col animate-pulse">
-                {/* Caja de imagen "Glass" */}
                 <div className="h-64 w-full bg-white/5 border border-white/5 rounded-sm mb-8 shadow-xl"></div>
                 <div className="h-8 w-3/4 bg-white/10 mb-4 rounded-sm"></div>
                 <div className="w-12 h-1 bg-white/20 mb-5"></div>

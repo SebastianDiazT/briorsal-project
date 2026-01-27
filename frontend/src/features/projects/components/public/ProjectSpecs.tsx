@@ -15,13 +15,7 @@ export const ProjectSpecs: React.FC<{ project: Project }> = ({ project }) => {
     const { data: companyResponse } = useGetCompanyInfoQuery();
     const companyInfo = companyResponse?.data;
 
-
-    const phoneNumber = companyInfo?.whatsapp;
-    const whatsappMessage = `Hola Briorsal, me interesa el proyecto *${project.name}* y quisiera más información.`;
-
-    const whatsappLink = phoneNumber
-        ? `https://wa.me/${phoneNumber}?text=${encodeURIComponent(whatsappMessage)}`
-        : null;
+    const whatsappLink = companyInfo?.whatsapp;
 
     return (
         <div className="bg-slate-50 p-8 rounded-3xl border border-slate-100 sticky top-24 shadow-sm">

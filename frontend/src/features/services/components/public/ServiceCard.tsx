@@ -16,15 +16,7 @@ const ServiceCard: React.FC<ServiceCardProps> = ({
     const { data: response } = useGetCompanyInfoQuery();
     const companyInfo = response?.data;
 
-    const baseWhatsappUrl = companyInfo?.whatsapp || '';
-
-    const cleanBaseUrl = baseWhatsappUrl.endsWith('/')
-        ? baseWhatsappUrl.slice(0, -1)
-        : baseWhatsappUrl;
-
-    const message = `Hola, estoy interesado en el servicio de *${title}*.`;
-
-    const finalUrl = `${cleanBaseUrl}?text=${encodeURIComponent(message)}`;
+    const whatsappLink = companyInfo?.whatsapp || '';
 
     return (
         <div className="flex flex-col group h-full">
@@ -58,7 +50,7 @@ const ServiceCard: React.FC<ServiceCardProps> = ({
                 </p>
 
                 <a
-                    href={finalUrl}
+                    href={whatsappLink}
                     target="_blank"
                     rel="noreferrer"
                     className="inline-flex items-center gap-2 bg-orange-600 border border-orange-500 text-white font-bold py-3 px-8 text-base uppercase tracking-widest transition-all duration-300 hover:bg-orange-700 hover:shadow-lg"
