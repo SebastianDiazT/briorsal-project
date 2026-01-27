@@ -1,22 +1,30 @@
-from rest_framework import filters, viewsets, permissions
+from rest_framework import viewsets, permissions, filters
+from rest_framework.throttling import AnonRateThrottle
 from django_filters.rest_framework import DjangoFilterBackend
+
 from .models import ContactMessage
-from .serializers import ContactMessageSerializer, ContactStatusSerializer
+from .serializers import ContactMessageSerializer, ContactUpdateSerializer
 
 class ContactMessageViewSet(viewsets.ModelViewSet):
     queryset = ContactMessage.objects.all().order_by('-created_at')
+
     serializer_class = ContactMessageSerializer
+
+    throttle_classes = [AnonRateThrottle]
+
     filter_backends = [
         DjangoFilterBackend,
         filters.SearchFilter,
         filters.OrderingFilter,
     ]
 
-    filterset_fields = ['is_read', 'email']
-    search_fields = ['name', 'email', 'subject', 'message']
-    ordering_fields = ['created_at', 'name', 'email']
+    filterset_fields = ['status', 'inquiry_type', 'email']
 
-    http_method_names = ['get', 'post', 'patch', 'head', 'options']
+    search_fields = ['first_name', 'last_name', 'email', 'subject', 'message']
+
+    ordering_fields = ['created_at', 'status']
+
+    http_method_names = ['get', 'post', 'patch', 'delete', 'head', 'options']
 
     def get_permissions(self):
         if self.action == 'create':
@@ -25,6 +33,6 @@ class ContactMessageViewSet(viewsets.ModelViewSet):
 
     def get_serializer_class(self):
         if self.action == 'partial_update':
-            return ContactStatusSerializer
+            return ContactUpdateSerializer
 
         return ContactMessageSerializer

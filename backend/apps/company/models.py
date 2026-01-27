@@ -1,13 +1,16 @@
 from django.db import models
-from django.core.validators import FileExtensionValidator
-from core.validators import validate_image_size
+from cloudinary.models import CloudinaryField
+from core.validators import MaxFileSizeValidator, validate_image_extension
 
 class ClientLogo(models.Model):
     name = models.CharField(max_length=100, verbose_name='Nombre del Cliente')
-    image = models.ImageField(
-        upload_to='company/clients/',
-        verbose_name='Logo',
-        validators=[validate_image_size, FileExtensionValidator(allowed_extensions=['jpg', 'jpeg', 'png', 'webp'])],
+    image = CloudinaryField(
+        'Logo',
+        folder='company/clients/',
+        validators=[
+            MaxFileSizeValidator(limit_mb=2),
+            validate_image_extension
+        ]
     )
     created_at = models.DateTimeField(auto_now_add=True, verbose_name='Fecha de Creación')
 
@@ -22,12 +25,16 @@ class ClientLogo(models.Model):
 class Service(models.Model):
     name = models.CharField(max_length=100, verbose_name='Nombre del Servicio')
     description = models.TextField(verbose_name='Descripción')
-    image = models.ImageField(
-        upload_to='company/services/',
-        verbose_name='Imagen',
+
+    image = CloudinaryField(
+        'Imagen',
+        folder='company/services/',
         blank=True,
         null=True,
-        validators=[validate_image_size, FileExtensionValidator(allowed_extensions=['jpg', 'jpeg', 'png', 'webp'])],
+        validators=[
+            MaxFileSizeValidator(limit_mb=5), 
+            validate_image_extension
+        ]
     )
     created_at = models.DateTimeField(auto_now_add=True, verbose_name='Fecha de Creación')
 
@@ -43,6 +50,7 @@ class CompanyInfo(models.Model):
     phone = models.CharField(max_length=50, blank=True, verbose_name='Teléfono')
     email = models.EmailField(blank=True, verbose_name='Email')
     address = models.CharField(max_length=255, blank=True, verbose_name='Dirección')
+
     google_maps_url = models.URLField(
         max_length=500,
         blank=True,
@@ -53,12 +61,12 @@ class CompanyInfo(models.Model):
         max_length=500,
         blank=True,
         verbose_name="Link Compartir (Navegación)",
-        help_text="El enlace corto (maps.app.goo.gl) para que el cliente navegue",
+        help_text="El enlace corto para compartir",
     )
     opening_hours = models.TextField(
         blank=True,
         verbose_name='Horario de Atención',
-        help_text='Ej: Lunes a Viernes: 8 am - 5 pm (Usa saltos de línea para separar días)',
+        help_text='Ej: Lunes a Viernes: 8 am - 5 pm',
     )
 
     facebook = models.URLField(blank=True, default='', verbose_name='Facebook')
@@ -66,6 +74,7 @@ class CompanyInfo(models.Model):
     linkedin = models.URLField(blank=True, default='', verbose_name='LinkedIn')
     tiktok = models.URLField(blank=True, default='', verbose_name='TikTok')
     whatsapp = models.URLField(blank=True, default='', help_text='Número para link de WA', verbose_name='WhatsApp')
+
     class Meta:
         db_table = 'company_info'
         verbose_name = 'Información de Empresa'
@@ -78,12 +87,16 @@ class AboutUs(models.Model):
     description = models.TextField(verbose_name='Descripción de la Empresa')
     mission = models.TextField(verbose_name='Misión')
     vision = models.TextField(verbose_name='Visión')
-    image = models.ImageField(
-        upload_to='company/about/',
+
+    image = CloudinaryField(
+        'Imagen Principal',
+        folder='company/about/',
         blank=True,
         null=True,
-        verbose_name='Imagen Principal',
-        validators=[validate_image_size, FileExtensionValidator(allowed_extensions=['jpg', 'jpeg', 'png', 'webp'])],
+        validators=[
+            MaxFileSizeValidator(limit_mb=5),
+            validate_image_extension
+        ]
     )
 
     class Meta:
@@ -95,16 +108,20 @@ class AboutUs(models.Model):
         return 'Información de Nosotros'
 
 class HomeHero(models.Model):
-    badge = models.CharField(max_length=100, default='Innovación y Solidez', verbose_name='Texto Superior (Badge)')
+    badge = models.CharField(max_length=100, default='Innovación y Solidez', verbose_name='Texto Superior')
     title = models.CharField(max_length=100, default='Construimos', verbose_name='Título Principal')
-    highlight = models.CharField(max_length=100, default='El Futuro.', verbose_name='Texto Destacado (Gradiente)')
+    highlight = models.CharField(max_length=100, default='El Futuro.', verbose_name='Texto Destacado')
     description = models.TextField(verbose_name='Descripción')
-    image = models.ImageField(
-        upload_to='company/home/',
+
+    image = CloudinaryField(
+        'Imagen de Fondo',
+        folder='company/home/',
         blank=True,
         null=True,
-        verbose_name='Imagen de Fondo',
-        validators=[validate_image_size, FileExtensionValidator(allowed_extensions=['jpg', 'jpeg', 'png', 'webp'])],
+        validators=[
+            MaxFileSizeValidator(limit_mb=10),
+            validate_image_extension
+        ]
     )
 
     class Meta:
@@ -116,15 +133,19 @@ class HomeHero(models.Model):
         return 'Configuración del Home Hero'
 
 class ProjectsHero(models.Model):
-    title = models.CharField(max_length=100, default='Nuestros', verbose_name='Título (Parte Blanca)')
-    highlight = models.CharField(max_length=100, default='Proyectos.', verbose_name='Texto Destacado (Naranja)')
-    description = models.TextField(verbose_name='Descripción', default='Una muestra de nuestra capacidad técnica y visión arquitectónica. Cada obra refleja nuestro compromiso con la calidad.')
-    image = models.ImageField(
-        upload_to='company/projects/',
+    title = models.CharField(max_length=100, default='Nuestros', verbose_name='Título')
+    highlight = models.CharField(max_length=100, default='Proyectos.', verbose_name='Texto Destacado')
+    description = models.TextField(verbose_name='Descripción', default='Una muestra de nuestra capacidad técnica...')
+
+    image = CloudinaryField(
+        'Imagen de Fondo',
+        folder='company/projects/',
         blank=True,
         null=True,
-        verbose_name='Imagen de Fondo',
-        validators=[validate_image_size, FileExtensionValidator(allowed_extensions=['jpg', 'jpeg', 'png', 'webp'])],
+        validators=[
+            MaxFileSizeValidator(limit_mb=10),
+            validate_image_extension
+        ]
     )
 
     class Meta:

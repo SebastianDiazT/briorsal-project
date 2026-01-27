@@ -1,10 +1,19 @@
 from django.urls import path, include
 from rest_framework.routers import DefaultRouter
-from .views import ClientLogoViewSet, ServiceViewSet, CompanyInfoView, AboutUsView, HomeHeroView, ProjectsHeroView
+from .views import (
+    ClientLogoViewSet,
+    ServiceViewSet,
+    CompanyInfoView,
+    AboutUsView,
+    HomeHeroView,
+    ProjectsHeroView
+)
+
+app_name = 'company'
 
 router = DefaultRouter()
-router.register(r'clients', ClientLogoViewSet)
-router.register(r'services', ServiceViewSet)
+router.register(r'clients', ClientLogoViewSet, basename='client-logo')
+router.register(r'services', ServiceViewSet, basename='service')
 
 urlpatterns = [
     path('info/', CompanyInfoView.as_view(), name='company-info'),

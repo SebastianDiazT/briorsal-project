@@ -1,5 +1,6 @@
 from django_filters.rest_framework import DjangoFilterBackend
-from rest_framework import filters, generics, permissions, viewsets
+from rest_framework import filters, generics, viewsets, permissions
+import cloudinary.uploader
 from .models import AboutUs, ClientLogo, CompanyInfo, Service, HomeHero, ProjectsHero
 from .serializers import (
     AboutUsSerializer,
@@ -10,65 +11,84 @@ from .serializers import (
     ProjectsHeroSerializer,
 )
 
-class ClientLogoViewSet(viewsets.ModelViewSet):
-    queryset = ClientLogo.objects.all().order_by('-created_at')
-    serializer_class = ClientLogoSerializer
-    permission_classes = [permissions.IsAuthenticatedOrReadOnly]
+class IsAdminOrReadOnly(permissions.BasePermission):
+    def has_permission(self, request, view):
+        if request.method in permissions.SAFE_METHODS:
+            return True
+        return request.user and request.user.is_staff
 
-    filter_backends = [
-        DjangoFilterBackend,
-        filters.SearchFilter,
-    ]
-
-    filterset_fields = ['name']
-    search_fields = ['name']
-
-class ServiceViewSet(viewsets.ModelViewSet):
-    queryset = Service.objects.all().order_by('created_at')
-    serializer_class = ServiceSerializer
-    permission_classes = [permissions.IsAuthenticatedOrReadOnly]
-
-    filter_backends = [
-        DjangoFilterBackend,
-        filters.SearchFilter,
-    ]
-
-    filterset_fields = ['name']
-    search_fields = ['name', 'description']
-
-class CompanyInfoView(generics.RetrieveUpdateAPIView):
-    serializer_class = CompanyInfoSerializer
-    permission_classes = [permissions.IsAuthenticatedOrReadOnly]
-
-    def get_object(self):
-        obj, created = CompanyInfo.objects.get_or_create(defaults={'email': ''})
-        return obj
-
-class AboutUsView(generics.RetrieveUpdateAPIView):
-    serializer_class = AboutUsSerializer
-    permission_classes = [permissions.IsAuthenticatedOrReadOnly]
-
-    def get_object(self):
-        obj, created = AboutUs.objects.get_or_create(defaults={'description': ''})
-        return obj
-
+class DeleteImageMixin:
     def perform_update(self, serializer):
         delete_image = self.request.data.get('delete_image')
 
-        if delete_image == 'true':
-            if serializer.instance.image:
-                serializer.instance.image.delete(save=False)
+        if str(delete_image).lower() == 'true':
+            img = serializer.instance.image
 
+            if img:
+                if hasattr(img, 'public_id'):
+                    try:
+                        cloudinary.uploader.destroy(img.public_id)
+                    except Exception as e:
+                        print(f"Error borrando en Cloudinary: {e}")
+
+                elif hasattr(img, 'delete'):
+                    img.delete(save=False)
             serializer.save(image=None)
         else:
             serializer.save()
 
-class HomeHeroView(generics.RetrieveUpdateAPIView):
-    serializer_class = HomeHeroSerializer
-    permission_classes = [permissions.IsAuthenticatedOrReadOnly]
+class ClientLogoViewSet(viewsets.ModelViewSet):
+    queryset = ClientLogo.objects.all().order_by('-created_at')
+    serializer_class = ClientLogoSerializer
+    permission_classes = [IsAdminOrReadOnly]
+
+    filter_backends = [
+        DjangoFilterBackend,
+        filters.SearchFilter,
+        filters.OrderingFilter,
+    ]
+
+    filterset_fields = ['name']
+    search_fields = ['name']
+    ordering_fields = ['name', 'created_at']
+
+class ServiceViewSet(viewsets.ModelViewSet):
+    queryset = Service.objects.all().order_by('created_at')
+    serializer_class = ServiceSerializer
+    permission_classes = [IsAdminOrReadOnly]
+
+    filter_backends = [
+        DjangoFilterBackend,
+        filters.SearchFilter,
+        filters.OrderingFilter,
+    ]
+
+    filterset_fields = ['name']
+    search_fields = ['name', 'description']
+    ordering_fields = ['name', 'created_at']
+
+class CompanyInfoView(generics.RetrieveUpdateAPIView):
+    serializer_class = CompanyInfoSerializer
+    permission_classes = [IsAdminOrReadOnly]
 
     def get_object(self):
-        obj, created = HomeHero.objects.get_or_create(defaults={
+        obj, _ = CompanyInfo.objects.get_or_create(defaults={'email': ''})
+        return obj
+
+class AboutUsView(DeleteImageMixin, generics.RetrieveUpdateAPIView):
+    serializer_class = AboutUsSerializer
+    permission_classes = [IsAdminOrReadOnly]
+
+    def get_object(self):
+        obj, _ = AboutUs.objects.get_or_create(defaults={'description': ''})
+        return obj
+
+class HomeHeroView(DeleteImageMixin, generics.RetrieveUpdateAPIView):
+    serializer_class = HomeHeroSerializer
+    permission_classes = [IsAdminOrReadOnly]
+
+    def get_object(self):
+        obj, _ = HomeHero.objects.get_or_create(defaults={
             'badge': '',
             'title': '',
             'highlight': '',
@@ -76,35 +96,14 @@ class HomeHeroView(generics.RetrieveUpdateAPIView):
         })
         return obj
 
-    def perform_update(self, serializer):
-        delete_image = self.request.data.get('delete_image')
-
-        if delete_image == 'true':
-            if serializer.instance.image:
-                serializer.instance.image.delete(save=False)
-
-            serializer.save(image=None)
-        else:
-            serializer.save()
-
-class ProjectsHeroView(generics.RetrieveUpdateAPIView):
+class ProjectsHeroView(DeleteImageMixin, generics.RetrieveUpdateAPIView):
     serializer_class = ProjectsHeroSerializer
-    permission_classes = [permissions.IsAuthenticatedOrReadOnly]
+    permission_classes = [IsAdminOrReadOnly]
 
     def get_object(self):
-        obj, created = ProjectsHero.objects.get_or_create(defaults={
+        obj, _ = ProjectsHero.objects.get_or_create(defaults={
             'title': '',
             'highlight': '',
             'description': '',
         })
         return obj
-
-    def perform_update(self, serializer):
-        delete_image = self.request.data.get('delete_image')
-
-        if delete_image == 'true':
-            if serializer.instance.image:
-                serializer.instance.image.delete(save=False)
-            serializer.save(image=None)
-        else:
-            serializer.save()

@@ -12,13 +12,24 @@ class CustomPagination(PageNumberPagination):
         return super().paginate_queryset(queryset, request, view)
 
     def get_paginated_response(self, data):
+        if not hasattr(self, 'page') or self.page is None:
+            return Response({
+                'results': data,
+                'meta': {
+                    'total_records': len(data) if isinstance(data, list) else 1,
+                    'paginated': False
+                }
+            })
+
         return Response({
             'results': data,
             'meta': {
-                'page': self.page.number,
+                'current_page': self.page.number,
                 'total_pages': self.page.paginator.num_pages,
                 'total_records': self.page.paginator.count,
+                'page_size': self.get_page_size(self.request),
                 'next': self.get_next_link(),
                 'previous': self.get_previous_link(),
+                'paginated': True
             }
         })

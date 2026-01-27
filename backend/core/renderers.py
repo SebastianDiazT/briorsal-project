@@ -8,22 +8,24 @@ class CustomJSONRenderer(JSONRenderer):
             return super().render(data, accepted_media_type, renderer_context)
 
         custom_message = None
+        meta_data = None
+        final_data = data
 
         if isinstance(data, dict):
             custom_message = data.pop("custom_message", None)
+
+            if 'results' in data and 'meta' in data:
+                final_data = data['results']
+                meta_data = data['meta']
+                if not custom_message:
+                    custom_message = "Lista obtenida correctamente."
 
         formatted_data = {
             'status': 'success',
             'code': response.status_code if response else 200,
             'message': custom_message or 'Operación realizada correctamente.',
-            'data': data,
-            'meta': None
+            'data': final_data,
+            'meta': meta_data
         }
-
-        if isinstance(data, dict) and 'results' in data and 'meta' in data:
-            formatted_data['data'] = data['results']
-            formatted_data['meta'] = data['meta']
-            if not custom_message:
-                formatted_data["message"] = "Lista obtenida correctamente."
 
         return super().render(formatted_data, accepted_media_type, renderer_context)

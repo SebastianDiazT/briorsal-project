@@ -1,22 +1,25 @@
 import os
 import sys
+import cloudinary
 from datetime import timedelta
 from pathlib import Path
 
-import dj_database_url
 import environ
 
 env = environ.Env()
-environ.Env.read_env()
 
 BASE_DIR = Path(__file__).resolve().parent.parent
+environ.Env.read_env(os.path.join(BASE_DIR, '.env'))
 
-sys.path.insert(0, str(BASE_DIR / "apps"))
+sys.path.insert(0, str(BASE_DIR / 'apps'))
 
 SECRET_KEY = env('SECRET_KEY')
-DEBUG = env.bool('DEBUG', default=False)
 
-ALLOWED_HOSTS = env.list('ALLOWED_HOSTS', default=['localhost', '127.0.0.1'])
+DEBUG = env.bool('DEBUG', default=True)
+
+ALLOWED_HOSTS = env.list('ALLOWED_HOSTS', default=['127.0.0.1'])
+
+SITE_ID = 1
 
 DJANGO_APPS = [
     'django.contrib.admin',
@@ -25,16 +28,19 @@ DJANGO_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'django.contrib.sites',
 ]
 
 THIRD_PARTY_APPS = [
+    'cloudinary_storage',
+    'cloudinary',
     'rest_framework',
     'rest_framework_simplejwt',
+    'rest_framework_simplejwt.token_blacklist',
+    'djoser',
     'corsheaders',
     'drf_spectacular',
     'django_filters',
-    'djoser',
-    'imagekit',
     'adminsortable2',
 ]
 
@@ -59,12 +65,12 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
 
-ROOT_URLCONF = "core.urls"
+ROOT_URLCONF = 'core.urls'
 
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': [BASE_DIR / 'templates'],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -77,24 +83,22 @@ TEMPLATES = [
 ]
 
 WSGI_APPLICATION = 'core.wsgi.application'
-ASGI_APPLICATION = 'core.asgi.application'
 
-RENDER = env.bool('RENDER', default=False)
 
-db_config = dj_database_url.config(
-    default='sqlite:///db.sqlite3',
-    conn_max_age=600,
-    conn_health_checks=True,
-)
-
-if 'RENDER' in os.environ and db_config['ENGINE'] == 'django.db.backends.postgresql':
-    db_config['OPTIONS'] = {'sslmode': 'require'}
-
-DATABASES = {'default': db_config}
+DATABASES = {
+    'default': env.db('DATABASE_URL', default=f'sqlite:///{BASE_DIR}/db.sqlite3')
+}
 
 CORS_ALLOWED_ORIGINS = env.list('CORS_ALLOWED_ORIGINS', default=[])
-CSRF_TRUSTED_ORIGINS = env.list('CORS_ALLOWED_ORIGINS', default=[])
+CSRF_TRUSTED_ORIGINS = env.list('CSRF_TRUSTED_ORIGINS', default=[])
 CORS_ALLOW_CREDENTIALS = True
+
+PASSWORD_HASHERS = [
+    'django.contrib.auth.hashers.Argon2PasswordHasher',
+    'django.contrib.auth.hashers.PBKDF2PasswordHasher',
+    'django.contrib.auth.hashers.PBKDF2SHA1PasswordHasher',
+    'django.contrib.auth.hashers.BCryptSHA256PasswordHasher',
+]
 
 AUTH_PASSWORD_VALIDATORS = [
     {
@@ -118,14 +122,24 @@ USE_TZ = True
 
 STATIC_URL = '/static/'
 STATIC_ROOT = os.path.join(BASE_DIR, 'static')
-if not DEBUG:
-    STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
-DATA_UPLOAD_MAX_MEMORY_SIZE = 104857600
-FILE_UPLOAD_MAX_MEMORY_SIZE = 104857600
-
-MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+MEDIA_URL = '/media/'
+
+CLOUDINARY_STORAGE = {
+    'CLOUD_NAME': env('CLOUDINARY_CLOUD_NAME'),
+    'API_KEY': env('CLOUDINARY_API_KEY'),
+    'API_SECRET': env('CLOUDINARY_API_SECRET'),
+}
+
+cloudinary.config(
+    cloud_name=env('CLOUDINARY_CLOUD_NAME'),
+    api_key=env('CLOUDINARY_API_KEY'),
+    api_secret=env('CLOUDINARY_API_SECRET'),
+    secure=True
+)
+
+AUTH_USER_MODEL = 'users.UserAccount'
 
 REST_FRAMEWORK = {
     'DEFAULT_PERMISSION_CLASSES': [
@@ -138,6 +152,16 @@ REST_FRAMEWORK = {
     'PAGE_SIZE': 10,
     'PAGE_SIZE_QUERY_PARAM': 'page_size',
     'MAX_PAGE_SIZE': 100,
+
+    'DEFAULT_THROTTLE_CLASSES': [
+        'rest_framework.throttling.AnonRateThrottle',
+        'rest_framework.throttling.UserRateThrottle'
+    ],
+
+    'DEFAULT_THROTTLE_RATES': {
+        'anon': '100/day',
+        'user': '1000/day'
+    },
 
     'DEFAULT_SCHEMA_CLASS': 'drf_spectacular.openapi.AutoSchema',
     'DEFAULT_FILTER_BACKENDS': ['django_filters.rest_framework.DjangoFilterBackend'],
@@ -152,25 +176,29 @@ REST_FRAMEWORK = {
 
 SIMPLE_JWT = {
     'AUTH_HEADER_TYPES': ('Bearer',),
-    'ACCESS_TOKEN_LIFETIME': timedelta(minutes=60),
-    'REFRESH_TOKEN_LIFETIME': timedelta(days=1),
+    'ACCESS_TOKEN_LIFETIME': timedelta(minutes=15),
+    'REFRESH_TOKEN_LIFETIME': timedelta(days=7),
     'ROTATE_REFRESH_TOKENS': True,
     'BLACKLIST_AFTER_ROTATION': True,
+    'UPDATE_LAST_LOGIN': True,
+    'ALGORITHM': 'HS256',
+    'SIGNING_KEY': SECRET_KEY,
 }
-
-AUTH_USER_MODEL = 'users.UserAccount'
 
 DJOSER = {
     'LOGIN_FIELD': 'email',
     'USER_CREATE_PASSWORD_RETYPE': True,
     'USERNAME_CHANGED_EMAIL_CONFIRMATION': True,
     'PASSWORD_CHANGED_EMAIL_CONFIRMATION': True,
-    'SEND_CONFIRMATION_EMAIL': False,
+    'SEND_CONFIRMATION_EMAIL': env.bool('SEND_EMAILS', default=False),
     'SET_USERNAME_RETYPE': True,
+    'PASSWORD_RESET_SHOW_EMAIL_NOT_FOUND': True,
+
     'PASSWORD_RESET_CONFIRM_URL': 'password/reset/confirm/{uid}/{token}',
     'USERNAME_RESET_CONFIRM_URL': 'email/reset/confirm/{uid}/{token}',
     'ACTIVATION_URL': 'activate/{uid}/{token}',
-    'SEND_ACTIVATION_EMAIL': False,
+
+    'SEND_ACTIVATION_EMAIL': env.bool('SEND_EMAILS', default=False),
     'SERIALIZERS': {
         'user_create': 'apps.users.serializers.UserCreateSerializer',
         'user': 'apps.users.serializers.UserSerializer',
@@ -187,22 +215,13 @@ DJOSER = {
 
 SPECTACULAR_SETTINGS = {
     'TITLE': 'Briorsal API',
-    'DESCRIPTION': 'API para gestión de constructora',
+    'DESCRIPTION': 'API para gestión corporativa de Constructora Briorsal',
     'VERSION': '1.0.0',
     'COMPONENT_SPLIT_REQUEST': True,
+    'SERVE_PERMISSIONS': ['rest_framework.permissions.IsAdminUser'],
 }
 
-if DEBUG:
-    EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
-else:
-    EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
-    EMAIL_HOST = env('EMAIL_HOST', default='')
-    EMAIL_PORT = env('EMAIL_PORT', default=587)
-    EMAIL_HOST_USER = env('EMAIL_HOST_USER', default='')
-    EMAIL_HOST_PASSWORD = env('EMAIL_HOST_PASSWORD', default='')
-    EMAIL_USE_SSL = True
-
-    DEFAULT_FROM_EMAIL = env('EMAIL_HOST_USER')
+DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 LOGGING = {
     'version': 1,
@@ -218,20 +237,34 @@ LOGGING = {
             'class': 'logging.StreamHandler',
             'formatter': 'verbose',
         },
+        'file': {
+            'level': 'ERROR',
+            'class': 'logging.FileHandler',
+            'filename': os.path.join(BASE_DIR, 'django_errors.log'),
+            'formatter': 'verbose',
+        },
     },
     'root': {
-        'handlers': ['console'],
+        'handlers': ['console', 'file'],
         'level': 'INFO',
     },
 }
 
-if DEBUG:
-    SECURE_BROWSER_XSS_FILTER = True
-    X_FRAME_OPTIONS = "DENY"
-    SECURE_CONTENT_TYPE_NOSNIFF = True
-
-    SECURE_SSL_REDIRECT = env.bool("SECURE_SSL_REDIRECT", default=True)
+if not DEBUG:
+    SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
+    SECURE_SSL_REDIRECT = True
     SESSION_COOKIE_SECURE = True
     CSRF_COOKIE_SECURE = True
+    SECURE_HSTS_SECONDS = 31536000
+    SECURE_HSTS_INCLUDE_SUBDOMAINS = True
+    SECURE_HSTS_PRELOAD = True
 
-DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+    EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+    EMAIL_HOST = env('EMAIL_HOST', default='smtp.example.com')
+    EMAIL_PORT = env.int('EMAIL_PORT', default=465)
+    EMAIL_USE_SSL = env.bool('EMAIL_USE_SSL', default=True)
+    EMAIL_HOST_USER = env('EMAIL_HOST_USER', default='user@example.com')
+    EMAIL_HOST_PASSWORD = env('EMAIL_HOST_PASSWORD', default='password')
+    DEFAULT_FROM_EMAIL = env('DEFAULT_FROM_EMAIL', default='no-reply@constructorabriorsal.com')
+
+    CONTACT_EMAILS = ['constructora@grupobriorsal.com']

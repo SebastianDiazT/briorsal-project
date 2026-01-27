@@ -1,12 +1,22 @@
 from django.urls import path, include
 from rest_framework.routers import DefaultRouter
-from .views import ProjectViewSet, CategoryViewSet, ProjectImageViewSet, ProjectVideoViewSet
+from .views import (
+    ProjectViewSet,
+    CategoryViewSet,
+    ProjectImageViewSet,
+    ProjectVideoViewSet
+)
+
+app_name = 'projects'
 
 router = DefaultRouter()
-router.register(r'projects', ProjectViewSet)
-router.register(r'categories', CategoryViewSet)
-router.register(r'project-images', ProjectImageViewSet)
-router.register(r'project-videos', ProjectVideoViewSet)
+
+router.register(r'list', ProjectViewSet, basename='project')
+
+router.register(r'categories', CategoryViewSet, basename='category')
+
+router.register(r'images', ProjectImageViewSet, basename='project-image')
+router.register(r'videos', ProjectVideoViewSet, basename='project-video')
 
 urlpatterns = [
     path('', include(router.urls)),

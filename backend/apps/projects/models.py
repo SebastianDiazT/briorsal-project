@@ -1,11 +1,12 @@
-from django.core.validators import FileExtensionValidator
 from django.db import models
 from django.utils.text import slugify
+from cloudinary.models import CloudinaryField
 
-from core.validators import validate_image_size, validate_video_size
-
-from imagekit.models import ImageSpecField
-from imagekit.processors import ResizeToFill
+from core.validators import (
+    MaxFileSizeValidator,
+    validate_image_extension,
+    validate_video_extension
+)
 
 class Category(models.Model):
     name = models.CharField(max_length=100, unique=True, verbose_name='Nombre de la Categoría')
@@ -26,34 +27,49 @@ class Project(models.Model):
     ]
 
     sort_order = models.PositiveIntegerField(default=0, verbose_name='Orden de Clasificación')
-
     name = models.CharField(max_length=255, verbose_name='Nombre del Proyecto')
-    slug = models.SlugField(unique=True, blank=True, max_length=255, verbose_name='Slug(URL)')
-    categories = models.ManyToManyField(Category, related_name='projects', verbose_name='Categorías')
+    slug = models.SlugField(unique=True, blank=True, max_length=255, verbose_name='Slug (URL)')
+
+    categories = models.ManyToManyField(
+        Category,
+        related_name='projects',
+        verbose_name='Categorías'
+    )
+
+    related_projects = models.ManyToManyField(
+        'self',
+        blank=True,
+        symmetrical=True,
+        verbose_name="Proyectos Relacionados",
+        help_text="Selecciona proyectos similares o etapas de la misma obra."
+    )
+
     location = models.CharField(max_length=255, verbose_name='Ubicación')
     description = models.TextField(blank=True, verbose_name='Descripción')
     year = models.PositiveIntegerField(blank=True, null=True, verbose_name='Año')
-    service_type = models.CharField(max_length=255, blank=True, null=True, verbose_name='Edificación')
+    service_type = models.CharField(max_length=255, blank=True, null=True, verbose_name='Tipo de Edificación')
     levels = models.CharField(max_length=100, blank=True, null=True, verbose_name='Niveles / Pisos')
-    area = models.CharField(max_length=100, blank=True, null=True, verbose_name='Área (m2)')
+    area = models.CharField(max_length=100, blank=True, null=True, verbose_name='Área Construida')
     status = models.CharField(max_length=50, choices=STATUS_CHOICES, default='en_proceso', verbose_name='Estado')
 
-    cover_image = models.ImageField(
-        upload_to='projects/covers/',
-        verbose_name='Imagen de Portada (Principal)',
-        blank=True, null=True,
-        help_text='Imagen principal para el listado de proyectos.'
+    cover_image = CloudinaryField(
+        'Imagen de Portada (Listado)',
+        folder='projects/covers/',
+        validators=[MaxFileSizeValidator(limit_mb=5), validate_image_extension],
+        help_text='Imagen cuadrada o vertical para el catálogo.'
     )
 
-    cover_thumbnail = ImageSpecField(
-        source='cover_image',
-        processors=[ResizeToFill(800, 800)],
-        format='WEBP',
-        options={'quality': 85},
+    banner_image = CloudinaryField(
+        'Imagen de Banner (Detalle)',
+        folder='projects/banners/',
+        blank=True, null=True,
+        validators=[MaxFileSizeValidator(limit_mb=8), validate_image_extension],
+        help_text='Imagen panorámica ancha. Si se deja vacía, el frontend puede usar la portada como fallback.'
     )
 
     extra_info = models.JSONField(blank=True, null=True, verbose_name='Información Extra (JSON)')
     is_featured = models.BooleanField(default=False, verbose_name='¿Es Destacado?')
+
     created_at = models.DateTimeField(auto_now_add=True, verbose_name='Fecha de Creación')
     updated_at = models.DateTimeField(auto_now=True, verbose_name='Fecha de Actualización')
 
@@ -61,18 +77,16 @@ class Project(models.Model):
         db_table = 'projects'
         verbose_name = 'Proyecto'
         verbose_name_plural = 'Proyectos'
-        ordering = ['sort_order']
+        ordering = ['sort_order', '-year']
 
     def save(self, *args, **kwargs):
         if not self.slug:
             self.slug = slugify(self.name)
-
             original_slug = self.slug
             counter = 1
             while Project.objects.filter(slug=self.slug).exists():
                 self.slug = f"{original_slug}-{counter}"
                 counter += 1
-
         super().save(*args, **kwargs)
 
     def __str__(self):
@@ -80,36 +94,41 @@ class Project(models.Model):
 
 class ProjectImage(models.Model):
     project = models.ForeignKey(Project, on_delete=models.CASCADE, related_name='images', verbose_name='Proyecto')
-    image = models.ImageField(
-        upload_to='projects/gallery/',
-        verbose_name='Imagen',
-        validators=[validate_image_size, FileExtensionValidator(allowed_extensions=['jpg', 'jpeg', 'png', 'webp'])],
+
+    image = CloudinaryField(
+        'Imagen de Galería',
+        folder='projects/gallery/',
+        validators=[MaxFileSizeValidator(limit_mb=5), validate_image_extension]
     )
 
-    image_large = ImageSpecField(
-        source='image',
-        processors=[ResizeToFill(1920, 1080)],
-        format='WEBP',
-        options={'quality': 80}
-    )
+    created_at = models.DateTimeField(auto_now_add=True)
 
     class Meta:
         db_table = 'project_images'
-        verbose_name = 'Imagen de Proyecto'
-        verbose_name_plural = 'Imágenes de Proyectos'
+        verbose_name = 'Imagen de Galería'
+        verbose_name_plural = 'Imágenes de Galería'
 
     def __str__(self):
-        return f"Imagen for {self.project.name}"
+        return f"Img: {self.project.name}"
 
 class ProjectVideo(models.Model):
     project = models.ForeignKey(Project, on_delete=models.CASCADE, related_name='videos', verbose_name='Proyecto')
-    video = models.FileField(
-        upload_to='projects/videos/',
-        verbose_name='Video MP4',
-        validators=[validate_video_size, FileExtensionValidator(allowed_extensions=['mp4', 'mov', 'avi', 'mkv'])],
+
+    title = models.CharField(max_length=100, blank=True, verbose_name='Título del Video')
+
+    video = CloudinaryField(
+        'Video',
+        folder='projects/videos/',
+        resource_type='video',
+        validators=[MaxFileSizeValidator(limit_mb=100), validate_video_extension]
     )
+
+    created_at = models.DateTimeField(auto_now_add=True)
 
     class Meta:
         db_table = 'project_videos'
         verbose_name = 'Video de Proyecto'
         verbose_name_plural = 'Videos de Proyectos'
+
+    def __str__(self):
+        return f"Video: {self.project.name} - {self.title}"

@@ -15,7 +15,7 @@ urlpatterns = [
     path('api/auth/', include('djoser.urls')),
     path('api/auth/', include('djoser.urls.jwt')),
 
-    path('api/', include('apps.projects.urls')),
+    path('api/projects/', include('apps.projects.urls')),
     path('api/company/', include('apps.company.urls')),
     path('api/contact/', include('apps.contact.urls')),
 
@@ -28,5 +28,6 @@ if settings.DEBUG:
     urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
 else:
     urlpatterns += [
-        re_path(r"^media/(?P<path>.*)$", serve, {"document_root": settings.MEDIA_ROOT}),
+        re_path(r'^media/(?P<path>.*)$', serve, {'document_root': settings.MEDIA_ROOT}),
+        re_path(r'^static/(?P<path>.*)$', serve, {'document_root': settings.STATIC_ROOT}),
     ]
