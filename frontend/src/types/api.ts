@@ -7,11 +7,13 @@ export interface ApiResponse<T> {
 }
 
 export interface PaginationMeta {
-    page: number;
+    current_page: number;
     total_pages: number;
     total_records: number;
+    page_size: number;
     next: string | null;
     previous: string | null;
+    paginated: boolean;
 }
 
 export interface ApiError {

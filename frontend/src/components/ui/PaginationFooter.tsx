@@ -17,13 +17,13 @@ export const PaginationFooter: React.FC<PaginationFooterProps> = ({
 
     const handlePrevious = () => {
         if (meta.previous) {
-            onPageChange(meta.page - 1);
+            onPageChange(meta.current_page - 1);
         }
     };
 
     const handleNext = () => {
         if (meta.next) {
-            onPageChange(meta.page + 1);
+            onPageChange(meta.current_page + 1);
         }
     };
 
@@ -33,7 +33,7 @@ export const PaginationFooter: React.FC<PaginationFooterProps> = ({
         >
             <div className="text-xs text-slate-500 font-medium">
                 Mostrando página{' '}
-                <span className="font-bold text-slate-700">{meta.page}</span> de{' '}
+                <span className="font-bold text-slate-700">{meta.current_page}</span> de{' '}
                 <span className="font-bold text-slate-700">
                     {meta.total_pages}
                 </span>{' '}

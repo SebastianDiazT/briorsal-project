@@ -27,8 +27,10 @@ export const ServiceForm: React.FC<ServiceFormProps> = ({
     const [description, setDescription] = useState('');
     const [previewImage, setPreviewImage] = useState<string | null>(null);
     const [imageFile, setImageFile] = useState<File | null>(null);
-    const [isDragActive, setIsDragActive] = useState(false);
 
+    const [deleteImageFlag, setDeleteImageFlag] = useState(false);
+
+    const [isDragActive, setIsDragActive] = useState(false);
     const fileInputRef = useRef<HTMLInputElement>(null);
 
     useEffect(() => {
@@ -36,6 +38,7 @@ export const ServiceForm: React.FC<ServiceFormProps> = ({
             setName(initialData.name);
             setDescription(initialData.description);
             setPreviewImage(initialData.image);
+            setDeleteImageFlag(false);
         }
     }, [initialData]);
 
@@ -78,6 +81,7 @@ export const ServiceForm: React.FC<ServiceFormProps> = ({
         const objectUrl = URL.createObjectURL(file);
         setPreviewImage(objectUrl);
         setImageFile(file);
+        setDeleteImageFlag(false);
     };
 
     const handleDragOver = useCallback((e: React.DragEvent) => {
@@ -112,14 +116,20 @@ export const ServiceForm: React.FC<ServiceFormProps> = ({
 
     const handleDeleteImage = (e: React.MouseEvent) => {
         e.stopPropagation();
+
         if (previewImage && previewImage.startsWith('blob:')) {
             URL.revokeObjectURL(previewImage);
         }
+
         setPreviewImage(null);
         setImageFile(null);
+
         if (fileInputRef.current) {
             fileInputRef.current.value = '';
         }
+
+        setDeleteImageFlag(true);
+        toast('Imagen eliminada. Guarda para confirmar.', { icon: '🗑️' });
     };
 
     const handleSubmit = async (e: React.FormEvent) => {
@@ -130,7 +140,12 @@ export const ServiceForm: React.FC<ServiceFormProps> = ({
         const formData = new FormData();
         formData.append('name', name);
         formData.append('description', description);
-        if (imageFile) formData.append('image', imageFile);
+
+        if (deleteImageFlag) {
+            formData.append('delete_image', 'true');
+        } else if (imageFile) {
+            formData.append('image', imageFile);
+        }
 
         await onSubmit(formData);
     };

@@ -28,7 +28,6 @@ const Footer = () => {
         <footer className="bg-brand-dark-950 text-white py-12 font-sans border-t border-brand-dark-800">
             <div className="w-full max-w-[90%] mx-auto px-4">
                 <div className="flex flex-col lg:flex-row justify-between items-center lg:items-start gap-12 lg:gap-8">
-                    {/* LOGO */}
                     <div className="flex justify-center items-center lg:justify-start">
                         <img
                             src={logoBriorsal}
@@ -37,7 +36,6 @@ const Footer = () => {
                         />
                     </div>
 
-                    {/* CONTACTO */}
                     <div className="text-center lg:text-left">
                         <h3
                             className="font-extrabold text-base uppercase tracking-widest mb-6 relative inline-block pb-2 
@@ -104,7 +102,6 @@ const Footer = () => {
                         </ul>
                     </div>
 
-                    {/* SÍGUENOS */}
                     <div className="text-center lg:text-right flex flex-col items-center lg:items-end">
                         <h3
                             className="font-extrabold text-base uppercase tracking-widest mb-6 relative inline-block pb-2 

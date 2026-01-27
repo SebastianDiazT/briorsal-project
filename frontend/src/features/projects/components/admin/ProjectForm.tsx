@@ -421,7 +421,6 @@ export const ProjectForm: React.FC<ProjectFormProps> = ({
 
     return (
         <form onSubmit={handleSubmit} className="animate-fade-in-up pb-10">
-            {/* Inputs Ocultos */}
             <input
                 type="file"
                 ref={coverInputRef}
@@ -488,7 +487,6 @@ export const ProjectForm: React.FC<ProjectFormProps> = ({
                 <div className="p-4 md:p-8">
                     {activeTab === 'general' && (
                         <div className="space-y-8 animate-fade-in">
-                            {/* PORTADA CON DRAG & DROP */}
                             <div
                                 onDragOver={(e) => {
                                     e.preventDefault();

@@ -32,7 +32,7 @@ class Service(models.Model):
         blank=True,
         null=True,
         validators=[
-            MaxFileSizeValidator(limit_mb=5), 
+            MaxFileSizeValidator(limit_mb=5),
             validate_image_extension
         ]
     )

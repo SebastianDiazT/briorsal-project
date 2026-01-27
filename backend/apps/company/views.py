@@ -37,7 +37,7 @@ class DeleteImageMixin:
         else:
             serializer.save()
 
-class ClientLogoViewSet(viewsets.ModelViewSet):
+class ClientLogoViewSet(DeleteImageMixin, viewsets.ModelViewSet):
     queryset = ClientLogo.objects.all().order_by('-created_at')
     serializer_class = ClientLogoSerializer
     permission_classes = [IsAdminOrReadOnly]
@@ -52,7 +52,7 @@ class ClientLogoViewSet(viewsets.ModelViewSet):
     search_fields = ['name']
     ordering_fields = ['name', 'created_at']
 
-class ServiceViewSet(viewsets.ModelViewSet):
+class ServiceViewSet(DeleteImageMixin, viewsets.ModelViewSet):
     queryset = Service.objects.all().order_by('created_at')
     serializer_class = ServiceSerializer
     permission_classes = [IsAdminOrReadOnly]

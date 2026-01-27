@@ -99,7 +99,6 @@ export const CustomSelect: React.FC<CustomSelectProps> = ({
 
             {isOpen && !disabled && (
                 <div className="absolute top-full left-0 mt-1.5 w-full bg-white rounded-xl shadow-xl border border-slate-100 overflow-hidden z-50 animate-fade-in-up origin-top min-w-[180px]">
-                    {/* CAMBIO: Se eliminaron las clases de scroll (max-h-60 overflow-y-auto) */}
                     <div className="py-1">
                         <div
                             onClick={() => handleSelect('')}

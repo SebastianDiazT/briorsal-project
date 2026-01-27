@@ -8,22 +8,27 @@ import {
 } from 'react-icons/fa6';
 import toast from 'react-hot-toast';
 
-import PageMeta from '@/components/common/PageMeta';
-import FadeIn from '@/components/common/FadeIn';
+import PageMeta from '@components/common/PageMeta';
+import FadeIn from '@components/common/FadeIn';
 
-import { useGetCompanyInfoQuery } from '@/features/company/api/companyApi';
-import { useCreateContactMessageMutation } from '@/features/contact/api/contactApi';
-import { ContactMessageRequest } from '@/features/contact/types';
+import { useGetCompanyInfoQuery } from '@features/company/api/companyApi';
+import { useCreateContactMessageMutation } from '@features/contact/api/contactApi';
+import {
+    ContactMessageRequest,
+    INQUIRY_LABELS,
+} from '@features/contact/types';
+
+interface InputProps extends React.InputHTMLAttributes<HTMLInputElement> {
+    label: string;
+}
 
 const FormInput = ({
     label,
     id,
-    type = 'text',
-    required = false,
-    value,
-    onChange,
-    placeholder,
-}: any) => (
+    required,
+    className,
+    ...props
+}: InputProps) => (
     <div className="space-y-2 group">
         <label
             htmlFor={id}
@@ -34,19 +39,73 @@ const FormInput = ({
         <input
             id={id}
             name={id}
-            type={type}
             required={required}
-            value={value}
-            onChange={onChange}
-            placeholder={placeholder}
-            className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3.5 text-slate-200 placeholder-slate-500 focus:outline-none focus:border-orange-500 focus:bg-white/10 focus:ring-1 focus:ring-orange-500 transition-all duration-300"
+            className={`w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3.5 text-slate-200 placeholder-slate-500 focus:outline-none focus:border-orange-500 focus:bg-white/10 focus:ring-1 focus:ring-orange-500 transition-all duration-300 ${className}`}
+            {...props}
         />
+    </div>
+);
+
+interface SelectProps extends React.SelectHTMLAttributes<HTMLSelectElement> {
+    label: string;
+    options: Record<string, string>;
+}
+
+const FormSelect = ({
+    label,
+    id,
+    required,
+    options,
+    className,
+    ...props
+}: SelectProps) => (
+    <div className="space-y-2 group">
+        <label
+            htmlFor={id}
+            className="text-xs font-bold text-slate-400 uppercase tracking-widest ml-1 transition-colors group-focus-within:text-orange-500"
+        >
+            {label} {required && <span className="text-orange-500">*</span>}
+        </label>
+        <div className="relative">
+            <select
+                id={id}
+                name={id}
+                required={required}
+                className={`w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3.5 text-slate-200 placeholder-slate-500 focus:outline-none focus:border-orange-500 focus:bg-white/10 focus:ring-1 focus:ring-orange-500 transition-all duration-300 appearance-none cursor-pointer ${className}`}
+                {...props}
+            >
+                {Object.entries(options).map(([value, label]) => (
+                    <option
+                        key={value}
+                        value={value}
+                        className="bg-[#1b252f] text-slate-200"
+                    >
+                        {label}
+                    </option>
+                ))}
+            </select>
+            <div className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none text-slate-500">
+                <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    className="h-4 w-4"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                >
+                    <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M19 9l-7 7-7-7"
+                    />
+                </svg>
+            </div>
+        </div>
     </div>
 );
 
 const ContactInfoItem = ({ icon: Icon, title, children, delay }: any) => (
     <FadeIn delay={delay} direction="right">
-        {/* Tarjetas de info con borde muy sutil para definirlas sobre el fondo oscuro */}
         <div className="flex items-start gap-5 p-5 rounded-2xl hover:bg-white/5 transition-colors border border-white/5 hover:border-white/10 group">
             <div className="w-12 h-12 rounded-full bg-[#25303b] border border-white/10 flex items-center justify-center shrink-0 group-hover:bg-orange-600 group-hover:border-orange-500 transition-all duration-300 shadow-lg">
                 <Icon className="text-white text-lg group-hover:scale-110 transition-transform" />
@@ -76,10 +135,13 @@ const Contact = () => {
         phone: '',
         subject: '',
         message: '',
+        inquiry_type: 'GENERAL',
     });
 
     const handleChange = (
-        e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+        e: React.ChangeEvent<
+            HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
+        >
     ) => {
         setFormData({ ...formData, [e.target.name]: e.target.value });
     };
@@ -88,7 +150,10 @@ const Contact = () => {
         e.preventDefault();
         try {
             await createMessage(formData).unwrap();
-            toast.success('¡Mensaje enviado correctamente!');
+            toast.success(
+                '¡Mensaje enviado correctamente! Nos pondremos en contacto pronto.'
+            );
+
             setFormData({
                 first_name: '',
                 last_name: '',
@@ -96,14 +161,17 @@ const Contact = () => {
                 phone: '',
                 subject: '',
                 message: '',
+                inquiry_type: 'GENERAL',
             });
+
+            console.log(formData);
         } catch (error) {
             console.error(error);
-            toast.error('Error al enviar el mensaje.');
+            toast.error(
+                'Ocurrió un error al enviar el mensaje. Inténtalo de nuevo.'
+            );
         }
     };
-
-    // Color Base: #1b252f
 
     return (
         <>
@@ -114,9 +182,7 @@ const Contact = () => {
 
             <div className="min-h-screen bg-[#1b252f] font-sans selection:bg-orange-500/30 selection:text-orange-200">
                 <div className="grid grid-cols-1 lg:grid-cols-12 min-h-[calc(100vh-80px)]">
-                    {/* --- COLUMNA IZQUIERDA: INFORMACIÓN --- */}
                     <div className="lg:col-span-5 bg-[#1b252f] relative overflow-hidden p-8 lg:p-16 flex flex-col justify-center border-b lg:border-b-0 lg:border-r border-white/5">
-                        {/* Elementos decorativos de fondo (Blobs) */}
                         <div className="absolute top-0 left-0 w-full h-full overflow-hidden pointer-events-none">
                             <div className="absolute top-[-20%] left-[-20%] w-[500px] h-[500px] bg-orange-500/10 rounded-full blur-[100px] animate-pulse"></div>
                             <div className="absolute bottom-[-10%] right-[-10%] w-[400px] h-[400px] bg-blue-500/5 rounded-full blur-[100px]"></div>
@@ -194,9 +260,7 @@ const Contact = () => {
                         </div>
                     </div>
 
-                    {/* --- COLUMNA DERECHA: FORMULARIO --- */}
                     <div className="lg:col-span-7 bg-[#1b252f] p-8 lg:p-20 flex flex-col justify-center relative">
-                        {/* Gradiente sutil en móvil para separar secciones */}
                         <div className="absolute top-0 right-0 w-full h-1 bg-gradient-to-r from-transparent via-white/10 to-transparent lg:hidden"></div>
 
                         <div className="max-w-2xl mx-auto w-full">
@@ -254,15 +318,27 @@ const Contact = () => {
                                     </FadeIn>
                                 </div>
 
-                                <FadeIn direction="up" delay={0.4}>
-                                    <FormInput
-                                        id="subject"
-                                        label="Asunto"
-                                        value={formData.subject}
-                                        onChange={handleChange}
-                                        placeholder="Ej. Cotización de Proyecto (Opcional)"
-                                    />
-                                </FadeIn>
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                    <FadeIn direction="up" delay={0.38}>
+                                        <FormSelect
+                                            id="inquiry_type"
+                                            label="Tipo de Consulta"
+                                            required
+                                            options={INQUIRY_LABELS}
+                                            value={formData.inquiry_type}
+                                            onChange={handleChange}
+                                        />
+                                    </FadeIn>
+                                    <FadeIn direction="up" delay={0.4}>
+                                        <FormInput
+                                            id="subject"
+                                            label="Asunto"
+                                            value={formData.subject}
+                                            onChange={handleChange}
+                                            placeholder="Ej. Duda sobre acabados"
+                                        />
+                                    </FadeIn>
+                                </div>
 
                                 <FadeIn direction="up" delay={0.45}>
                                     <div className="space-y-2 group">

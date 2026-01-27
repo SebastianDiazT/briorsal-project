@@ -31,7 +31,6 @@ import { ProjectsMobileList } from '@features/projects/components/admin/Projects
 const ProjectsList: React.FC = () => {
     const navigate = useNavigate();
 
-    // --- STATES ---
     const [page, setPage] = useState(1);
     const [pageSize, setPageSize] = useState(10);
     const [searchTerm, setSearchTerm] = useState('');
@@ -39,7 +38,6 @@ const ProjectsList: React.FC = () => {
     const [filterStatus, setFilterStatus] = useState('');
     const [filterFeatured, setFilterFeatured] = useState(false);
 
-    // Control states
     const [projectToDelete, setProjectToDelete] = useState<string | null>(null);
     const [isReordering, setIsReordering] = useState(false);
     const [localProjects, setLocalProjects] = useState<Project[]>([]);
@@ -53,7 +51,6 @@ const ProjectsList: React.FC = () => {
         filterFeatured
     );
 
-    // --- API QUERIES ---
     const {
         data: response,
         isLoading: isLoadingProjects,
@@ -84,15 +81,12 @@ const ProjectsList: React.FC = () => {
     const projectsFromApi = response?.data || [];
     const meta = response?.meta;
 
-    // --- SYNCHRONIZATION ---
     useEffect(() => {
         if (projectsFromApi) {
             setLocalProjects(projectsFromApi);
         }
     }, [projectsFromApi]);
 
-    // --- SMART PAGINATION LOGIC (From CategoriesList) ---
-    // If the list becomes empty after loading (e.g., deleted last item on page), go back one page.
     useEffect(() => {
         if (
             !isFetching &&
@@ -104,13 +98,10 @@ const ProjectsList: React.FC = () => {
             setPage((prev) => Math.max(prev - 1, 1));
         }
 
-        // Also handle error case like in CategoriesList
         if (isError && page > 1) {
             setPage((prev) => Math.max(prev - 1, 1));
         }
     }, [projectsFromApi.length, isFetching, isLoadingProjects, isError, page]);
-
-    // --- HANDLERS ---
     const handleStartReorder = () => {
         setSearchTerm('');
         setFilterCategory('');

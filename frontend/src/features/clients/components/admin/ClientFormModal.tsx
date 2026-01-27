@@ -45,6 +45,11 @@ export const ClientFormModal: React.FC<ClientFormModalProps> = ({
     const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const file = e.target.files?.[0];
         if (file) {
+            if (file.size > 2 * 1024 * 1024) {
+                toast.error('La imagen no debe pesar más de 2MB');
+                return;
+            }
+
             setSelectedFile(file);
             const objectUrl = URL.createObjectURL(file);
             setPreview(objectUrl);
@@ -76,8 +81,22 @@ export const ClientFormModal: React.FC<ClientFormModalProps> = ({
                 toast.success('Cliente agregado correctamente');
             }
             onClose();
-        } catch (error) {
-            toast.error('Error al guardar el cliente');
+        } catch (error: any) {
+            console.error('Error al guardar:', error);
+
+            const errorData = error?.data;
+
+            if (errorData?.errors) {
+                const firstField = Object.keys(errorData.errors)[0];
+                const firstMessage = errorData.errors[firstField][0];
+                toast.error(firstMessage);
+            }
+            else if (errorData?.message) {
+                toast.error(errorData.message);
+            }
+            else {
+                toast.error('Ocurrió un error al guardar. Inténtalo de nuevo.');
+            }
         }
     };
 
@@ -118,8 +137,7 @@ export const ClientFormModal: React.FC<ClientFormModalProps> = ({
 
                     <div className="space-y-2">
                         <label className="text-xs font-bold text-slate-400 uppercase tracking-widest">
-                            Logotipo{' '}
-                            {clientToEdit ? '(Opcional)' : ''}
+                            Logotipo {clientToEdit ? '(Opcional)' : ''}
                         </label>
 
                         <div

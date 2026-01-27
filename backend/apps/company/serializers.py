@@ -1,23 +1,20 @@
 from rest_framework import serializers
 from .models import ClientLogo, Service, CompanyInfo, AboutUs, HomeHero, ProjectsHero
 
-class CloudinaryImageMixin:
-    def get_image_url(self, obj):
-        if hasattr(obj, 'image') and obj.image:
-            return obj.image.url
-        return None
+class BaseImageSerializer(serializers.ModelSerializer):
+    def to_representation(self, instance):
+        representation = super().to_representation(instance)
+        if hasattr(instance, 'image') and instance.image:
+            representation['image'] = instance.image.url
+        return representation
 
-class ClientLogoSerializer(serializers.ModelSerializer, CloudinaryImageMixin):
-    image = serializers.SerializerMethodField(method_name='get_image_url')
-
+class ClientLogoSerializer(BaseImageSerializer):
     class Meta:
         model = ClientLogo
         fields = '__all__'
         read_only_fields = ('id', 'created_at')
 
-class ServiceSerializer(serializers.ModelSerializer, CloudinaryImageMixin):
-    image = serializers.SerializerMethodField(method_name='get_image_url')
-
+class ServiceSerializer(BaseImageSerializer):
     class Meta:
         model = Service
         fields = '__all__'
@@ -29,25 +26,19 @@ class CompanyInfoSerializer(serializers.ModelSerializer):
         fields = '__all__'
         read_only_fields = ('id',)
 
-class AboutUsSerializer(serializers.ModelSerializer, CloudinaryImageMixin):
-    image = serializers.SerializerMethodField(method_name='get_image_url')
-
+class AboutUsSerializer(BaseImageSerializer):
     class Meta:
         model = AboutUs
         fields = '__all__'
         read_only_fields = ('id',)
 
-class HomeHeroSerializer(serializers.ModelSerializer, CloudinaryImageMixin):
-    image = serializers.SerializerMethodField(method_name='get_image_url')
-
+class HomeHeroSerializer(BaseImageSerializer):
     class Meta:
         model = HomeHero
         fields = '__all__'
         read_only_fields = ('id',)
 
-class ProjectsHeroSerializer(serializers.ModelSerializer, CloudinaryImageMixin):
-    image = serializers.SerializerMethodField(method_name='get_image_url')
-
+class ProjectsHeroSerializer(BaseImageSerializer):
     class Meta:
         model = ProjectsHero
         fields = '__all__'

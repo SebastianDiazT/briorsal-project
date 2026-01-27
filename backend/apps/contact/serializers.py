@@ -16,6 +16,23 @@ class ContactMessageSerializer(serializers.ModelSerializer):
             'admin_notes'
         )
 
+    def validate_inquiry_type(self, value):
+        if value is None or value == "":
+            raise serializers.ValidationError(
+                "Debes seleccionar un tipo de consulta válido."
+            )
+        return value
+
+    def validate_email(self, value):
+        if not value or value.strip() == "":
+            raise serializers.ValidationError("El correo electrónico es obligatorio.")
+        return value
+
+    def validate_message(self, value):
+        if not value or value.strip() == "":
+            raise serializers.ValidationError("El mensaje no puede estar vacío.")
+        return value
+
 class ContactUpdateSerializer(serializers.ModelSerializer):
     class Meta:
         model = ContactMessage

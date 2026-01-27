@@ -10,7 +10,6 @@ import {
 } from 'react-icons/fa';
 import { Project } from '@features/projects/types';
 
-// Dnd Kit Imports
 import {
     DndContext,
     closestCenter,
@@ -36,7 +35,6 @@ interface SortableRowProps {
     isReordering: boolean;
 }
 
-// --- Fila Ordenable ---
 const SortableRow = ({
     project,
     onEdit,
@@ -60,7 +58,6 @@ const SortableRow = ({
         opacity: isDragging ? 0.5 : 1,
     } as React.CSSProperties;
 
-    // Lógica de imagen: 1. Portada, 2. Primera de Galería, 3. Null
     const displayImage =
         project.cover_image ||
         (project.images && project.images.length > 0
@@ -73,7 +70,6 @@ const SortableRow = ({
             style={style}
             className={`group transition-colors duration-200 ${isDragging ? 'bg-orange-50 shadow-inner' : 'hover:bg-slate-50/60 bg-white'}`}
         >
-            {/* Columna Drag Handle */}
             {isReordering && (
                 <td className="py-3 px-2 align-middle text-center w-[40px] border-r border-slate-100 bg-slate-50">
                     <button
@@ -87,7 +83,6 @@ const SortableRow = ({
                 </td>
             )}
 
-            {/* Portada */}
             <td className="py-3 px-4 align-middle text-center w-[100px]">
                 <div
                     className={`relative inline-block h-12 w-16 rounded-lg overflow-hidden border bg-slate-100 shadow-sm ${project.is_featured ? 'border-orange-400 ring-1 ring-orange-100' : 'border-slate-200'}`}
@@ -114,7 +109,6 @@ const SortableRow = ({
                 </div>
             </td>
 
-            {/* Información */}
             <td className="py-3 px-4 align-middle">
                 <div className="flex flex-col gap-1 pr-4">
                     <span
@@ -148,7 +142,6 @@ const SortableRow = ({
                 </div>
             </td>
 
-            {/* Múltiples Categorías */}
             <td className="py-3 px-4 align-middle hidden lg:table-cell w-[20%]">
                 <div className="flex flex-wrap gap-1">
                     {project.categories && project.categories.length > 0 ? (
@@ -173,7 +166,6 @@ const SortableRow = ({
                 </div>
             </td>
 
-            {/* Estado */}
             <td className="py-3 px-4 align-middle text-center w-[120px]">
                 <span
                     className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-bold border whitespace-nowrap ${
@@ -191,7 +183,6 @@ const SortableRow = ({
                 </span>
             </td>
 
-            {/* Acciones */}
             <td className="py-3 px-6 align-middle text-right w-[100px]">
                 <div className="flex items-center justify-end gap-2">
                     <button

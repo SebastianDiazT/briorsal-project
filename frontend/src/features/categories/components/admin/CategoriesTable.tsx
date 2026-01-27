@@ -67,7 +67,6 @@ export const CategoriesTable: React.FC<CategoriesTableProps> = ({
                                     key={category.id}
                                     className="group hover:bg-slate-50/60 transition-colors duration-150"
                                 >
-                                    {/* NOMBRE */}
                                     <td className="py-4 px-6 align-middle">
                                         <div className="flex items-center gap-3">
                                             <div className="w-8 h-8 rounded-lg bg-orange-50 text-orange-500 flex items-center justify-center border border-orange-100 group-hover:bg-orange-500 group-hover:text-white transition-all">

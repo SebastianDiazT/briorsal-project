@@ -89,8 +89,8 @@ DATABASES = {
     'default': env.db('DATABASE_URL', default=f'sqlite:///{BASE_DIR}/db.sqlite3')
 }
 
-CORS_ALLOWED_ORIGINS = env.list('CORS_ALLOWED_ORIGINS', default=[])
-CSRF_TRUSTED_ORIGINS = env.list('CSRF_TRUSTED_ORIGINS', default=[])
+CORS_ALLOWED_ORIGINS = env.list('CORS_ALLOWED_ORIGINS', default=['http://localhost:5173', 'http://127.0.0.1:5173'])
+CSRF_TRUSTED_ORIGINS = env.list('CSRF_TRUSTED_ORIGINS', default=['http://localhost:5173', 'http://127.0.0.1:5173'])
 CORS_ALLOW_CREDENTIALS = True
 
 PASSWORD_HASHERS = [
@@ -251,20 +251,23 @@ LOGGING = {
 }
 
 if not DEBUG:
-    SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
-    SECURE_SSL_REDIRECT = True
-    SESSION_COOKIE_SECURE = True
-    CSRF_COOKIE_SECURE = True
-    SECURE_HSTS_SECONDS = 31536000
-    SECURE_HSTS_INCLUDE_SUBDOMAINS = True
-    SECURE_HSTS_PRELOAD = True
+    # SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
+    # SECURE_SSL_REDIRECT = True
+    # SESSION_COOKIE_SECURE = True
+    # CSRF_COOKIE_SECURE = True
+    # SECURE_HSTS_SECONDS = 31536000
+    # SECURE_HSTS_INCLUDE_SUBDOMAINS = True
+    # SECURE_HSTS_PRELOAD = True
 
     EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
     EMAIL_HOST = env('EMAIL_HOST', default='smtp.example.com')
     EMAIL_PORT = env.int('EMAIL_PORT', default=465)
     EMAIL_USE_SSL = env.bool('EMAIL_USE_SSL', default=True)
+    EMAIL_USE_TLS = env.bool('EMAIL_USE_TLS', default=False)
     EMAIL_HOST_USER = env('EMAIL_HOST_USER', default='user@example.com')
     EMAIL_HOST_PASSWORD = env('EMAIL_HOST_PASSWORD', default='password')
-    DEFAULT_FROM_EMAIL = env('DEFAULT_FROM_EMAIL', default='no-reply@constructorabriorsal.com')
+    DEFAULT_FROM_EMAIL = env('DEFAULT_FROM_EMAIL', default='no-reply@gmail.com')
 
-    CONTACT_EMAILS = ['constructora@grupobriorsal.com']
+    CONTACT_EMAILS = ['sdiazt@unsa.edu.pe']
+
+    # CONTACT_EMAILS = ['constructora@grupobriorsal.com']

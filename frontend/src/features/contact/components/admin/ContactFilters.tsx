@@ -1,12 +1,24 @@
 import React from 'react';
-import { FaSearch, FaTimes, FaFilter, FaSortAmountDown } from 'react-icons/fa';
+import {
+    FaSearch,
+    FaTimes,
+    FaFilter,
+    FaSortAmountDown,
+    FaTags,
+} from 'react-icons/fa';
 import { CustomSelect } from '@/components/ui/CustomSelect';
+import { INQUIRY_LABELS, STATUS_LABELS } from '../../types';
 
 interface ContactFiltersProps {
     searchTerm: string;
     onSearchChange: (val: string) => void;
-    filterStatus: string;
+
+    statusFilter: string;
     onStatusChange: (val: string) => void;
+
+    inquiryFilter: string;
+    onInquiryChange: (val: string) => void;
+
     pageSize: number;
     onPageSizeChange: (val: number) => void;
     onClear: () => void;
@@ -15,16 +27,27 @@ interface ContactFiltersProps {
 export const ContactFilters: React.FC<ContactFiltersProps> = ({
     searchTerm,
     onSearchChange,
-    filterStatus,
+    statusFilter,
     onStatusChange,
+    inquiryFilter,
+    onInquiryChange,
     pageSize,
     onPageSizeChange,
     onClear,
 }) => {
-    const statusOptions = [
-        { value: 'unread', label: 'No Leídos (Nuevos)' },
-        { value: 'read', label: 'Leídos (Histórico)' },
-    ];
+    const statusOptions = Object.entries(STATUS_LABELS).map(
+        ([value, label]) => ({
+            value,
+            label,
+        })
+    );
+
+    const inquiryOptions = Object.entries(INQUIRY_LABELS).map(
+        ([value, label]) => ({
+            value,
+            label,
+        })
+    );
 
     const sizeOptions = [
         { value: 5, label: '5 por página' },
@@ -36,9 +59,8 @@ export const ContactFilters: React.FC<ContactFiltersProps> = ({
 
     return (
         <div className="bg-white p-2 rounded-2xl shadow-sm border border-slate-200 mb-6 flex flex-col xl:flex-row gap-3 relative z-20">
-            <div className="flex-1 grid grid-cols-1 md:grid-cols-2 gap-3 p-1">
-                {/* BUSCADOR */}
-                <div className="relative group">
+            <div className="flex-1 grid grid-cols-1 md:grid-cols-12 gap-3 p-1">
+                <div className="md:col-span-4 relative group">
                     <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none">
                         <FaSearch
                             className={`transition-colors ${searchTerm ? 'text-orange-500' : 'text-slate-400'}`}
@@ -61,34 +83,40 @@ export const ContactFilters: React.FC<ContactFiltersProps> = ({
                     )}
                 </div>
 
-                {/* FILTROS Y BOTÓN LIMPIAR */}
-                <div className="flex gap-3">
-                    <div className="flex-1">
-                        <CustomSelect
-                            value={filterStatus}
-                            onChange={onStatusChange}
-                            options={statusOptions}
-                            placeholder="Filtrar Estado"
-                            icon={FaFilter}
-                        />
-                    </div>
+                <div className="md:col-span-3">
+                    <CustomSelect
+                        value={statusFilter}
+                        onChange={onStatusChange}
+                        options={statusOptions}
+                        placeholder="Estado"
+                        icon={FaFilter}
+                    />
+                </div>
 
-                    {/* El botón limpiar aparece si hay búsqueda O si hay un estado seleccionado (diferente de 'all' que es el default vacío) */}
-                    {(searchTerm ||
-                        (filterStatus && filterStatus !== 'all')) && (
+                <div className="md:col-span-4">
+                    <CustomSelect
+                        value={inquiryFilter}
+                        onChange={onInquiryChange}
+                        options={inquiryOptions}
+                        placeholder="Tipo de Consulta"
+                        icon={FaTags}
+                    />
+                </div>
+
+                {(searchTerm || statusFilter || inquiryFilter) && (
+                    <div className="md:col-span-1 flex justify-center md:justify-start">
                         <button
                             onClick={onClear}
-                            className="h-[42px] px-4 flex items-center gap-2 bg-red-50 text-red-500 border border-red-100 rounded-xl hover:bg-red-100 transition-colors text-sm font-bold shrink-0"
+                            className="h-[42px] w-full md:w-auto px-3 flex items-center justify-center gap-2 bg-red-50 text-red-500 border border-red-100 rounded-xl hover:bg-red-100 transition-colors text-sm font-bold"
                             title="Limpiar filtros"
                         >
                             <FaTimes />
                         </button>
-                    )}
-                </div>
+                    </div>
+                )}
             </div>
 
-            {/* PAGINACIÓN */}
-            <div className="border-t xl:border-t-0 xl:border-l border-slate-100 p-1 xl:pl-3 flex items-center justify-end xl:justify-center min-w-[160px]">
+            <div className="border-t xl:border-t-0 xl:border-l border-slate-100 p-1 xl:pl-3 flex items-center justify-end xl:justify-center min-w-[140px]">
                 <CustomSelect
                     value={pageSize}
                     onChange={(val) => onPageSizeChange(Number(val))}

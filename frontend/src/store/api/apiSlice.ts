@@ -1,9 +1,16 @@
-import { createApi, fetchBaseQuery, BaseQueryFn, FetchArgs, FetchBaseQueryError } from '@reduxjs/toolkit/query/react';
+import {
+    createApi,
+    fetchBaseQuery,
+    BaseQueryFn,
+    FetchArgs,
+    FetchBaseQueryError,
+} from '@reduxjs/toolkit/query/react';
 import { RootState } from '@store/store';
 import { logout } from '@store/slices/authSlice';
 import toast from 'react-hot-toast';
 
-const BASE_URL = import.meta.env.VITE_API_URL || 'http://127.0.0.1:8000/api/';
+const BASE_URL =
+    import.meta.env.VITE_API_URL || 'http://127.0.0.1:8000/api/v1/';
 
 const baseQuery = fetchBaseQuery({
     baseUrl: BASE_URL,
@@ -26,10 +33,12 @@ const baseQueryWithReauth: BaseQueryFn<
     let result = await baseQuery(args, api, extraOptions);
 
     if (result.error && result.error.status === 401) {
-        toast.error('Tu sesión ha expirado. Inicia sesión nuevamente.', {
-            id: 'session-expired',
-        });
-        api.dispatch(logout());
+        if (window.location.pathname !== '/admin/login') {
+            toast.error('Tu sesión ha expirado. Inicia sesión nuevamente.', {
+                id: 'session-expired',
+            });
+            api.dispatch(logout());
+        }
     }
 
     return result;
@@ -38,7 +47,18 @@ const baseQueryWithReauth: BaseQueryFn<
 export const apiSlice = createApi({
     reducerPath: 'api',
     baseQuery: baseQueryWithReauth,
-    tagTypes: ['Projects', 'Company', 'Users', 'Services', 'Categories', 'ContactMessages', 'Clients'],
+    tagTypes: [
+        'Projects',
+        'Company',
+        'AboutUs',
+        'HomeHero',
+        'ProjectsHero',
+        'Users',
+        'Services',
+        'Categories',
+        'ContactMessages',
+        'Clients',
+    ],
     endpoints: (_builder) => ({
     }),
 });

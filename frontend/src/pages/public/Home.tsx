@@ -23,7 +23,7 @@ const Home = () => {
                 <HomeHero />
                 <HomeStats />
                 <HomeServices />
-                <HomeProjects />
+                {/* <HomeProjects /> */}
                 <ClientsMarquee />
                 <HomeCTA />
             </main>

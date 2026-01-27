@@ -1,6 +1,11 @@
 import React from 'react';
 import { FaEye } from 'react-icons/fa';
-import { ContactMessage } from '../../types';
+import {
+    ContactMessage,
+    STATUS_LABELS,
+    STATUS_COLORS,
+    INQUIRY_LABELS,
+} from '../../types';
 
 interface MessagesTableProps {
     messages: ContactMessage[];
@@ -34,18 +39,20 @@ export const MessagesTable: React.FC<MessagesTableProps> = ({
                 <table className="w-full text-left border-collapse">
                     <thead>
                         <tr className="bg-slate-50 border-b border-slate-100">
-                            <th className="py-4 px-6 w-16 text-center"></th>
+                            <th className="py-4 px-6 w-32 text-[11px] font-extrabold text-slate-400 uppercase tracking-widest">
+                                Estado
+                            </th>
                             <th className="py-4 px-6 text-[11px] font-extrabold text-slate-400 uppercase tracking-widest">
                                 Remitente
                             </th>
                             <th className="py-4 px-6 text-[11px] font-extrabold text-slate-400 uppercase tracking-widest">
-                                Asunto
+                                Tipo / Asunto
                             </th>
                             <th className="py-4 px-6 text-[11px] font-extrabold text-slate-400 uppercase tracking-widest">
                                 Fecha
                             </th>
                             <th className="py-4 px-6 text-[11px] font-extrabold text-slate-400 uppercase tracking-widest text-right">
-                                Detalle
+                                Acciones
                             </th>
                         </tr>
                     </thead>
@@ -58,30 +65,24 @@ export const MessagesTable: React.FC<MessagesTableProps> = ({
                             </tr>
                         ) : (
                             messages.map((msg) => {
-                                const isUnread = !msg.is_read;
+                                const isNew = msg.status === 'NEW';
                                 return (
                                     <tr
                                         key={msg.id}
-                                        className={`group transition-colors duration-150 ${isUnread ? 'bg-orange-50/30 hover:bg-orange-50/60' : 'hover:bg-slate-50'}`}
+                                        className={`group transition-colors duration-150 ${isNew ? 'bg-orange-50/40 hover:bg-orange-50/70' : 'hover:bg-slate-50'}`}
                                     >
-                                        <td className="py-4 px-6 text-center align-middle">
-                                            {isUnread ? (
-                                                <div
-                                                    className="w-2.5 h-2.5 rounded-full bg-orange-500 mx-auto shadow-sm shadow-orange-500/50"
-                                                    title="No leído"
-                                                ></div>
-                                            ) : (
-                                                <div
-                                                    className="w-2.5 h-2.5 rounded-full bg-slate-200 mx-auto"
-                                                    title="Leído"
-                                                ></div>
-                                            )}
+                                        <td className="py-4 px-6 align-middle">
+                                            <span
+                                                className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${STATUS_COLORS[msg.status]}`}
+                                            >
+                                                {STATUS_LABELS[msg.status]}
+                                            </span>
                                         </td>
 
                                         <td className="py-4 px-6 align-middle">
                                             <div className="flex flex-col">
                                                 <span
-                                                    className={`text-sm ${isUnread ? 'font-bold text-slate-900' : 'font-medium text-slate-600'}`}
+                                                    className={`text-sm ${isNew ? 'font-bold text-slate-900' : 'font-medium text-slate-700'}`}
                                                 >
                                                     {msg.first_name}{' '}
                                                     {msg.last_name}
@@ -93,13 +94,23 @@ export const MessagesTable: React.FC<MessagesTableProps> = ({
                                         </td>
 
                                         <td className="py-4 px-6 align-middle">
-                                            <span className="text-sm text-slate-600 font-medium line-clamp-1 max-w-[200px]">
-                                                {msg.subject || 'Sin asunto'}
-                                            </span>
+                                            <div className="flex flex-col gap-1">
+                                                <span className="text-xs font-bold text-orange-600 uppercase">
+                                                    {
+                                                        INQUIRY_LABELS[
+                                                            msg.inquiry_type
+                                                        ]
+                                                    }
+                                                </span>
+                                                <span className="text-sm text-slate-600 line-clamp-1 max-w-[250px]">
+                                                    {msg.subject ||
+                                                        'Sin asunto'}
+                                                </span>
+                                            </div>
                                         </td>
 
                                         <td className="py-4 px-6 align-middle">
-                                            <span className="text-xs font-semibold text-slate-400 bg-slate-100 px-2 py-1 rounded-md">
+                                            <span className="text-xs font-semibold text-slate-500 bg-slate-100 px-2 py-1 rounded-md whitespace-nowrap">
                                                 {new Date(
                                                     msg.created_at
                                                 ).toLocaleDateString()}
@@ -110,8 +121,8 @@ export const MessagesTable: React.FC<MessagesTableProps> = ({
                                             <div className="flex items-center justify-end">
                                                 <button
                                                     onClick={() => onView(msg)}
-                                                    className="w-8 h-8 flex items-center justify-center rounded-lg bg-white text-slate-500 hover:text-blue-600 hover:bg-blue-50 border border-slate-200 hover:border-blue-200 transition-all shadow-sm"
-                                                    title="Ver Mensaje"
+                                                    className="w-8 h-8 flex items-center justify-center rounded-lg bg-white text-slate-500 hover:text-orange-600 hover:bg-orange-50 border border-slate-200 hover:border-orange-200 transition-all shadow-sm"
+                                                    title="Ver Detalle"
                                                 >
                                                     <FaEye size={14} />
                                                 </button>

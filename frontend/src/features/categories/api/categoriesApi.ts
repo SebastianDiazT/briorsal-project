@@ -28,13 +28,13 @@ export const categoriesApi = apiSlice.injectEndpoints({
                     }
                     if (args.search) params.append('search', args.search);
                 }
-                return `categories/?${params.toString()}`;
+                return `projects/categories/?${params.toString()}`;
             },
             providesTags: ['Categories'],
         }),
 
         getCategoryById: builder.query<Category, number>({
-            query: (id) => `categories/${id}/`,
+            query: (id) => `projects/categories/${id}/`,
             transformResponse: (response: ApiResponse<Category>) =>
                 response.data,
             providesTags: (_result, _err, id) => [{ type: 'Categories', id }],
@@ -42,7 +42,7 @@ export const categoriesApi = apiSlice.injectEndpoints({
 
         createCategory: builder.mutation<Category, CreateCategoryRequest>({
             query: (data) => ({
-                url: 'categories/',
+                url: 'projects/categories/',
                 method: 'POST',
                 body: data,
             }),
@@ -51,7 +51,7 @@ export const categoriesApi = apiSlice.injectEndpoints({
 
         updateCategory: builder.mutation<Category, UpdateCategoryRequest>({
             query: ({ id, data }) => ({
-                url: `categories/${id}/`,
+                url: `projects/categories/${id}/`,
                 method: 'PATCH',
                 body: data,
             }),
@@ -60,7 +60,7 @@ export const categoriesApi = apiSlice.injectEndpoints({
 
         deleteCategory: builder.mutation<void, number>({
             query: (id) => ({
-                url: `categories/${id}/`,
+                url: `projects/categories/${id}/`,
                 method: 'DELETE',
             }),
             invalidatesTags: ['Categories', 'Projects'],

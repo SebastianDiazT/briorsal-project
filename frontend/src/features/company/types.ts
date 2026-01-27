@@ -13,28 +13,12 @@ export interface CompanyInfo {
     whatsapp: string;
 }
 
-export interface CompanyResponse {
-    status: string;
-    code: number;
-    message: string;
-    data: CompanyInfo;
-    meta: any;
-}
-
 export interface AboutUs {
     id: number;
     description: string;
     mission: string;
     vision: string;
     image: string | null;
-}
-
-export interface AboutUsResponse {
-    status: string;
-    code: number;
-    message: string;
-    data: AboutUs;
-    meta: any;
 }
 
 export interface HomeHero {
@@ -46,26 +30,10 @@ export interface HomeHero {
     image: string | null;
 }
 
-export interface HomeHeroResponse {
-    status: string;
-    code: number;
-    message: string;
-    data: HomeHero;
-    meta: any;
-}
-
 export interface ProjectsHero {
     id: number;
     title: string;
     highlight: string;
     description: string;
     image: string | null;
-}
-
-export interface ProjectsHeroResponse {
-    status: string;
-    code: number;
-    message: string;
-    data: ProjectsHero;
-    meta: any;
 }

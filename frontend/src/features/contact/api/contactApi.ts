@@ -1,12 +1,23 @@
 import { apiSlice } from '@/store/api/apiSlice';
 import { ApiResponse } from '@/types/api';
-import { ContactMessage, ContactMessageRequest } from '../types';
+import { ContactMessage, ContactMessageRequest, ContactStatus } from '../types';
 
 export interface GetContactMessagesArgs {
     page?: number;
     pageSize?: number;
     search?: string;
-    no_page?: boolean;
+    status?: string;
+    inquiry_type?: string;
+    ordering?: string;
+}
+
+export interface UpdateContactMessageArgs {
+    id: number;
+    data: {
+        status?: ContactStatus;
+        admin_notes?: string;
+        is_read?: boolean;
+    };
 }
 
 export const contactApi = apiSlice.injectEndpoints({
@@ -15,15 +26,23 @@ export const contactApi = apiSlice.injectEndpoints({
             ApiResponse<ContactMessage[]>,
             GetContactMessagesArgs
         >({
-            query: ({ page = 1, pageSize = 10, search, no_page }) => {
+            query: ({
+                page = 1,
+                pageSize = 10,
+                search,
+                status,
+                inquiry_type,
+                ordering,
+            }) => {
                 const params = new URLSearchParams();
-                if (no_page) {
-                    params.append('no_page', 'true');
-                } else {
-                    params.append('page', page.toString());
-                    params.append('page_size', pageSize.toString());
-                }
+
+                params.append('page', page.toString());
+                params.append('page_size', pageSize.toString());
+
                 if (search) params.append('search', search);
+                if (status) params.append('status', status);
+                if (inquiry_type) params.append('inquiry_type', inquiry_type);
+                if (ordering) params.append('ordering', ordering);
 
                 return `contact/messages/?${params.toString()}`;
             },
@@ -42,14 +61,14 @@ export const contactApi = apiSlice.injectEndpoints({
             invalidatesTags: ['ContactMessages'],
         }),
 
-        updateContactMessageStatus: builder.mutation<
+        updateContactMessage: builder.mutation<
             ApiResponse<ContactMessage>,
-            { id: number; is_read: boolean }
+            UpdateContactMessageArgs
         >({
-            query: ({ id, is_read }) => ({
+            query: ({ id, data }) => ({
                 url: `contact/messages/${id}/`,
                 method: 'PATCH',
-                body: { is_read },
+                body: data,
             }),
             invalidatesTags: ['ContactMessages'],
         }),
@@ -57,7 +76,7 @@ export const contactApi = apiSlice.injectEndpoints({
 });
 
 export const {
-    useCreateContactMessageMutation,
     useGetContactMessagesQuery,
-    useUpdateContactMessageStatusMutation,
+    useCreateContactMessageMutation,
+    useUpdateContactMessageMutation,
 } = contactApi;
