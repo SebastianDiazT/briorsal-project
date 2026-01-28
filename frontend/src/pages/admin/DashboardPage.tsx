@@ -10,7 +10,7 @@ import {
     FaEllipsisH,
     FaPhone,
     FaMapMarkerAlt,
-} from 'react-icons/fa'; // Usando react-icons/fa estándar para compatibilidad
+} from 'react-icons/fa';
 
 import { useGetProjectsQuery } from '@/features/projects/api/projectsApi';
 import { useGetClientsQuery } from '@/features/clients/api/clientsApi';
@@ -19,13 +19,11 @@ import { useGetCategoriesQuery } from '@/features/categories/api/categoriesApi';
 
 import PageMeta from '@/components/common/PageMeta';
 
-// --- SUB-COMPONENTES UI ---
-
 interface StatCardProps {
     title: string;
     value: number | string;
     icon: React.ElementType;
-    colorClass: string; // Ej: "text-blue-500 bg-blue-50"
+    colorClass: string;
     link: string;
     isLoading: boolean;
 }
@@ -66,7 +64,6 @@ const StatCard: React.FC<StatCardProps> = ({
             </div>
         </div>
 
-        {/* Decoración de fondo */}
         <div className="absolute -bottom-4 -right-4 opacity-[0.03] group-hover:opacity-[0.07] transition-opacity transform rotate-12">
             <Icon size={100} />
         </div>
@@ -125,10 +122,7 @@ const QuickActionLink = ({ to, icon: Icon, label, colorClass }: any) => (
     </Link>
 );
 
-// --- COMPONENTE PRINCIPAL ---
-
 const DashboardPage = () => {
-    // Queries con polling o refresh si es necesario
     const { data: projectsData, isLoading: loadingProjects } =
         useGetProjectsQuery({ pageSize: 1 });
     const { data: clientsData, isLoading: loadingClients } = useGetClientsQuery(
@@ -137,7 +131,7 @@ const DashboardPage = () => {
     const { data: categoriesData, isLoading: loadingCats } =
         useGetCategoriesQuery({ pageSize: 1 });
     const { data: messagesData, isLoading: loadingMsgs } =
-        useGetContactMessagesQuery({ page: 1, pageSize: 4 }); // Reduje a 4 para que encaje mejor visualmente
+        useGetContactMessagesQuery({ page: 1, pageSize: 4 });
 
     const stats = {
         projects: projectsData?.meta?.total_records || 0,
@@ -148,7 +142,6 @@ const DashboardPage = () => {
 
     const recentMessages = messagesData?.data || [];
 
-    // Formato de fecha elegante
     const dateOptions: Intl.DateTimeFormatOptions = {
         weekday: 'long',
         day: 'numeric',
@@ -166,9 +159,7 @@ const DashboardPage = () => {
             />
 
             <div className="w-full animate-fade-in-up pb-10">
-                {/* HEADER / WELCOME SECTION */}
                 <div className="bg-white rounded-2xl p-6 md:p-8 border border-slate-100 shadow-sm mb-8 flex flex-col md:flex-row justify-between items-start md:items-end gap-6 relative overflow-hidden">
-                    {/* Fondo decorativo sutil */}
                     <div className="absolute top-0 right-0 w-64 h-64 bg-gradient-to-br from-orange-50 to-slate-50 rounded-bl-full opacity-50 pointer-events-none" />
 
                     <div className="relative z-10">
@@ -203,7 +194,6 @@ const DashboardPage = () => {
                     </div>
                 </div>
 
-                {/* STATS GRID */}
                 <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6 mb-8">
                     <StatCard
                         title="Proyectos"
@@ -239,9 +229,7 @@ const DashboardPage = () => {
                     />
                 </div>
 
-                {/* MAIN CONTENT GRID */}
                 <div className="grid grid-cols-1 xl:grid-cols-3 gap-8">
-                    {/* LEFT COLUMN: MESSAGES (Wider) */}
                     <div className="xl:col-span-2 flex flex-col gap-6">
                         <div className="bg-white border border-slate-200 rounded-2xl shadow-sm overflow-hidden flex flex-col h-full">
                             <div className="p-6 border-b border-slate-100 flex justify-between items-center">
@@ -314,11 +302,8 @@ const DashboardPage = () => {
                         </div>
                     </div>
 
-                    {/* RIGHT COLUMN: ACTIONS & INFO */}
                     <div className="flex flex-col gap-6">
-                        {/* Company Card */}
                         <div className="bg-slate-900 rounded-2xl p-6 text-white shadow-xl shadow-slate-900/20 relative overflow-hidden group">
-                            {/* Efectos de fondo */}
                             <div className="absolute top-0 right-0 w-40 h-40 bg-orange-500 rounded-full blur-[60px] opacity-20 -mr-10 -mt-10 group-hover:opacity-30 transition-opacity duration-500"></div>
 
                             <div className="relative z-10">
@@ -357,7 +342,6 @@ const DashboardPage = () => {
                             </div>
                         </div>
 
-                        {/* Quick Links */}
                         <div className="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm">
                             <h3 className="font-bold text-slate-800 mb-4 text-xs uppercase tracking-wide text-opacity-70">
                                 Accesos Rápidos
