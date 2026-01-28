@@ -4,9 +4,11 @@ import {
     FaArrowLeft,
     FaArrowRight,
     FaBuilding,
-    FaHouse,
     FaLayerGroup,
-} from 'react-icons/fa6';
+    FaMapMarkerAlt,
+    FaCalendarAlt,
+} from 'react-icons/fa';
+import { FaHouse } from 'react-icons/fa6';
 
 import { useGetProjectsQuery } from '@/features/projects/api/projectsApi';
 import { useGetCategoriesQuery } from '@/features/categories/api/categoriesApi';
@@ -14,7 +16,7 @@ import { useGetProjectsHeroQuery } from '@/features/company/api/companyApi';
 
 import PageMeta from '@/components/common/PageMeta';
 import FadeIn from '@/components/common/FadeIn';
-import { Project } from '@/features/projects/types';
+import { ProjectCard } from '@/features/projects/types';
 
 import heroBgImg from '@/assets/projects/hero.png';
 
@@ -22,26 +24,25 @@ const PortfolioCard = ({
     project,
     delay,
 }: {
-    project: Project;
+    project: ProjectCard;
     delay: number;
 }) => {
-    const mainImage =
-        project.cover_image ||
-        (project.images && project.images.length > 0
-            ? project.images[0].image
-            : null);
-
+    const mainImage = project.cover;
     const categoryName =
-        project.categories && project.categories.length > 0
-            ? project.categories[0].name
+        project.category_names && project.category_names.length > 0
+            ? project.category_names[0]
             : 'General';
+
+    const extraCategories =
+        project.category_names?.length > 1
+            ? project.category_names.length - 1
+            : 0;
 
     return (
         <FadeIn delay={delay} direction="up">
             <Link
                 to={`/proyectos/${project.slug}`}
-
-                className="group relative block w-full overflow-hidden rounded-3xl bg-[#1b252f] shadow-lg aspect-square md:aspect-[4/5] hover:shadow-2xl hover:shadow-orange-500/10 transition-all duration-300"
+                className="group relative block w-full overflow-hidden rounded-2xl bg-slate-900 shadow-lg aspect-[3/4] hover:shadow-2xl hover:shadow-orange-500/20 transition-all duration-500 transform hover:-translate-y-1"
             >
                 {mainImage ? (
                     <img
@@ -51,32 +52,46 @@ const PortfolioCard = ({
                         loading="lazy"
                     />
                 ) : (
-                    <div className="absolute inset-0 flex items-center justify-center bg-[#25303b] text-slate-600">
+                    <div className="absolute inset-0 flex items-center justify-center bg-slate-800 text-slate-600">
                         <FaBuilding size={40} />
                     </div>
                 )}
 
-                <div className="absolute inset-0 bg-gradient-to-t from-[#1b252f]/90 via-[#1b252f]/20 to-transparent opacity-80 group-hover:opacity-90 transition-opacity duration-300"></div>
+                <div className="absolute inset-0 bg-gradient-to-t from-slate-900 via-slate-900/40 to-transparent opacity-80 group-hover:opacity-90 transition-opacity duration-300"></div>
 
-                <div className="absolute bottom-0 left-0 w-full p-6 md:p-8 translate-y-4 group-hover:translate-y-0 transition-transform duration-300">
-                    <div className="flex flex-wrap gap-2 mb-2">
-                        <span className="inline-block px-2.5 py-1 text-[10px] font-bold text-white bg-orange-600 rounded-full shadow-lg shadow-orange-600/20 uppercase tracking-wider">
+                <div className="absolute bottom-0 left-0 w-full p-6 translate-y-2 group-hover:translate-y-0 transition-transform duration-300">
+                    <div className="flex flex-wrap gap-2 mb-3">
+                        <span className="inline-flex items-center px-2.5 py-1 text-[10px] font-bold text-white bg-orange-600 rounded-md shadow-lg shadow-orange-600/20 uppercase tracking-wider">
                             {categoryName}
                         </span>
-                        {project.categories &&
-                            project.categories.length > 1 && (
-                                <span className="inline-block px-2 py-1 text-[10px] font-bold text-white bg-slate-800/80 rounded-full backdrop-blur-sm uppercase tracking-wider">
-                                    +{project.categories.length - 1}
-                                </span>
-                            )}
+                        {extraCategories > 0 && (
+                            <span className="inline-flex items-center px-2 py-1 text-[10px] font-bold text-white bg-white/20 backdrop-blur-md rounded-md uppercase tracking-wider border border-white/10">
+                                +{extraCategories}
+                            </span>
+                        )}
+                        {project.status === 'en_proceso' && (
+                            <span className="inline-flex items-center px-2 py-1 text-[10px] font-bold text-blue-200 bg-blue-900/50 border border-blue-500/30 rounded-md uppercase tracking-wider backdrop-blur-md">
+                                En Ejecución
+                            </span>
+                        )}
                     </div>
-                    <h3 className="text-xl md:text-2xl font-bold text-white mb-1 leading-tight line-clamp-2">
+
+                    <h3 className="text-xl md:text-2xl font-bold text-white mb-2 leading-tight line-clamp-2 text-shadow-sm group-hover:text-orange-50 transition-colors">
                         {project.name}
                     </h3>
-                    <p className="text-slate-300 text-xs flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300 delay-100 mt-2">
-                        <FaBuilding className="text-orange-500" />{' '}
-                        {project.location || 'Ubicación no especificada'}
-                    </p>
+
+                    <div className="flex items-center gap-4 text-slate-300 text-xs font-medium opacity-0 group-hover:opacity-100 transition-opacity duration-500 delay-75 transform translate-y-2 group-hover:translate-y-0">
+                        <div className="flex items-center gap-1.5 truncate">
+                            <FaMapMarkerAlt className="text-orange-500 shrink-0" />
+                            <span className="truncate">{project.location}</span>
+                        </div>
+                        {project.year && (
+                            <div className="flex items-center gap-1.5 shrink-0">
+                                <FaCalendarAlt className="text-orange-500 shrink-0" />
+                                <span>{project.year}</span>
+                            </div>
+                        )}
+                    </div>
                 </div>
             </Link>
         </FadeIn>
@@ -84,10 +99,11 @@ const PortfolioCard = ({
 };
 
 const ProjectSkeleton = () => (
-    <div className="rounded-3xl aspect-square md:aspect-[4/5] bg-slate-100 animate-pulse relative overflow-hidden">
-        <div className="absolute bottom-0 left-0 w-full p-8 space-y-3">
-            <div className="w-20 h-6 bg-slate-200 rounded-full"></div>
-            <div className="w-3/4 h-8 bg-slate-200 rounded-lg"></div>
+    <div className="rounded-2xl aspect-[3/4] bg-slate-200 animate-pulse relative overflow-hidden">
+        <div className="absolute bottom-0 left-0 w-full p-6 space-y-3">
+            <div className="w-24 h-6 bg-slate-300 rounded-md"></div>
+            <div className="w-3/4 h-8 bg-slate-300 rounded-lg"></div>
+            <div className="w-1/2 h-4 bg-slate-300 rounded-full"></div>
         </div>
     </div>
 );
@@ -119,21 +135,25 @@ const ProjectsPage = () => {
     const meta = response?.meta;
 
     useEffect(() => {
-        setPage(1);
-    }, [selectedCategory]);
-
-    const scrollToGrid = () => {
-        const grid = document.getElementById('projects-grid');
-        if (grid) {
-            const y = grid.getBoundingClientRect().top + window.scrollY - 100;
-            window.scrollTo({ top: y, behavior: 'smooth' });
+        if (!isLoading && !isFetching) {
+            const grid = document.getElementById('projects-grid');
+            if (grid) {
+                const y =
+                    grid.getBoundingClientRect().top + window.scrollY - 100;
+                window.scrollTo({ top: y, behavior: 'smooth' });
+            }
         }
+    }, [page, selectedCategory]);
+
+    const handleCategoryChange = (catId: string) => {
+        setSelectedCategory(catId);
+        setPage(1);
     };
 
     const handlePageChange = (p: number) => {
         setPage(p);
-        scrollToGrid();
     };
+
     const showPagination = meta && projects.length > 0 && meta.total_pages > 1;
 
     const heroTitle = heroData?.title || 'Nuestros';
@@ -147,40 +167,43 @@ const ProjectsPage = () => {
         <>
             <PageMeta
                 title="PORTAFOLIO – BRIORSAL"
-                description="Nuestros proyectos."
+                description="Explora nuestros proyectos de construcción, diseño y arquitectura."
             />
 
-            <section className="relative min-h-[60vh] flex items-center justify-center overflow-hidden bg-slate-900 pt-32 pb-48">
+            <section className="relative min-h-[50vh] md:min-h-[60vh] flex items-center justify-center overflow-hidden bg-slate-500 pt-32 pb-32 md:pb-48">
                 <div className="absolute inset-0 z-0">
                     <div
-                        className="absolute inset-0 bg-cover bg-center bg-no-repeat bg-fixed opacity-60 transition-all duration-700"
+                        className="absolute inset-0 bg-cover bg-center bg-no-repeat opacity-80 transition-all duration-700 scale-105"
                         style={{ backgroundImage: `url(${heroImage})` }}
                     />
-                    <div className="absolute inset-0 bg-gradient-to-b from-[#1b252f]/90 via-[#1b252f]/60 to-slate-50"></div>
+                    <div className="absolute inset-0 bg-gradient-to-b from-slate-700/90 via-slate-700/70 to-slate-50"></div>
                 </div>
+
                 <div className="container mx-auto px-4 relative z-10 text-center">
                     <FadeIn direction="down">
-                        <div className="flex items-center justify-center gap-2 text-slate-300 text-sm font-medium mb-8 uppercase tracking-wider">
+                        <div className="flex items-center justify-center gap-2 text-slate-300 text-xs md:text-sm font-bold mb-6 uppercase tracking-widest">
                             <Link
                                 to="/"
                                 className="hover:text-white transition-colors flex items-center gap-1"
                             >
-                                <FaHouse size={12} /> Inicio
+                                <FaHouse size={12} className="pb-0.5" /> Inicio
                             </Link>
-                            <span className="text-orange-500">/</span>
+                            <span className="text-orange-500">•</span>
                             <span className="text-white">Portafolio</span>
                         </div>
                     </FadeIn>
+
                     <FadeIn direction="up" delay={0.2}>
-                        <h1 className="text-4xl md:text-7xl font-black text-white mb-6 leading-tight drop-shadow-lg max-w-5xl mx-auto">
+                        <h1 className="text-4xl md:text-6xl lg:text-7xl font-black text-white mb-6 leading-tight drop-shadow-2xl">
                             {heroTitle}{' '}
-                            <span className="text-transparent bg-clip-text bg-gradient-to-r from-orange-400 to-orange-600 block md:inline">
+                            <span className="text-transparent bg-clip-text bg-gradient-to-r from-orange-400 to-orange-600">
                                 {heroHighlight}
                             </span>
                         </h1>
                     </FadeIn>
+
                     <FadeIn direction="up" delay={0.4}>
-                        <p className="text-lg md:text-xl text-slate-200 font-light max-w-2xl mx-auto leading-relaxed drop-shadow-md px-4">
+                        <p className="text-base md:text-xl text-slate-300 font-light max-w-2xl mx-auto leading-relaxed px-4">
                             {heroDescription}
                         </p>
                     </FadeIn>
@@ -189,40 +212,42 @@ const ProjectsPage = () => {
 
             <section
                 id="projects-grid"
-                className="bg-slate-50 pb-24 min-h-screen -mt-20 relative z-20"
+                className="bg-slate-50 pb-24 min-h-screen -mt-20 relative z-20 rounded-t-[2.5rem] md:rounded-t-[4rem] shadow-[0_-20px_40px_-15px_rgba(0,0,0,0.1)]"
             >
-                <div className="container mx-auto px-4">
-                    <div className="mb-16 transform -translate-y-10 relative z-30">
+                <div className="container mx-auto px-4 pt-16">
+                    <div className="mb-12 relative z-30">
                         <FadeIn direction="up" delay={0.5}>
-                            <div className="flex flex-wrap items-center justify-center gap-3">
+                            <div className="flex flex-wrap items-center justify-center gap-2 md:gap-3">
                                 <button
-                                    onClick={() => setSelectedCategory('')}
-                                    className={`px-6 py-3 rounded-full text-sm font-bold transition-all duration-300 border flex items-center gap-2 shadow-xl ${selectedCategory === '' ? 'bg-orange-600 text-white border-orange-600 scale-105 ring-4 ring-orange-600/20' : 'bg-white text-slate-600 border-white hover:border-orange-300 hover:text-orange-500 hover:-translate-y-1'}`}
+                                    onClick={() => handleCategoryChange('')}
+                                    className={`px-5 py-2.5 rounded-full text-sm font-bold transition-all duration-300 flex items-center gap-2 shadow-sm border ${
+                                        selectedCategory === ''
+                                            ? 'bg-orange-600 text-white border-orange-600 shadow-orange-500/30'
+                                            : 'bg-white text-slate-600 border-slate-200 hover:border-orange-300 hover:text-orange-600'
+                                    }`}
                                 >
-                                    <FaLayerGroup
-                                        className={
-                                            selectedCategory === ''
-                                                ? 'text-white'
-                                                : 'text-slate-400'
-                                        }
-                                    />{' '}
-                                    Todos
+                                    <FaLayerGroup /> Todos
                                 </button>
                                 {isLoadingCats ? (
                                     <>
-                                        <div className="w-24 h-12 bg-white rounded-full animate-pulse opacity-80"></div>
-                                        <div className="w-32 h-12 bg-white rounded-full animate-pulse opacity-80"></div>
+                                        <div className="w-24 h-10 bg-slate-200 rounded-full animate-pulse"></div>
+                                        <div className="w-32 h-10 bg-slate-200 rounded-full animate-pulse"></div>
                                     </>
                                 ) : (
                                     categories.map((cat: any) => (
                                         <button
                                             key={cat.id}
                                             onClick={() =>
-                                                setSelectedCategory(
+                                                handleCategoryChange(
                                                     String(cat.id)
                                                 )
                                             }
-                                            className={`px-6 py-3 rounded-full text-sm font-bold transition-all duration-300 border shadow-xl ${selectedCategory === String(cat.id) ? 'bg-orange-600 text-white border-orange-600 scale-105 ring-4 ring-orange-600/20' : 'bg-white text-slate-600 border-white hover:border-orange-300 hover:text-orange-500 hover:-translate-y-1'}`}
+                                            className={`px-5 py-2.5 rounded-full text-sm font-bold transition-all duration-300 border shadow-sm ${
+                                                selectedCategory ===
+                                                String(cat.id)
+                                                    ? 'bg-orange-600 text-white border-orange-600 shadow-orange-500/30 transform scale-105'
+                                                    : 'bg-white text-slate-600 border-slate-200 hover:border-orange-300 hover:text-orange-600 hover:-translate-y-0.5'
+                                            }`}
                                         >
                                             {cat.name}
                                         </button>
@@ -249,34 +274,28 @@ const ProjectsPage = () => {
                             ))}
                         </div>
                     ) : (
-                        <div className="text-center py-32 bg-white rounded-[3rem] border border-slate-200 border-dashed shadow-sm mx-auto max-w-2xl">
-                            <div className="w-24 h-24 bg-slate-50 rounded-full flex items-center justify-center mx-auto mb-6">
-                                <FaBuilding className="text-4xl text-slate-300" />
+                        <div className="text-center py-24 bg-white rounded-3xl border border-slate-200 border-dashed mx-auto max-w-2xl">
+                            <div className="w-20 h-20 bg-slate-50 rounded-full flex items-center justify-center mx-auto mb-6">
+                                <FaBuilding className="text-3xl text-slate-300" />
                             </div>
-                            <h3 className="text-2xl font-bold text-slate-800 mb-2">
+                            <h3 className="text-xl font-bold text-slate-800 mb-2">
                                 No se encontraron proyectos
                             </h3>
-                            <p className="text-slate-500 mb-8 max-w-sm mx-auto">
-                                No hay proyectos en la categoría "
-                                <span className="font-bold text-slate-700">
-                                    {categories.find(
-                                        (c: any) =>
-                                            String(c.id) === selectedCategory
-                                    )?.name || 'seleccionada'}
-                                </span>
-                                ".
+                            <p className="text-slate-500 mb-8 max-w-sm mx-auto text-sm">
+                                No hay resultados para la categoría
+                                seleccionada.
                             </p>
                             <button
-                                onClick={() => setSelectedCategory('')}
-                                className="inline-flex items-center gap-2 px-8 py-3 rounded-full bg-slate-900 text-white font-bold hover:bg-orange-600 transition-colors shadow-lg"
+                                onClick={() => handleCategoryChange('')}
+                                className="inline-flex items-center gap-2 px-6 py-2.5 rounded-full bg-slate-900 text-white text-sm font-bold hover:bg-orange-600 transition-colors shadow-lg"
                             >
-                                Ver todos los proyectos
+                                Ver todo el portafolio
                             </button>
                         </div>
                     )}
 
                     {showPagination && meta && (
-                        <div className="flex flex-col md:flex-row items-center justify-between mt-20 pt-10 border-t border-slate-200 gap-6">
+                        <div className="flex flex-col md:flex-row items-center justify-between mt-20 pt-8 border-t border-slate-200 gap-6">
                             <span className="text-sm text-slate-500 font-medium order-2 md:order-1">
                                 Página{' '}
                                 <span className="text-slate-900 font-bold">
@@ -287,15 +306,17 @@ const ProjectsPage = () => {
                                     {meta.total_pages}
                                 </span>
                             </span>
+
                             <div className="flex items-center gap-2 order-1 md:order-2">
                                 <button
                                     onClick={() => handlePageChange(page - 1)}
                                     disabled={page === 1}
-                                    className="flex items-center gap-2 px-6 py-3 rounded-xl border border-slate-200 text-slate-600 font-bold text-sm transition-all hover:border-orange-500 hover:text-orange-600 hover:bg-orange-50 disabled:opacity-50 disabled:cursor-not-allowed"
+                                    className="flex items-center gap-2 px-5 py-2.5 rounded-xl border border-slate-200 text-slate-600 font-bold text-sm transition-all hover:border-orange-500 hover:text-orange-600 hover:bg-orange-50 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-transparent disabled:hover:border-slate-200 disabled:hover:text-slate-600"
                                 >
-                                    <FaArrowLeft /> Anterior
+                                    <FaArrowLeft size={12} /> Anterior
                                 </button>
-                                <div className="hidden md:flex gap-2 mx-2">
+
+                                <div className="hidden md:flex gap-1.5 mx-2">
                                     {Array.from(
                                         { length: meta.total_pages },
                                         (_, i) => i + 1
@@ -303,18 +324,23 @@ const ProjectsPage = () => {
                                         <button
                                             key={p}
                                             onClick={() => handlePageChange(p)}
-                                            className={`w-10 h-10 rounded-xl flex items-center justify-center text-sm font-bold transition-all ${page === p ? 'bg-orange-600 text-white shadow-lg shadow-orange-500/30' : 'text-slate-500 hover:bg-slate-100 hover:text-slate-900'}`}
+                                            className={`w-9 h-9 rounded-lg flex items-center justify-center text-sm font-bold transition-all ${
+                                                page === p
+                                                    ? 'bg-orange-600 text-white shadow-md'
+                                                    : 'text-slate-500 hover:bg-slate-100'
+                                            }`}
                                         >
                                             {p}
                                         </button>
                                     ))}
                                 </div>
+
                                 <button
                                     onClick={() => handlePageChange(page + 1)}
                                     disabled={page >= meta.total_pages}
-                                    className="flex items-center gap-2 px-6 py-3 rounded-xl border border-slate-200 text-slate-600 font-bold text-sm transition-all hover:border-orange-500 hover:text-orange-600 hover:bg-orange-50 disabled:opacity-50 disabled:cursor-not-allowed"
+                                    className="flex items-center gap-2 px-5 py-2.5 rounded-xl border border-slate-200 text-slate-600 font-bold text-sm transition-all hover:border-orange-500 hover:text-orange-600 hover:bg-orange-50 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-transparent disabled:hover:border-slate-200 disabled:hover:text-slate-600"
                                 >
-                                    Siguiente <FaArrowRight />
+                                    Siguiente <FaArrowRight size={12} />
                                 </button>
                             </div>
                         </div>

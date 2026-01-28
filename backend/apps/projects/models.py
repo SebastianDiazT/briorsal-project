@@ -56,7 +56,8 @@ class Project(models.Model):
         'Imagen de Portada (Listado)',
         folder='projects/covers/',
         validators=[MaxFileSizeValidator(limit_mb=5), validate_image_extension],
-        help_text='Imagen cuadrada o vertical para el catálogo.'
+        help_text='Imagen cuadrada o vertical para el catálogo.',
+        null=True, blank=True
     )
 
     banner_image = CloudinaryField(
@@ -64,7 +65,7 @@ class Project(models.Model):
         folder='projects/banners/',
         blank=True, null=True,
         validators=[MaxFileSizeValidator(limit_mb=8), validate_image_extension],
-        help_text='Imagen panorámica ancha. Si se deja vacía, el frontend puede usar la portada como fallback.'
+        help_text='Imagen panorámica ancha. Si se deja vacía, el frontend puede usar la portada como fallback.',
     )
 
     extra_info = models.JSONField(blank=True, null=True, verbose_name='Información Extra (JSON)')

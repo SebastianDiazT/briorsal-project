@@ -42,7 +42,7 @@ class ProjectCardSerializer(serializers.ModelSerializer):
         model = Project
         fields = [
             'id', 'name', 'slug', 'cover',
-            'category_names', 'location', 'year', 'status'
+            'category_names', 'location', 'year', 'is_featured', 'status'
         ]
 
     def get_cover(self, obj):
@@ -106,6 +106,29 @@ class ProjectSerializer(serializers.ModelSerializer):
 
     def get_banner_image_url(self, obj):
         return get_cloudinary_url(obj.banner_image)
+
+    def to_internal_value(self, data):
+        data_mutable = data.copy()
+
+        if 'category_ids' in data and data['category_ids'] == '':
+            if hasattr(data_mutable, 'setlist'):
+                data_mutable.setlist('category_ids', [])
+            else:
+                data_mutable['category_ids'] = []
+
+        if 'related_project_ids' in data and data['related_project_ids'] == '':
+            if hasattr(data_mutable, 'setlist'):
+                data_mutable.setlist('related_project_ids', [])
+            else:
+                data_mutable['related_project_ids'] = []
+
+        if 'cover_image' in data and data['cover_image'] == '':
+            data_mutable['cover_image'] = None
+
+        if 'banner_image' in data and data['banner_image'] == '':
+            data_mutable['banner_image'] = None
+
+        return super().to_internal_value(data_mutable)
 
     def create(self, validated_data):
         uploaded_images = validated_data.pop('uploaded_images', [])

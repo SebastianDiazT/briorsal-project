@@ -15,18 +15,18 @@ import {
     useGetProjectsQuery,
     useDeleteProjectMutation,
     useReorderProjectsMutation,
-} from '@features/projects/api/projectsApi';
-import { useGetCategoriesQuery } from '@features/categories/api/categoriesApi';
-import { Project } from '@features/projects/types';
+} from '@/features/projects/api/projectsApi';
+import { useGetCategoriesQuery } from '@/features/categories/api/categoriesApi';
+import { ProjectCard } from '@/features/projects/types';
 
-import PageMeta from '@components/common/PageMeta';
-import { ConfirmModal } from '@components/ui/ConfirmModal';
-import { EmptyState } from '@components/ui/EmptyState';
-import { PageHeader } from '@components/ui/PageHeader';
-import { PaginationFooter } from '@components/ui/PaginationFooter';
-import { ProjectFilters } from '@features/projects/components/admin/ProjectFilters';
-import { ProjectsTable } from '@features/projects/components/admin/ProjectsTable';
-import { ProjectsMobileList } from '@features/projects/components/admin/ProjectsMobileList';
+import PageMeta from '@/components/common/PageMeta';
+import { ConfirmModal } from '@/components/ui/ConfirmModal';
+import { EmptyState } from '@/components/ui/EmptyState';
+import { PageHeader } from '@/components/ui/PageHeader';
+import { PaginationFooter } from '@/components/ui/PaginationFooter';
+import { ProjectFilters } from '@/features/projects/components/admin/ProjectFilters';
+import { ProjectsTable } from '@/features/projects/components/admin/ProjectsTable';
+import { ProjectsMobileList } from '@/features/projects/components/admin/ProjectsMobileList';
 
 const ProjectsList: React.FC = () => {
     const navigate = useNavigate();
@@ -40,7 +40,8 @@ const ProjectsList: React.FC = () => {
 
     const [projectToDelete, setProjectToDelete] = useState<string | null>(null);
     const [isReordering, setIsReordering] = useState(false);
-    const [localProjects, setLocalProjects] = useState<Project[]>([]);
+
+    const [localProjects, setLocalProjects] = useState<ProjectCard[]>([]);
 
     const isShowingAll = pageSize === -1;
 
@@ -68,9 +69,7 @@ const ProjectsList: React.FC = () => {
         ordering: !hasActiveFilters ? 'sort_order' : undefined,
     });
 
-    const { data: categoriesResponse } = useGetCategoriesQuery({
-        no_page: true,
-    });
+    const { data: categoriesResponse } = useGetCategoriesQuery();
     const categories = categoriesResponse?.data || [];
 
     const [deleteProject, { isLoading: isDeleting }] =
@@ -102,6 +101,7 @@ const ProjectsList: React.FC = () => {
             setPage((prev) => Math.max(prev - 1, 1));
         }
     }, [projectsFromApi.length, isFetching, isLoadingProjects, isError, page]);
+
     const handleStartReorder = () => {
         setSearchTerm('');
         setFilterCategory('');
@@ -109,7 +109,7 @@ const ProjectsList: React.FC = () => {
         setFilterFeatured(false);
         setPage(1);
         setIsReordering(true);
-        toast('Modo reordenar activado. Arrastra las filas.', { icon: '✋' });
+        toast('Modo reordenar activado. Arrastra las filas.');
     };
 
     const handleCancelReorder = () => {
@@ -135,7 +135,7 @@ const ProjectsList: React.FC = () => {
         }
     };
 
-    const handleLocalReorder = (newOrder: Project[]) => {
+    const handleLocalReorder = (newOrder: ProjectCard[]) => {
         setLocalProjects(newOrder);
     };
 
@@ -184,19 +184,19 @@ const ProjectsList: React.FC = () => {
 
     const emptyStateProps = hasActiveFilters
         ? {
-              title: 'No se encontraron resultados',
-              description:
-                  'No encontramos proyectos que coincidan con los filtros aplicados.',
-              isFiltered: true,
-              onClear: clearFilters,
-          }
+            title: 'No se encontraron resultados',
+            description:
+                'No encontramos proyectos que coincidan con los filtros aplicados.',
+            isFiltered: true,
+            onClear: clearFilters,
+        }
         : {
-              title: 'El portafolio está vacío',
-              description: 'Aún no has agregado ningún proyecto.',
-              isFiltered: false,
-              createLink: '/admin/projects/new',
-              createText: 'Crear Proyecto',
-          };
+            title: 'El portafolio está vacío',
+            description: 'Aún no has agregado ningún proyecto.',
+            isFiltered: false,
+            createLink: '/admin/projects/new',
+            createText: 'Crear Proyecto',
+        };
 
     return (
         <>

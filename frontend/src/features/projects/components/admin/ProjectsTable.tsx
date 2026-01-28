@@ -8,7 +8,7 @@ import {
     FaCalendarAlt,
     FaGripVertical,
 } from 'react-icons/fa';
-import { Project } from '@features/projects/types';
+import { ProjectCard } from '@/features/projects/types';
 
 import {
     DndContext,
@@ -29,7 +29,7 @@ import {
 import { CSS } from '@dnd-kit/utilities';
 
 interface SortableRowProps {
-    project: Project;
+    project: ProjectCard;
     onEdit: (slug: string) => void;
     onDelete: (slug: string) => void;
     isReordering: boolean;
@@ -58,17 +58,17 @@ const SortableRow = ({
         opacity: isDragging ? 0.5 : 1,
     } as React.CSSProperties;
 
-    const displayImage =
-        project.cover_image ||
-        (project.images && project.images.length > 0
-            ? project.images[0].image
-            : null);
+    const displayImage = project.cover;
 
     return (
         <tr
             ref={setNodeRef}
             style={style}
-            className={`group transition-colors duration-200 ${isDragging ? 'bg-orange-50 shadow-inner' : 'hover:bg-slate-50/60 bg-white'}`}
+            className={`group transition-colors duration-200 ${
+                isDragging
+                    ? 'bg-orange-50 shadow-inner'
+                    : 'hover:bg-slate-50/60 bg-white'
+            }`}
         >
             {isReordering && (
                 <td className="py-3 px-2 align-middle text-center w-[40px] border-r border-slate-100 bg-slate-50">
@@ -85,7 +85,11 @@ const SortableRow = ({
 
             <td className="py-3 px-4 align-middle text-center w-[100px]">
                 <div
-                    className={`relative inline-block h-12 w-16 rounded-lg overflow-hidden border bg-slate-100 shadow-sm ${project.is_featured ? 'border-orange-400 ring-1 ring-orange-100' : 'border-slate-200'}`}
+                    className={`relative inline-block h-12 w-16 rounded-lg overflow-hidden border bg-slate-100 shadow-sm ${
+                        project.is_featured
+                            ? 'border-orange-400 ring-1 ring-orange-100'
+                            : 'border-slate-200'
+                    }`}
                 >
                     {displayImage ? (
                         <img
@@ -144,19 +148,22 @@ const SortableRow = ({
 
             <td className="py-3 px-4 align-middle hidden lg:table-cell w-[20%]">
                 <div className="flex flex-wrap gap-1">
-                    {project.categories && project.categories.length > 0 ? (
+                    {project.category_names &&
+                    project.category_names.length > 0 ? (
                         <>
-                            {project.categories.slice(0, 2).map((cat: any) => (
-                                <span
-                                    key={cat.id}
-                                    className="inline-flex items-center px-2 py-0.5 rounded bg-slate-100 text-slate-600 text-[10px] font-bold border border-slate-200 uppercase tracking-tight"
-                                >
-                                    {cat.name}
-                                </span>
-                            ))}
-                            {project.categories.length > 2 && (
+                            {project.category_names
+                                .slice(0, 2)
+                                .map((catName, index) => (
+                                    <span
+                                        key={index}
+                                        className="inline-flex items-center px-2 py-0.5 rounded bg-slate-100 text-slate-600 text-[10px] font-bold border border-slate-200 uppercase tracking-tight"
+                                    >
+                                        {catName}
+                                    </span>
+                                ))}
+                            {project.category_names.length > 2 && (
                                 <span className="text-[10px] font-bold text-slate-400 ml-1">
-                                    +{project.categories.length - 2}
+                                    +{project.category_names.length - 2}
                                 </span>
                             )}
                         </>
@@ -175,7 +182,11 @@ const SortableRow = ({
                     }`}
                 >
                     <span
-                        className={`w-1.5 h-1.5 rounded-full ${project.status === 'en_proceso' ? 'bg-blue-500' : 'bg-green-500'}`}
+                        className={`w-1.5 h-1.5 rounded-full ${
+                            project.status === 'en_proceso'
+                                ? 'bg-blue-500'
+                                : 'bg-green-500'
+                        }`}
                     ></span>
                     {project.status === 'en_proceso'
                         ? 'En Ejecución'
@@ -189,7 +200,7 @@ const SortableRow = ({
                         onClick={() => onEdit(project.slug)}
                         disabled={isReordering}
                         className="w-8 h-8 flex items-center justify-center rounded-full bg-white text-slate-500 hover:text-blue-600 hover:bg-blue-50 border border-slate-200 hover:border-blue-200 transition-all active:scale-95 shadow-sm disabled:opacity-30 disabled:cursor-not-allowed"
-                        title="Editar Proyecto"
+                        title="Editar"
                     >
                         <FaEdit size={12} />
                     </button>
@@ -197,7 +208,7 @@ const SortableRow = ({
                         onClick={() => onDelete(project.slug)}
                         disabled={isReordering}
                         className="w-8 h-8 flex items-center justify-center rounded-full bg-white text-slate-500 hover:text-red-600 hover:bg-red-50 border border-slate-200 hover:border-red-200 transition-all active:scale-95 shadow-sm disabled:opacity-30 disabled:cursor-not-allowed"
-                        title="Eliminar Proyecto"
+                        title="Eliminar"
                     >
                         <FaTrash size={12} />
                     </button>
@@ -208,11 +219,11 @@ const SortableRow = ({
 };
 
 interface ProjectsTableProps {
-    projects: Project[];
+    projects: ProjectCard[];
     isLoading: boolean;
     onEdit: (slug: string) => void;
     onDelete: (slug: string) => void;
-    onReorderChange?: (newOrder: Project[]) => void;
+    onReorderChange?: (newOrder: ProjectCard[]) => void;
     isReordering: boolean;
     EmptyState: React.FC;
 }
@@ -266,7 +277,9 @@ export const ProjectsTable: React.FC<ProjectsTableProps> = ({
 
     return (
         <div
-            className={`hidden md:block bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden transition-all ${isReordering ? 'ring-2 ring-orange-400 ring-offset-2' : ''}`}
+            className={`hidden md:block bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden transition-all ${
+                isReordering ? 'ring-2 ring-orange-400 ring-offset-2' : ''
+            }`}
         >
             <div className="w-full overflow-x-auto">
                 <DndContext
@@ -303,7 +316,7 @@ export const ProjectsTable: React.FC<ProjectsTableProps> = ({
                             {projects.length === 0 ? (
                                 <tr>
                                     <td
-                                        colSpan={isReordering ? 7 : 6}
+                                        colSpan={isReordering ? 6 : 5}
                                         className="p-0"
                                     >
                                         <EmptyState />

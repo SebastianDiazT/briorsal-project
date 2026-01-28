@@ -94,10 +94,6 @@ export const ProjectSpecs: React.FC<{ project: Project }> = ({ project }) => {
                     <FaRegEnvelope className="text-lg" />
                     <span>Ir a Contacto</span>
                 </Link>
-
-                <p className="text-center text-[10px] text-slate-400 mt-2 font-medium uppercase tracking-wide">
-                    Respuesta inmediata
-                </p>
             </div>
         </div>
     );

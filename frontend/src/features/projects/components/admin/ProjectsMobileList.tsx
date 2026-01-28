@@ -6,12 +6,12 @@ import {
     FaStar,
     FaMapMarkerAlt,
     FaSpinner,
-    FaCalendarAlt
+    FaCalendarAlt,
 } from 'react-icons/fa';
-import { Project } from '@features/projects/types';
+import { ProjectCard } from '@/features/projects/types';
 
 interface ProjectsMobileListProps {
-    projects: Project[];
+    projects: ProjectCard[];
     isLoading: boolean;
     onEdit: (slug: string) => void;
     onDelete: (slug: string) => void;
@@ -36,11 +36,13 @@ export const ProjectsMobileList: React.FC<ProjectsMobileListProps> = ({
                 </div>
             ) : projects.length === 0 ? (
                 <div className="bg-white rounded-2xl border border-slate-200 overflow-hidden shadow-sm">
-                    <EmptyState />
+                    <div className="p-8 flex justify-center">
+                        <EmptyState />
+                    </div>
                 </div>
             ) : (
                 projects.map((project) => {
-                    const displayImage = project.cover_image;
+                    const displayImage = project.cover;
 
                     return (
                         <div
@@ -87,15 +89,18 @@ export const ProjectsMobileList: React.FC<ProjectsMobileListProps> = ({
                             <div className="p-4 flex flex-col gap-3">
                                 <div>
                                     <div className="flex flex-wrap gap-1 mb-2">
-                                        {project.categories.length > 0 ? (
-                                            project.categories.map((cat) => (
-                                                <span
-                                                    key={cat.id}
-                                                    className="text-[10px] font-bold text-slate-500 bg-slate-100 px-2 py-0.5 rounded border border-slate-200"
-                                                >
-                                                    {cat.name}
-                                                </span>
-                                            ))
+                                        {project.category_names &&
+                                        project.category_names.length > 0 ? (
+                                            project.category_names.map(
+                                                (catName, index) => (
+                                                    <span
+                                                        key={index}
+                                                        className="text-[10px] font-bold text-slate-500 bg-slate-100 px-2 py-0.5 rounded border border-slate-200"
+                                                    >
+                                                        {catName}
+                                                    </span>
+                                                )
+                                            )
                                         ) : (
                                             <span className="text-[10px] text-slate-400 italic">
                                                 Sin categoría
@@ -106,7 +111,6 @@ export const ProjectsMobileList: React.FC<ProjectsMobileListProps> = ({
                                     <h3 className="font-bold text-slate-800 text-lg leading-snug line-clamp-2 mb-2">
                                         {project.name}
                                     </h3>
-
                                     <div className="flex flex-col gap-1 text-xs text-slate-500 font-medium">
                                         <div className="flex items-center gap-1.5">
                                             <FaMapMarkerAlt className="text-slate-400 w-3" />

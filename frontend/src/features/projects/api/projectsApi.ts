@@ -1,43 +1,55 @@
-import { apiSlice } from '@store/api/apiSlice';
+import { apiSlice } from '@/store/api/apiSlice';
 import { ApiResponse } from '@/types/api';
-import { Project, ProjectImage, ProjectVideo, GetProjectsArgs, CreateProjectRequest, UpdateProjectRequest, ReorderProjectsRequest } from '../types';
+import {
+    Project,
+    ProjectCard,
+    ProjectImage,
+    ProjectVideo,
+    GetProjectsArgs,
+    CreateProjectRequest,
+    UpdateProjectRequest,
+    ReorderProjectsRequest,
+    CategoryShort,
+} from '../types';
 
 export const projectsApi = apiSlice.injectEndpoints({
     endpoints: (builder) => ({
-        getProjects: builder.query<ApiResponse<Project[]>, GetProjectsArgs>({
-            query: ({
-                page = 1,
-                pageSize = 10,
-                search,
-                categories,
-                status,
-                is_featured,
-                no_page,
-                ordering,
-            }) => {
-                const params = new URLSearchParams();
+        getProjects: builder.query<ApiResponse<ProjectCard[]>, GetProjectsArgs>(
+            {
+                query: ({
+                    page = 1,
+                    pageSize = 10,
+                    search,
+                    categories,
+                    status,
+                    is_featured,
+                    no_page,
+                    ordering,
+                }) => {
+                    const params = new URLSearchParams();
 
-                if (no_page) {
-                    params.append('no_page', 'true');
-                } else {
-                    params.append('page', page.toString());
-                    params.append('page_size', pageSize.toString());
-                }
+                    if (no_page) {
+                        params.append('no_page', 'true');
+                    } else {
+                        params.append('page', page.toString());
+                        params.append('page_size', pageSize.toString());
+                    }
 
-                if (search) params.append('search', search);
-                if (categories) params.append('categories', categories);
-                if (status) params.append('status', status);
-                if (is_featured)
-                    params.append('is_featured', is_featured.toString());
-                if (ordering) params.append('ordering', ordering);
+                    if (search) params.append('search', search);
+                    if (categories) params.append('categories', categories);
+                    if (status) params.append('status', status);
+                    if (is_featured)
+                        params.append('is_featured', is_featured.toString());
+                    if (ordering) params.append('ordering', ordering);
 
-                return `projects/?${params.toString()}`;
-            },
-            providesTags: ['Projects'],
-        }),
+                    return `projects/list/?${params.toString()}`;
+                },
+                providesTags: ['Projects'],
+            }
+        ),
 
         getProjectBySlug: builder.query<Project, string>({
-            query: (slug) => `projects/${slug}/`,
+            query: (slug) => `projects/list/${slug}/`,
             transformResponse: (response: ApiResponse<Project>) =>
                 response.data,
             providesTags: (_result, _err, slug) => [
@@ -47,37 +59,45 @@ export const projectsApi = apiSlice.injectEndpoints({
 
         createProject: builder.mutation<Project, CreateProjectRequest>({
             query: (data) => ({
-                url: 'projects/',
+                url: 'projects/list/',
                 method: 'POST',
                 body: data,
             }),
-            invalidatesTags: ['Projects'],
+            invalidatesTags: ['Projects', 'Categories'],
         }),
 
         updateProject: builder.mutation<Project, UpdateProjectRequest>({
             query: ({ slug, data }) => ({
-                url: `projects/${slug}/`,
+                url: `projects/list/${slug}/`,
                 method: 'PATCH',
                 body: data,
             }),
-            invalidatesTags: ['Projects'],
+            invalidatesTags: (_result, _error, arg) => [
+                'Projects',
+                { type: 'Projects', id: arg.slug },
+            ],
+        }),
+
+        deleteProject: builder.mutation<void, string>({
+            query: (slug) => ({
+                url: `projects/list/${slug}/`,
+                method: 'DELETE',
+            }),
+            invalidatesTags: ['Projects', 'Categories'],
         }),
 
         reorderProjects: builder.mutation<void, ReorderProjectsRequest>({
             query: (reorderData) => ({
-                url: 'projects/reorder/',
+                url: 'projects/list/reorder/',
                 method: 'POST',
                 body: reorderData,
             }),
             invalidatesTags: ['Projects'],
         }),
 
-        deleteProject: builder.mutation<void, string>({
-            query: (slug) => ({
-                url: `projects/${slug}/`,
-                method: 'DELETE',
-            }),
-            invalidatesTags: ['Projects'],
+        getCategories: builder.query<ApiResponse<CategoryShort[]>, void>({
+            query: () => 'projects/categories/',
+            providesTags: ['Categories'],
         }),
 
         updateProjectImage: builder.mutation<
@@ -88,7 +108,7 @@ export const projectsApi = apiSlice.injectEndpoints({
                 const formData = new FormData();
                 formData.append('image', file);
                 return {
-                    url: `project-images/${id}/`,
+                    url: `projects/images/${id}/`,
                     method: 'PATCH',
                     body: formData,
                 };
@@ -98,7 +118,7 @@ export const projectsApi = apiSlice.injectEndpoints({
 
         deleteProjectImage: builder.mutation<void, number>({
             query: (imageId) => ({
-                url: `project-images/${imageId}/`,
+                url: `projects/images/${imageId}/`,
                 method: 'DELETE',
             }),
             invalidatesTags: ['Projects'],
@@ -106,13 +126,14 @@ export const projectsApi = apiSlice.injectEndpoints({
 
         updateProjectVideo: builder.mutation<
             ProjectVideo,
-            { id: number; file: File }
+            { id: number; file: File; title?: string }
         >({
-            query: ({ id, file }) => {
+            query: ({ id, file, title }) => {
                 const formData = new FormData();
-                formData.append('video', file);
+                if (file) formData.append('video', file);
+                if (title) formData.append('title', title);
                 return {
-                    url: `project-videos/${id}/`,
+                    url: `projects/videos/${id}/`,
                     method: 'PATCH',
                     body: formData,
                 };
@@ -122,7 +143,7 @@ export const projectsApi = apiSlice.injectEndpoints({
 
         deleteProjectVideo: builder.mutation<void, number>({
             query: (videoId) => ({
-                url: `project-videos/${videoId}/`,
+                url: `projects/videos/${videoId}/`,
                 method: 'DELETE',
             }),
             invalidatesTags: ['Projects'],
@@ -135,10 +156,11 @@ export const {
     useGetProjectBySlugQuery,
     useCreateProjectMutation,
     useUpdateProjectMutation,
-    useReorderProjectsMutation,
     useDeleteProjectMutation,
-    useDeleteProjectImageMutation,
-    useDeleteProjectVideoMutation,
+    useReorderProjectsMutation,
+    useGetCategoriesQuery,
     useUpdateProjectImageMutation,
+    useDeleteProjectImageMutation,
     useUpdateProjectVideoMutation,
+    useDeleteProjectVideoMutation,
 } = projectsApi;

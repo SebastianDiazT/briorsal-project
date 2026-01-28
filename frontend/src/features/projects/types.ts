@@ -1,36 +1,58 @@
 export interface CategoryShort {
     id: number;
     name: string;
+    project_count?: number;
 }
 
 export interface ProjectImage {
     id: number;
-    image: string;
+    image_url: string;
 }
 
 export interface ProjectVideo {
     id: number;
-    video: string;
+    title: string;
+    video_url: string;
+}
+
+export interface ProjectCard {
+    id: number;
+    name: string;
+    slug: string;
+    cover: string | null;
+    category_names: string[];
+    location: string;
+    year: number | null;
+    is_featured: boolean;
+    status: 'en_proceso' | 'entregado';
 }
 
 export interface Project {
     id: number;
     slug: string;
     name: string;
-    description?: string;
-    categories: CategoryShort[];
-    cover_image: string | null;
-    sort_order: number;
-    year: number | null;
     location: string;
+    description?: string;
+    year: number | null;
+    status: 'en_proceso' | 'entregado';
+
     service_type: string | null;
     levels: string | null;
     area: string | null;
-    status: 'en_proceso' | 'entregado';
-    extra_info: Record<string, any> | null;
+
     is_featured: boolean;
+    sort_order: number;
+    extra_info: Record<string, any> | null;
+
+    categories: CategoryShort[];
+    related_projects: ProjectCard[];
+
+    cover_image_url: string | null;
+    banner_image_url: string | null;
+
     images: ProjectImage[];
     videos: ProjectVideo[];
+
     created_at: string;
     updated_at: string;
 }
@@ -53,6 +75,7 @@ export interface ReorderProjectItem {
     id: number;
     sort_order: number;
 }
+
 export interface ReorderProjectsRequest {
     items: ReorderProjectItem[];
 }

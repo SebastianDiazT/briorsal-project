@@ -11,7 +11,7 @@ import {
     useGetProjectBySlugQuery,
     useUpdateProjectMutation,
 } from '@/features/projects/api/projectsApi';
-import { ProjectForm } from '@features/projects/components/admin/ProjectForm';
+import { ProjectForm } from '@/features/projects/components/admin/form/ProjectForm';
 import PageMeta from '@components/common/PageMeta';
 import { PageHeader } from '@components/ui/PageHeader';
 

@@ -2,7 +2,7 @@ import { useNavigate } from 'react-router-dom';
 import toast from 'react-hot-toast';
 import { FaBuilding, FaArrowLeft } from 'react-icons/fa';
 import { useCreateProjectMutation } from '@/features/projects/api/projectsApi';
-import { ProjectForm } from '@features/projects/components/admin/ProjectForm';
+import { ProjectForm } from '@/features/projects/components/admin/form/ProjectForm';
 import PageMeta from '@components/common/PageMeta';
 import { PageHeader } from '@components/ui/PageHeader';
 
@@ -24,7 +24,10 @@ const ProjectCreate = () => {
 
     return (
         <>
-            <PageMeta title="CREAR PROYECTO" description="Crear un nuevo proyecto" />
+            <PageMeta
+                title="CREAR PROYECTO"
+                description="Crear un nuevo proyecto"
+            />
 
             <div className="w-full animate-fade-in-up pb-10">
                 <PageHeader

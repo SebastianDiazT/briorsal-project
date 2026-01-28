@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import {
     FaPhone,
     FaMapLocationDot,
@@ -8,15 +8,17 @@ import {
 } from 'react-icons/fa6';
 import toast from 'react-hot-toast';
 
-import PageMeta from '@components/common/PageMeta';
-import FadeIn from '@components/common/FadeIn';
+import PageMeta from '@/components/common/PageMeta';
+import FadeIn from '@/components/common/FadeIn';
+import { CustomSelect } from '@/components/ui/CustomSelect';
 
-import { useGetCompanyInfoQuery } from '@features/company/api/companyApi';
-import { useCreateContactMessageMutation } from '@features/contact/api/contactApi';
+import { useGetCompanyInfoQuery } from '@/features/company/api/companyApi';
+import { useCreateContactMessageMutation } from '@/features/contact/api/contactApi';
 import {
     ContactMessageRequest,
     INQUIRY_LABELS,
-} from '@features/contact/types';
+    InquiryType,
+} from '@/features/contact/types';
 
 interface InputProps extends React.InputHTMLAttributes<HTMLInputElement> {
     label: string;
@@ -43,64 +45,6 @@ const FormInput = ({
             className={`w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3.5 text-slate-200 placeholder-slate-500 focus:outline-none focus:border-orange-500 focus:bg-white/10 focus:ring-1 focus:ring-orange-500 transition-all duration-300 ${className}`}
             {...props}
         />
-    </div>
-);
-
-interface SelectProps extends React.SelectHTMLAttributes<HTMLSelectElement> {
-    label: string;
-    options: Record<string, string>;
-}
-
-const FormSelect = ({
-    label,
-    id,
-    required,
-    options,
-    className,
-    ...props
-}: SelectProps) => (
-    <div className="space-y-2 group">
-        <label
-            htmlFor={id}
-            className="text-xs font-bold text-slate-400 uppercase tracking-widest ml-1 transition-colors group-focus-within:text-orange-500"
-        >
-            {label} {required && <span className="text-orange-500">*</span>}
-        </label>
-        <div className="relative">
-            <select
-                id={id}
-                name={id}
-                required={required}
-                className={`w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3.5 text-slate-200 placeholder-slate-500 focus:outline-none focus:border-orange-500 focus:bg-white/10 focus:ring-1 focus:ring-orange-500 transition-all duration-300 appearance-none cursor-pointer ${className}`}
-                {...props}
-            >
-                {Object.entries(options).map(([value, label]) => (
-                    <option
-                        key={value}
-                        value={value}
-                        className="bg-[#1b252f] text-slate-200"
-                    >
-                        {label}
-                    </option>
-                ))}
-            </select>
-            <div className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none text-slate-500">
-                <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    className="h-4 w-4"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    stroke="currentColor"
-                >
-                    <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2}
-                        d="M19 9l-7 7-7-7"
-                    />
-                </svg>
-            </div>
-        </div>
     </div>
 );
 
@@ -138,12 +82,21 @@ const Contact = () => {
         inquiry_type: 'GENERAL',
     });
 
+    const inquiryOptions = useMemo(() => {
+        return Object.entries(INQUIRY_LABELS).map(([value, label]) => ({
+            value,
+            label,
+        }));
+    }, []);
+
     const handleChange = (
-        e: React.ChangeEvent<
-            HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
-        >
+        e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
     ) => {
         setFormData({ ...formData, [e.target.name]: e.target.value });
+    };
+
+    const handleSelectChange = (value: string) => {
+        setFormData({ ...formData, inquiry_type: value as InquiryType });
     };
 
     const handleSubmit = async (e: React.FormEvent) => {
@@ -163,8 +116,6 @@ const Contact = () => {
                 message: '',
                 inquiry_type: 'GENERAL',
             });
-
-            console.log(formData);
         } catch (error) {
             console.error(error);
             toast.error(
@@ -320,15 +271,23 @@ const Contact = () => {
 
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                                     <FadeIn direction="up" delay={0.38}>
-                                        <FormSelect
-                                            id="inquiry_type"
-                                            label="Tipo de Consulta"
-                                            required
-                                            options={INQUIRY_LABELS}
-                                            value={formData.inquiry_type}
-                                            onChange={handleChange}
-                                        />
+                                        <div className="space-y-2 group">
+                                            <label className="text-xs font-bold text-slate-400 uppercase tracking-widest ml-1 transition-colors group-focus-within:text-orange-500">
+                                                Tipo de Consulta{' '}
+                                                <span className="text-orange-500">
+                                                    *
+                                                </span>
+                                            </label>
+                                            <CustomSelect
+                                                value={formData.inquiry_type}
+                                                onChange={handleSelectChange}
+                                                options={inquiryOptions}
+                                                placeholder="Seleccionar..."
+                                                variant='glass'
+                                            />
+                                        </div>
                                     </FadeIn>
+
                                     <FadeIn direction="up" delay={0.4}>
                                         <FormInput
                                             id="subject"
