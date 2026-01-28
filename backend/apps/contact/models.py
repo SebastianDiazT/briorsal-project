@@ -1,6 +1,5 @@
 from django.db import models
 from django.utils.translation import gettext_lazy as _
-from django.core.validators import RegexValidator
 
 class ContactMessage(models.Model):
     class InquiryType(models.TextChoices):
@@ -20,13 +19,8 @@ class ContactMessage(models.Model):
     last_name = models.CharField(_('Apellido'), max_length=100)
     email = models.EmailField(_('Correo Electrónico'))
 
-    phone_regex = RegexValidator(
-        regex=r'^\+?1?\d{9,15}$',
-        message=_("El número debe tener el formato: '+999999999'. Hasta 15 dígitos.")
-    )
     phone = models.CharField(
         _('Teléfono'),
-        validators=[phone_regex],
         max_length=17,
         blank=True
     )

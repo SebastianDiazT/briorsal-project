@@ -21,6 +21,9 @@ ALLOWED_HOSTS = env.list('ALLOWED_HOSTS', default=['127.0.0.1'])
 
 SITE_ID = 1
 
+DOMAIN = env('DOMAIN', default='localhost:8000')
+SITE_NAME = 'Constructora Briorsal'
+
 DJANGO_APPS = [
     'django.contrib.admin',
     'django.contrib.auth',
@@ -70,7 +73,7 @@ ROOT_URLCONF = 'core.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [BASE_DIR / 'templates'],
+        'DIRS': [os.path.join(BASE_DIR, 'templates')],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -176,7 +179,7 @@ REST_FRAMEWORK = {
 
 SIMPLE_JWT = {
     'AUTH_HEADER_TYPES': ('Bearer',),
-    'ACCESS_TOKEN_LIFETIME': timedelta(minutes=150),
+    'ACCESS_TOKEN_LIFETIME': timedelta(minutes=60),
     'REFRESH_TOKEN_LIFETIME': timedelta(days=7),
     'ROTATE_REFRESH_TOKENS': True,
     'BLACKLIST_AFTER_ROTATION': True,
@@ -186,12 +189,15 @@ SIMPLE_JWT = {
 }
 
 DJOSER = {
+    'DOMAIN': DOMAIN,
+    'SITE_NAME': SITE_NAME,
     'LOGIN_FIELD': 'email',
     'USER_CREATE_PASSWORD_RETYPE': True,
     'USERNAME_CHANGED_EMAIL_CONFIRMATION': True,
     'PASSWORD_CHANGED_EMAIL_CONFIRMATION': True,
-    'SEND_CONFIRMATION_EMAIL': env.bool('SEND_EMAILS', default=False),
+    'SEND_CONFIRMATION_EMAIL': env.bool('SEND_EMAILS', default=True),
     'SET_USERNAME_RETYPE': True,
+    'SET_PASSWORD_RETYPE': True,
     'PASSWORD_RESET_SHOW_EMAIL_NOT_FOUND': True,
 
     'PASSWORD_RESET_CONFIRM_URL': 'password/reset/confirm/{uid}/{token}',
@@ -210,7 +216,7 @@ DJOSER = {
         'user_delete': ['rest_framework.permissions.IsAdminUser'],
         'user_list': ['rest_framework.permissions.IsAdminUser'],
         'token_create': ['rest_framework.permissions.AllowAny'],
-    }
+    },
 }
 
 SPECTACULAR_SETTINGS = {

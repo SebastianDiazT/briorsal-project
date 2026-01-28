@@ -32,6 +32,8 @@ import ContactList from '@pages/admin/contact/ContactList';
 import ClientsList from '@pages/admin/clients/ClientsList';
 
 import Login from '@pages/admin/Login';
+import { ForgotPasswordPage } from '@/pages/public/ForgotPasswordPage';
+import { ResetPasswordPage } from '@/pages/public/ResetPasswordPage';
 
 import Home from '@pages/public/Home';
 import ProjectsPage from '@pages/public/projects/ProjectsPage';
@@ -57,6 +59,8 @@ export default function App() {
 
                 <Route element={<PublicRoute />}>
                     <Route path="/admin/login" element={<Login />} />
+                    <Route path="/admin/forgot-password" element={<ForgotPasswordPage />} />
+                    <Route path="/password/reset/confirm/:uid/:token" element={<ResetPasswordPage />} />
                 </Route>
 
                 <Route element={<ProtectedRoute />}>

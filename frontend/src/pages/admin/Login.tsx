@@ -31,8 +31,8 @@ const Login = () => {
 
                         <div className="mt-16 border-t border-white/10 pt-6">
                             <p className="text-xs text-slate-500">
-                                &copy; {new Date().getFullYear()} GRUPO
-                                BRIORSAL. Todos los derechos reservados.
+                                &copy; {new Date().getFullYear()} Constructora
+                                Briorsal. Todos los derechos reservados.
                             </p>
                         </div>
                     </div>
@@ -53,7 +53,7 @@ const Login = () => {
                             <img
                                 src={logoBriorsal}
                                 alt="Briorsal"
-                                className="h-14 w-auto object-contain brightness-0 invert"
+                                className="h-14 w-auto object-contain"
                             />
                         </div>
 

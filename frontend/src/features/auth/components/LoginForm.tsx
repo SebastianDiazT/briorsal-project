@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import {
     FaLock,
     FaEnvelope,
@@ -206,6 +206,15 @@ export const LoginForm = () => {
                             {errors.password.message}
                         </p>
                     )}
+                </div>
+
+                <div className="flex justify-end -mt-4 mb-6">
+                    <Link
+                        to="/admin/forgot-password"
+                        className="text-sm font-medium text-slate-400 hover:text-orange-500 transition-colors duration-300 hover:underline decoration-orange-500/50 underline-offset-4"
+                    >
+                        ¿Olvidaste tu contraseña?
+                    </Link>
                 </div>
 
                 <div className="pt-6">

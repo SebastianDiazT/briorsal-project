@@ -24,7 +24,7 @@ class IsAdminOrReadOnly(permissions.BasePermission):
 class CategoryViewSet(viewsets.ModelViewSet):
     queryset = Category.objects.annotate(
         project_count=Count('projects')
-    )
+    ).order_by('created_at')
 
     serializer_class = CategorySerializer
     permission_classes = [IsAdminOrReadOnly]

@@ -58,6 +58,7 @@ export const apiSlice = createApi({
         'Categories',
         'ContactMessages',
         'Clients',
+        'User',
     ],
     endpoints: (_builder) => ({
     }),

@@ -24,7 +24,7 @@ const AdminLayout: React.FC = () => {
                     <p>
                         &copy; {new Date().getFullYear()}{' '}
                         <span className="font-semibold">
-                            Briorsal Constructora
+                            Constructora Briorsal
                         </span>
                         . Todos los derechos reservados.
                     </p>

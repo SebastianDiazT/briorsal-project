@@ -24,3 +24,26 @@ export interface AuthState {
     isLoading: boolean;
     error: string | null;
 }
+
+export interface ResetPasswordRequest {
+    email: string;
+}
+
+export interface ResetPasswordConfirmRequest {
+    uid: string;
+    token: string;
+    new_password: string;
+    re_new_password: string;
+}
+
+export interface SetPasswordRequest {
+    new_password: string;
+    re_new_password: string;
+    current_password: string;
+}
+
+export interface UpdateUserRequest {
+    first_name?: string;
+    last_name?: string;
+    email?: string;
+}
