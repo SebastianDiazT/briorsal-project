@@ -16,6 +16,7 @@ class Category(models.Model):
         db_table = 'categories'
         verbose_name = 'Categoría'
         verbose_name_plural = 'Categorías'
+        ordering = ['created_at']
 
     def __str__(self):
         return self.name

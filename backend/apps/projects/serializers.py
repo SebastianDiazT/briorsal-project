@@ -108,25 +108,34 @@ class ProjectSerializer(serializers.ModelSerializer):
         return get_cloudinary_url(obj.banner_image)
 
     def to_internal_value(self, data):
-        data_mutable = data.copy()
+        if hasattr(data, 'getlist'):
+            data_mutable = data.dict()
 
-        if 'category_ids' in data and data['category_ids'] == '':
-            if hasattr(data_mutable, 'setlist'):
-                data_mutable.setlist('category_ids', [])
-            else:
-                data_mutable['category_ids'] = []
+            list_fields = [
+                'category_ids',
+                'related_project_ids',
+                'uploaded_images',
+                'uploaded_videos',
+                'delete_images',
+                'delete_videos'
+            ]
+            for field in list_fields:
+                if field in data:
+                    data_mutable[field] = data.getlist(field)
+        else:
+            data_mutable = data.copy()
 
-        if 'related_project_ids' in data and data['related_project_ids'] == '':
-            if hasattr(data_mutable, 'setlist'):
-                data_mutable.setlist('related_project_ids', [])
-            else:
-                data_mutable['related_project_ids'] = []
+        for field in ['category_ids', 'related_project_ids']:
+            if field in data_mutable:
+                value = data_mutable[field]
+                if value == '' or value == ['']:
+                    data_mutable[field] = []
 
-        if 'cover_image' in data and data['cover_image'] == '':
-            data_mutable['cover_image'] = None
-
-        if 'banner_image' in data and data['banner_image'] == '':
-            data_mutable['banner_image'] = None
+        for field in ['cover_image', 'banner_image']:
+            if field in data_mutable:
+                value = data_mutable[field]
+                if value == '' or value == ['']:
+                    data_mutable[field] = None
 
         return super().to_internal_value(data_mutable)
 

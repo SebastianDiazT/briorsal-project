@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { FaSave, FaPen, FaListUl, FaImage, FaSpinner } from 'react-icons/fa';
 import toast from 'react-hot-toast';
 
@@ -97,10 +97,10 @@ export const ProjectForm: React.FC<ProjectFormProps> = ({
         type: 'image' | 'video';
     } | null>(null);
 
-    const imgInputRef = React.useRef<HTMLInputElement>(null);
-    const vidInputRef = React.useRef<HTMLInputElement>(null);
-    const replaceServerImgRef = React.useRef<HTMLInputElement>(null);
-    const replaceNewFileRef = React.useRef<HTMLInputElement>(null);
+    const imgInputRef = useRef<HTMLInputElement>(null);
+    const vidInputRef = useRef<HTMLInputElement>(null);
+    const replaceServerImgRef = useRef<HTMLInputElement>(null);
+    const replaceNewFileRef = useRef<HTMLInputElement>(null);
 
     useEffect(() => {
         if (initialData) {
@@ -176,6 +176,27 @@ export const ProjectForm: React.FC<ProjectFormProps> = ({
         }
     };
 
+    const processFiles = (files: FileList, type: 'image' | 'video') => {
+        const validFiles: File[] = [];
+        const validPreviews: string[] = [];
+        Array.from(files).forEach((f) => {
+            if (validateFile(f, type)) {
+                validFiles.push(f);
+                validPreviews.push(URL.createObjectURL(f));
+            }
+        });
+        if (validFiles.length > 0) {
+            if (type === 'image') {
+                setNewImages((p) => [...p, ...validFiles]);
+                setImagePreviews((p) => [...p, ...validPreviews]);
+            } else {
+                setNewVideos((p) => [...p, ...validFiles]);
+                setVideoPreviews((p) => [...p, ...validPreviews]);
+            }
+            toast.success(`${validFiles.length} archivos agregados`);
+        }
+    };
+
     const handleGalleryDrop = (e: React.DragEvent, type: 'image' | 'video') => {
         e.preventDefault();
         e.stopPropagation();
@@ -184,24 +205,7 @@ export const ProjectForm: React.FC<ProjectFormProps> = ({
             : setIsDragActiveVid(false);
 
         if (e.dataTransfer.files?.length) {
-            const validFiles: File[] = [];
-            const validPreviews: string[] = [];
-            Array.from(e.dataTransfer.files).forEach((f) => {
-                if (validateFile(f, type)) {
-                    validFiles.push(f);
-                    validPreviews.push(URL.createObjectURL(f));
-                }
-            });
-            if (validFiles.length > 0) {
-                if (type === 'image') {
-                    setNewImages((p) => [...p, ...validFiles]);
-                    setImagePreviews((p) => [...p, ...validPreviews]);
-                } else {
-                    setNewVideos((p) => [...p, ...validFiles]);
-                    setVideoPreviews((p) => [...p, ...validPreviews]);
-                }
-                toast.success(`${validFiles.length} archivos agregados`);
-            }
+            processFiles(e.dataTransfer.files, type);
         }
     };
 
@@ -336,10 +340,9 @@ export const ProjectForm: React.FC<ProjectFormProps> = ({
         if (categoryIds.length === 0) {
             formData.append('category_ids', '');
         } else {
-            categoryIds.forEach((id) =>
-                formData.append('category_ids', id)
-            );
+            categoryIds.forEach((id) => formData.append('category_ids', id));
         }
+
         if (relatedProjectIds.length === 0) {
             formData.append('related_project_ids', '');
         } else {
@@ -397,6 +400,27 @@ export const ProjectForm: React.FC<ProjectFormProps> = ({
 
     return (
         <form onSubmit={handleSubmit} className="relative pb-20">
+            <input
+                type="file"
+                ref={imgInputRef}
+                multiple
+                hidden
+                accept="image/*"
+                onChange={(e) =>
+                    e.target.files && processFiles(e.target.files, 'image')
+                }
+            />
+            <input
+                type="file"
+                ref={vidInputRef}
+                multiple
+                hidden
+                accept="video/*"
+                onChange={(e) =>
+                    e.target.files && processFiles(e.target.files, 'video')
+                }
+            />
+
             <input
                 type="file"
                 ref={replaceServerImgRef}

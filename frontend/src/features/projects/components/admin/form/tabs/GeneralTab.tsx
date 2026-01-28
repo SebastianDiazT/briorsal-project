@@ -8,6 +8,8 @@ import {
     FaExclamationCircle,
     FaImage,
     FaPen,
+    FaCheck,
+    FaTag,
 } from 'react-icons/fa';
 import { Category } from '@/features/categories/types';
 import { CustomSelect } from '@/components/ui/CustomSelect';
@@ -94,7 +96,7 @@ export const GeneralTab: React.FC<GeneralTabProps> = (props) => {
                     </h3>
                     <p className="text-sm text-slate-500 mt-1">
                         Define la información esencial que identificará al
-                        proyecto en todo el sistema y en las URLs públicas.
+                        proyecto en todo el sistema.
                     </p>
                 </div>
 
@@ -104,7 +106,7 @@ export const GeneralTab: React.FC<GeneralTabProps> = (props) => {
                             label="Nombre Oficial del Proyecto"
                             required
                             error={props.errors.name}
-                            description="Este nombre se utilizará para generar el enlace permanente (slug). Debe ser único y descriptivo (ej: 'Residencial Altos del Valle')."
+                            description="Este nombre se utilizará para generar el enlace permanente (slug)."
                         >
                             <input
                                 type="text"
@@ -122,7 +124,7 @@ export const GeneralTab: React.FC<GeneralTabProps> = (props) => {
                             required
                             icon={FaGlobeAmericas}
                             error={props.errors.location}
-                            description="Indica la Ciudad y el Distrito. Esta información es clave para los filtros de búsqueda de los clientes."
+                            description="Indica la Ciudad y el Distrito."
                         >
                             <input
                                 type="text"
@@ -142,7 +144,7 @@ export const GeneralTab: React.FC<GeneralTabProps> = (props) => {
                             required
                             icon={FaCheckCircle}
                             error={props.errors.status}
-                            description="Controla cómo se presenta el proyecto: como una oportunidad de inversión activa o como parte del portafolio histórico."
+                            description="Estado comercial o constructivo del proyecto."
                         >
                             <CustomSelect
                                 value={props.status}
@@ -157,7 +159,7 @@ export const GeneralTab: React.FC<GeneralTabProps> = (props) => {
                         <FormField
                             label="Año de Ejecución"
                             icon={FaCalendarAlt}
-                            description="Año de inicio o entrega del proyecto. Sirve para el ordenamiento cronológico."
+                            description="Año de inicio o entrega."
                         >
                             <input
                                 type="number"
@@ -169,37 +171,66 @@ export const GeneralTab: React.FC<GeneralTabProps> = (props) => {
                         </FormField>
                     </div>
 
+                    {/* --- MEJORA VISUAL DE CATEGORÍAS --- */}
                     <div className="md:col-span-2">
                         <FormField
                             label="Categorías y Clasificación"
                             required
                             icon={FaLayerGroup}
                             error={props.errors.category_ids}
-                            description="Selecciona una o más etiquetas. Esto permite agrupar el proyecto en secciones como 'Vivienda', 'Oficinas', etc."
+                            description="Selecciona una o más etiquetas para agrupar el proyecto."
                         >
-                            <div className="flex flex-wrap gap-2 bg-slate-50 p-4 rounded-xl border border-slate-100">
-                                {props.categories.map((cat) => {
-                                    const isActive = props.categoryIds.includes(
-                                        String(cat.id)
-                                    );
-                                    return (
-                                        <button
-                                            key={cat.id}
-                                            type="button"
-                                            onClick={() =>
-                                                props.toggleCategory(
+                            <div className="bg-slate-50 p-5 rounded-2xl border border-slate-100">
+                                {props.categories.length === 0 ? (
+                                    <div className="text-center py-4 text-slate-400 text-sm italic">
+                                        No hay categorías disponibles. Crea una
+                                        primero.
+                                    </div>
+                                ) : (
+                                    <div className="flex flex-wrap gap-3">
+                                        {props.categories.map((cat) => {
+                                            const isActive =
+                                                props.categoryIds.includes(
                                                     String(cat.id)
-                                                )
-                                            }
-                                            className={`px-4 py-2 rounded-lg text-xs font-bold border transition-all flex items-center gap-2 ${isActive ? 'bg-orange-500 border-orange-600 text-white shadow-md transform scale-105' : 'bg-white border-slate-200 text-slate-600 hover:border-slate-300 hover:bg-slate-100'}`}
-                                        >
-                                            {isActive && (
-                                                <FaCheckCircle size={10} />
-                                            )}
-                                            {cat.name}
-                                        </button>
-                                    );
-                                })}
+                                                );
+                                            return (
+                                                <button
+                                                    key={cat.id}
+                                                    type="button"
+                                                    onClick={() =>
+                                                        props.toggleCategory(
+                                                            String(cat.id)
+                                                        )
+                                                    }
+                                                    className={`
+                                                        relative group flex items-center gap-2.5 px-4 py-2.5 rounded-xl border text-xs font-bold transition-all duration-300 select-none
+                                                        ${
+                                                            isActive
+                                                                ? 'bg-gradient-to-br from-orange-500 to-orange-600 border-orange-600 text-white shadow-lg shadow-orange-500/25 scale-105'
+                                                                : 'bg-white border-slate-200 text-slate-500 hover:border-orange-300 hover:text-orange-600 hover:bg-white hover:shadow-md'
+                                                        }
+                                                    `}
+                                                >
+                                                    {/* Checkmark animado */}
+                                                    <div
+                                                        className={`
+                                                        w-4 h-4 rounded-full flex items-center justify-center transition-all duration-300
+                                                        ${isActive ? 'bg-white text-orange-600' : 'bg-slate-100 text-slate-300 group-hover:bg-orange-100 group-hover:text-orange-500'}
+                                                    `}
+                                                    >
+                                                        {isActive ? (
+                                                            <FaCheck size={8} />
+                                                        ) : (
+                                                            <FaTag size={8} />
+                                                        )}
+                                                    </div>
+
+                                                    {cat.name}
+                                                </button>
+                                            );
+                                        })}
+                                    </div>
+                                )}
                             </div>
                         </FormField>
                     </div>
@@ -214,24 +245,14 @@ export const GeneralTab: React.FC<GeneralTabProps> = (props) => {
                     </h3>
                     <div className="space-y-3">
                         <p className="text-sm text-slate-600 leading-relaxed">
-                            Esta es la imagen principal que representará al
-                            proyecto en el catálogo, resultados de búsqueda y
-                            tarjetas de redes sociales.
+                            Imagen principal para el catálogo y redes sociales.
                         </p>
                         <ul className="text-xs text-slate-500 list-disc list-inside space-y-1 ml-1">
                             <li>
-                                Se recomienda un{' '}
-                                <strong>formato vertical (3:4)</strong> para una
-                                mejor visualización en dispositivos móviles.
+                                Recomendado: <strong>Vertical (3:4)</strong>
                             </li>
-                            <li>
-                                Asegúrate de que la imagen tenga buena
-                                iluminación y enfoque.
-                            </li>
-                            <li>
-                                Evita textos o marcas de agua invasivas sobre la
-                                foto.
-                            </li>
+                            <li>Buena iluminación y enfoque.</li>
+                            <li>Sin marcas de agua invasivas.</li>
                         </ul>
                         <FileLimitInfo type="image" />
                     </div>
@@ -267,9 +288,8 @@ export const GeneralTab: React.FC<GeneralTabProps> = (props) => {
                             Destacar Proyecto en Inicio
                         </h4>
                         <p className="text-xs text-slate-500 mt-1">
-                            Al activar esta opción, el proyecto aparecerá en el
-                            carrusel principal o en la sección "Destacados" de
-                            la página de inicio, ganando mayor visibilidad.
+                            Aparecerá en el carrusel principal ganando mayor
+                            visibilidad.
                         </p>
                     </div>
                 </div>
