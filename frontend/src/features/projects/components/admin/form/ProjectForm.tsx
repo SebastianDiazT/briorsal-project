@@ -53,10 +53,8 @@ export const ProjectForm: React.FC<ProjectFormProps> = ({
     const [categoryIds, setCategoryIds] = useState<string[]>([]);
     const [relatedProjectIds, setRelatedProjectIds] = useState<string[]>([]);
     const [location, setLocation] = useState('');
-    const [status, setStatus] = useState<string>('en_proceso');
-    const [year, setYear] = useState<string>(
-        new Date().getFullYear().toString()
-    );
+    const [status, setStatus] = useState<string>('');
+    const [year, setYear] = useState<string>('');
     const [description, setDescription] = useState('');
     const [isFeatured, setIsFeatured] = useState(false);
     const [serviceType, setServiceType] = useState('');
@@ -122,15 +120,35 @@ export const ProjectForm: React.FC<ProjectFormProps> = ({
             setCoverPreview(initialData.cover_image_url || '');
             setBannerPreview(initialData.banner_image_url || '');
 
-            if (
-                initialData.extra_info &&
-                typeof initialData.extra_info === 'object'
-            ) {
-                const rows = Object.entries(initialData.extra_info).map(
-                    ([key, value]) => ({ key, value: String(value) })
-                );
-                if (rows.length > 0) setAttributes(rows);
+            if (initialData.extra_info) {
+                let parsedInfo: Record<string, any> = {};
+
+                if (typeof initialData.extra_info === 'string') {
+                    try {
+                        parsedInfo = JSON.parse(initialData.extra_info);
+                    } catch (e) {
+                        console.error('Error al leer extra_info:', e);
+                        parsedInfo = {};
+                    }
+                }
+                else if (typeof initialData.extra_info === 'object') {
+                    parsedInfo = initialData.extra_info;
+                }
+
+                const rows = Object.entries(parsedInfo).map(([key, value]) => ({
+                    key,
+                    value: String(value),
+                }));
+
+                if (rows.length > 0) {
+                    setAttributes(rows);
+                } else {
+                    setAttributes([{ key: '', value: '' }]);
+                }
+            } else {
+                setAttributes([{ key: '', value: '' }]);
             }
+
             setExistingImages(initialData.images || []);
             setExistingVideos(initialData.videos || []);
         }
@@ -335,7 +353,9 @@ export const ProjectForm: React.FC<ProjectFormProps> = ({
         formData.append('service_type', serviceType);
         formData.append('levels', levels);
         formData.append('area', area);
-        formData.append('year', year);
+        if (year && year.trim() !== '') {
+            formData.append('year', year);
+        }
 
         if (categoryIds.length === 0) {
             formData.append('category_ids', '');

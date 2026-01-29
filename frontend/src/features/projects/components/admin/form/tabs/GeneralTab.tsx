@@ -171,7 +171,6 @@ export const GeneralTab: React.FC<GeneralTabProps> = (props) => {
                         </FormField>
                     </div>
 
-                    {/* --- MEJORA VISUAL DE CATEGORÍAS --- */}
                     <div className="md:col-span-2">
                         <FormField
                             label="Categorías y Clasificación"
@@ -211,7 +210,6 @@ export const GeneralTab: React.FC<GeneralTabProps> = (props) => {
                                                         }
                                                     `}
                                                 >
-                                                    {/* Checkmark animado */}
                                                     <div
                                                         className={`
                                                         w-4 h-4 rounded-full flex items-center justify-center transition-all duration-300
