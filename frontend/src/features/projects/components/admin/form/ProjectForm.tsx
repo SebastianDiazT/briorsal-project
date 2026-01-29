@@ -41,9 +41,11 @@ export const ProjectForm: React.FC<ProjectFormProps> = ({
     const categories = categoriesResponse?.data || [];
     const { data: projectsResponse } = useGetProjectsQuery({ no_page: true });
     const allProjects = projectsResponse?.data || [];
+
     const availableRelatedProjects = initialData
         ? allProjects.filter((p) => p.id !== initialData.id)
         : allProjects;
+
     const [updateProjectImage] = useUpdateProjectImageMutation();
 
     const [activeTab, setActiveTab] = useState<TabType>('general');
@@ -122,29 +124,22 @@ export const ProjectForm: React.FC<ProjectFormProps> = ({
 
             if (initialData.extra_info) {
                 let parsedInfo: Record<string, any> = {};
-
                 if (typeof initialData.extra_info === 'string') {
                     try {
                         parsedInfo = JSON.parse(initialData.extra_info);
                     } catch (e) {
-                        console.error('Error al leer extra_info:', e);
-                        parsedInfo = {};
+                        console.error('Error parsing extra_info:', e);
                     }
-                }
-                else if (typeof initialData.extra_info === 'object') {
+                } else if (typeof initialData.extra_info === 'object') {
                     parsedInfo = initialData.extra_info;
                 }
-
                 const rows = Object.entries(parsedInfo).map(([key, value]) => ({
                     key,
                     value: String(value),
                 }));
-
-                if (rows.length > 0) {
-                    setAttributes(rows);
-                } else {
-                    setAttributes([{ key: '', value: '' }]);
-                }
+                setAttributes(
+                    rows.length > 0 ? rows : [{ key: '', value: '' }]
+                );
             } else {
                 setAttributes([{ key: '', value: '' }]);
             }
@@ -161,14 +156,9 @@ export const ProjectForm: React.FC<ProjectFormProps> = ({
             (type === 'image' ? MAX_IMG_SIZE_MB : MAX_VIDEO_SIZE_MB) *
             1024 *
             1024;
-        if (!allowedTypes.includes(file.type)) {
-            toast.error('Formato incorrecto');
-            return false;
-        }
-        if (file.size > maxBytes) {
-            toast.error('Archivo muy pesado');
-            return false;
-        }
+
+        if (!allowedTypes.includes(file.type)) return false;
+        if (file.size > maxBytes) return false;
         return true;
     };
 
@@ -178,9 +168,13 @@ export const ProjectForm: React.FC<ProjectFormProps> = ({
         if (type === 'cover') {
             setCoverImage(file);
             setCoverPreview(preview);
+            if (errors.cover_image)
+                setErrors((prev) => ({ ...prev, cover_image: '' }));
         } else {
             setBannerImage(file);
             setBannerPreview(preview);
+            if (errors.banner_image)
+                setErrors((prev) => ({ ...prev, banner_image: '' }));
         }
     };
 
@@ -194,36 +188,18 @@ export const ProjectForm: React.FC<ProjectFormProps> = ({
         }
     };
 
-    const processFiles = (files: FileList, type: 'image' | 'video') => {
-        const validFiles: File[] = [];
-        const validPreviews: string[] = [];
-        Array.from(files).forEach((f) => {
-            if (validateFile(f, type)) {
-                validFiles.push(f);
-                validPreviews.push(URL.createObjectURL(f));
-            }
-        });
-        if (validFiles.length > 0) {
-            if (type === 'image') {
-                setNewImages((p) => [...p, ...validFiles]);
-                setImagePreviews((p) => [...p, ...validPreviews]);
-            } else {
-                setNewVideos((p) => [...p, ...validFiles]);
-                setVideoPreviews((p) => [...p, ...validPreviews]);
-            }
-            toast.success(`${validFiles.length} archivos agregados`);
-        }
-    };
+    const handleGalleryFilesAdded = (
+        files: File[],
+        type: 'image' | 'video'
+    ) => {
+        const newPreviews = files.map((f) => URL.createObjectURL(f));
 
-    const handleGalleryDrop = (e: React.DragEvent, type: 'image' | 'video') => {
-        e.preventDefault();
-        e.stopPropagation();
-        type === 'image'
-            ? setIsDragActiveImg(false)
-            : setIsDragActiveVid(false);
-
-        if (e.dataTransfer.files?.length) {
-            processFiles(e.dataTransfer.files, type);
+        if (type === 'image') {
+            setNewImages((prev) => [...prev, ...files]);
+            setImagePreviews((prev) => [...prev, ...newPreviews]);
+        } else {
+            setNewVideos((prev) => [...prev, ...files]);
+            setVideoPreviews((prev) => [...prev, ...newPreviews]);
         }
     };
 
@@ -245,9 +221,13 @@ export const ProjectForm: React.FC<ProjectFormProps> = ({
     const handleReplaceNewChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const file = e.target.files?.[0];
         if (file && newFileToReplace) {
-            if (!validateFile(file, newFileToReplace.type)) return;
+            if (!validateFile(file, newFileToReplace.type)) {
+                toast.error('Archivo no válido');
+                return;
+            }
             const { index, type } = newFileToReplace;
             const preview = URL.createObjectURL(file);
+
             if (type === 'image') {
                 const files = [...newImages];
                 files[index] = file;
@@ -263,6 +243,7 @@ export const ProjectForm: React.FC<ProjectFormProps> = ({
                 previews[index] = preview;
                 setVideoPreviews(previews);
             }
+            toast.success('Archivo reemplazado');
         }
         setNewFileToReplace(null);
         if (replaceNewFileRef.current) replaceNewFileRef.current.value = '';
@@ -278,8 +259,11 @@ export const ProjectForm: React.FC<ProjectFormProps> = ({
     ) => {
         const file = e.target.files?.[0];
         if (file && imgToReplaceId) {
-            if (!validateFile(file, 'image')) return;
-            const toastId = toast.loading('Actualizando...');
+            if (!validateFile(file, 'image')) {
+                toast.error('Imagen no válida');
+                return;
+            }
+            const toastId = toast.loading('Actualizando imagen...');
             try {
                 const result = await updateProjectImage({
                     id: imgToReplaceId,
@@ -288,9 +272,11 @@ export const ProjectForm: React.FC<ProjectFormProps> = ({
                 setExistingImages((p) =>
                     p.map((img) => (img.id === imgToReplaceId ? result : img))
                 );
-                toast.success('Actualizado', { id: toastId });
+                toast.success('Imagen actualizada correctamente', {
+                    id: toastId,
+                });
             } catch {
-                toast.error('Error', { id: toastId });
+                toast.error('Error al actualizar la imagen', { id: toastId });
             }
         }
         setImgToReplaceId(null);
@@ -311,6 +297,7 @@ export const ProjectForm: React.FC<ProjectFormProps> = ({
             );
         }
         setItemToDelete(null);
+        toast.success('Marcado para eliminar');
     };
 
     const toggleCategory = (id: string) => {
@@ -329,12 +316,18 @@ export const ProjectForm: React.FC<ProjectFormProps> = ({
 
     const validateClientSide = () => {
         const newErrors: Record<string, string> = {};
-        if (!name.trim()) newErrors.name = 'Requerido';
-        if (categoryIds.length === 0) newErrors.category_ids = 'Requerido';
-        if (!location.trim()) newErrors.location = 'Requerido';
+        if (!name.trim())
+            newErrors.name = 'El nombre del proyecto es obligatorio.';
+        if (categoryIds.length === 0)
+            newErrors.category_ids =
+                'Debes seleccionar al menos una categoría.';
+        if (!location.trim()) newErrors.location = 'Indica la ubicación.';
+        if (!status) newErrors.status = 'Define el estado actual.';
+
         if (Object.keys(newErrors).length > 0) {
             setErrors(newErrors);
             setActiveTab('general');
+            toast.error('Revisa los campos marcados en rojo');
             return false;
         }
         return true;
@@ -353,35 +346,21 @@ export const ProjectForm: React.FC<ProjectFormProps> = ({
         formData.append('service_type', serviceType);
         formData.append('levels', levels);
         formData.append('area', area);
-        if (year && year.trim() !== '') {
-            formData.append('year', year);
-        }
+        if (year) formData.append('year', year);
 
-        if (categoryIds.length === 0) {
-            formData.append('category_ids', '');
-        } else {
-            categoryIds.forEach((id) => formData.append('category_ids', id));
-        }
-
-        if (relatedProjectIds.length === 0) {
+        categoryIds.forEach((id) => formData.append('category_ids', id));
+        relatedProjectIds.forEach((id) =>
+            formData.append('related_project_ids', id)
+        );
+        if (categoryIds.length === 0) formData.append('category_ids', '');
+        if (relatedProjectIds.length === 0)
             formData.append('related_project_ids', '');
-        } else {
-            relatedProjectIds.forEach((id) =>
-                formData.append('related_project_ids', id)
-            );
-        }
 
-        if (coverImage) {
-            formData.append('cover_image', coverImage);
-        } else if (!coverPreview) {
-            formData.append('cover_image', '');
-        }
+        if (coverImage) formData.append('cover_image', coverImage);
+        else if (!coverPreview) formData.append('cover_image', '');
 
-        if (bannerImage) {
-            formData.append('banner_image', bannerImage);
-        } else if (!bannerPreview) {
-            formData.append('banner_image', '');
-        }
+        if (bannerImage) formData.append('banner_image', bannerImage);
+        else if (!bannerPreview) formData.append('banner_image', '');
 
         const extraInfoObj = attributes.reduce(
             (acc, curr) => {
@@ -413,34 +392,13 @@ export const ProjectForm: React.FC<ProjectFormProps> = ({
                         : String(apiErrors[key]);
                 });
                 setErrors(newErrors);
-                toast.error('Corrige los errores');
+                toast.error('Error al guardar');
             }
         }
     };
 
     return (
         <form onSubmit={handleSubmit} className="relative pb-20">
-            <input
-                type="file"
-                ref={imgInputRef}
-                multiple
-                hidden
-                accept="image/*"
-                onChange={(e) =>
-                    e.target.files && processFiles(e.target.files, 'image')
-                }
-            />
-            <input
-                type="file"
-                ref={vidInputRef}
-                multiple
-                hidden
-                accept="video/*"
-                onChange={(e) =>
-                    e.target.files && processFiles(e.target.files, 'video')
-                }
-            />
-
             <input
                 type="file"
                 ref={replaceServerImgRef}
@@ -473,7 +431,14 @@ export const ProjectForm: React.FC<ProjectFormProps> = ({
                             key={item.id}
                             type="button"
                             onClick={() => setActiveTab(item.id as TabType)}
-                            className={`flex-1 flex items-center justify-center gap-2 py-4 text-sm font-bold transition-all relative ${activeTab === item.id ? 'text-orange-600 bg-orange-50/50' : 'text-slate-500 hover:bg-slate-50'}`}
+                            className={`
+                                flex-1 flex items-center justify-center gap-2 py-4 text-sm font-bold transition-all relative 
+                                ${
+                                    activeTab === item.id
+                                        ? 'text-orange-600 bg-orange-50/50'
+                                        : 'text-slate-500 hover:bg-slate-50'
+                                }
+                            `}
                         >
                             <item.icon size={14} />
                             <span className="hidden sm:inline">
@@ -537,6 +502,7 @@ export const ProjectForm: React.FC<ProjectFormProps> = ({
                             availableRelatedProjects={availableRelatedProjects}
                             relatedProjectIds={relatedProjectIds}
                             toggleRelatedProject={toggleRelatedProject}
+                            errors={errors}
                         />
                     )}
 
@@ -552,7 +518,7 @@ export const ProjectForm: React.FC<ProjectFormProps> = ({
                             setIsDragActiveImg={setIsDragActiveImg}
                             isDragActiveVid={isDragActiveVid}
                             setIsDragActiveVid={setIsDragActiveVid}
-                            onFileDrop={handleGalleryDrop}
+                            onFilesAdded={handleGalleryFilesAdded}
                             onRemoveNew={removeNewFile}
                             onReplaceNewClick={handleReplaceNewClick}
                             onReplaceServerClick={handleReplaceServerClick}
