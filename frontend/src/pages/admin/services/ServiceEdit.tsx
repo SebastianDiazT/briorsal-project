@@ -105,7 +105,9 @@ const ServiceEdit = () => {
                                 size={12}
                                 className="text-slate-400 group-hover:text-orange-500 transition-colors"
                             />
-                            <span className="hidden sm:inline">Ver en Web</span>
+                            <span className="hidden sm:inline">
+                                Ver Sitio Web
+                            </span>
                             <span className="sm:hidden">Ver</span>
                         </Link>
 

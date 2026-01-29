@@ -310,7 +310,9 @@ const ProjectsHeroPage = () => {
                             title="Ver página de proyectos en nueva pestaña"
                         >
                             <FaExternalLinkAlt size={14} />
-                            <span className="hidden sm:inline">Ver en Web</span>
+                            <span className="hidden sm:inline">
+                                Ver Sitio Web
+                            </span>
                         </Link>
 
                         <button

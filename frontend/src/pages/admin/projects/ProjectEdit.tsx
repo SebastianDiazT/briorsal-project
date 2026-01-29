@@ -104,7 +104,7 @@ const ProjectEdit = () => {
                                 size={12}
                                 className="text-slate-400 group-hover:text-orange-500 transition-colors"
                             />
-                            <span>Ver en Web</span>
+                            <span>Ver Sitio Web</span>
                         </Link>
 
                         <div className="h-6 w-px bg-slate-200 hidden sm:block"></div>

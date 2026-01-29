@@ -243,34 +243,39 @@ const ProjectsList: React.FC = () => {
                             </button>
                         </div>
                     ) : (
-                        <div className="flex items-center gap-3">
+                        <div className="flex items-center gap-2 sm:gap-3">
                             <Link
                                 to="/proyectos"
                                 target="_blank"
                                 rel="noopener noreferrer"
-                                className="hidden lg:flex items-center justify-center gap-2 px-5 py-2.5 rounded-xl bg-white border border-slate-200 text-slate-600 text-sm font-bold shadow-sm hover:bg-slate-50 hover:text-orange-600 hover:border-orange-200 hover:-translate-y-0.5 transition-all"
-                                title="Ver en Web"
+                                className="flex items-center justify-center gap-2 px-4 sm:px-5 py-2.5 rounded-xl bg-white border border-slate-200 text-slate-600 text-sm font-bold shadow-sm hover:bg-blue-50 hover:text-blue-600 hover:border-blue-200 hover:-translate-y-0.5 transition-all"
+                                title="Ir al sitio público"
                             >
                                 <FaExternalLinkAlt size={14} />
+                                <span className="hidden sm:inline">
+                                    Ver Sitio Web
+                                </span>
+                                <span className="sm:hidden">Ver</span>
                             </Link>
 
                             <button
                                 onClick={handleStartReorder}
-                                className="flex items-center justify-center gap-2 px-5 py-2.5 rounded-xl bg-white border border-slate-200 text-slate-600 text-sm font-bold shadow-sm hover:bg-slate-50 hover:text-blue-600 hover:border-blue-200 hover:-translate-y-0.5 transition-all"
+                                className="hidden md:flex items-center justify-center gap-2 px-5 py-2.5 rounded-xl bg-white border border-slate-200 text-slate-600 text-sm font-bold shadow-sm hover:bg-orange-50 hover:text-orange-600 hover:border-orange-200 hover:-translate-y-0.5 transition-all"
                                 title="Cambiar el orden visual de los proyectos"
                             >
                                 <FaSortAmountDown size={14} />
-                                <span className="hidden sm:inline">
-                                    Ordenar
-                                </span>
+                                <span>Reordenar Lista</span>
                             </button>
 
                             <Link
                                 to="/admin/projects/new"
-                                className="flex items-center justify-center gap-2 px-6 py-2.5 rounded-xl bg-slate-900 text-white text-sm font-bold shadow-lg shadow-slate-900/20 hover:bg-orange-600 hover:shadow-orange-600/30 hover:-translate-y-0.5 transition-all active:scale-95"
+                                className="flex items-center justify-center gap-2 px-4 sm:px-6 py-2.5 rounded-xl bg-slate-900 text-white text-sm font-bold shadow-lg shadow-slate-900/20 hover:bg-orange-600 hover:shadow-orange-600/30 hover:-translate-y-0.5 transition-all active:scale-95"
                             >
                                 <FaPlus size={12} className="opacity-80" />
-                                <span className="hidden sm:inline">Nuevo</span>
+                                <span className="hidden sm:inline">
+                                    Crear Proyecto
+                                </span>
+                                <span className="sm:hidden">Crear</span>
                             </Link>
                         </div>
                     )}

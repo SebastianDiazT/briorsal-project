@@ -176,7 +176,7 @@ export const DetailsTab: React.FC<DetailsTabProps> = (props) => {
                             </FormField>
 
                             <FormField
-                                label="Área Construida"
+                                label="Área"
                                 icon={FaRulerVertical}
                                 error={props.errors?.area}
                                 description="Superficie total en metros cuadrados."

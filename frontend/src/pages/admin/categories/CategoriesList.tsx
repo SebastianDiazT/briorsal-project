@@ -112,7 +112,10 @@ const CategoriesList: React.FC = () => {
 
     return (
         <>
-            <PageMeta title="GESTIÓN DE CATEGORÍAS" description="Gestión de Categorías" />
+            <PageMeta
+                title="GESTIÓN DE CATEGORÍAS"
+                description="Gestión de Categorías"
+            />
 
             <div className="w-full animate-fade-in-up pb-10">
                 <PageHeader
@@ -123,10 +126,13 @@ const CategoriesList: React.FC = () => {
                 >
                     <button
                         onClick={() => navigate('/admin/categories/new')}
-                        className="flex items-center gap-2 px-6 py-2.5 rounded-xl bg-slate-900 text-white text-sm font-bold shadow-lg hover:bg-orange-600 transition-all active:scale-95"
+                        className="flex items-center justify-center gap-2 px-4 sm:px-6 py-2.5 rounded-xl bg-slate-900 text-white text-sm font-bold shadow-lg shadow-slate-900/20 hover:bg-orange-600 hover:shadow-orange-600/30 hover:-translate-y-0.5 transition-all duration-300 active:scale-95"
                     >
                         <FaPlus size={12} className="opacity-80" />
-                        <span>Nueva Categoría</span>
+                        <span className="hidden sm:inline">
+                            Crear Categoría
+                        </span>
+                        <span className="sm:hidden">Crear</span>
                     </button>
                 </PageHeader>
 

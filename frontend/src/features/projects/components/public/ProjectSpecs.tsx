@@ -54,7 +54,7 @@ export const ProjectSpecs: React.FC<{ project: Project }> = ({ project }) => {
                     icon={FaBuilding}
                 />
                 <SpecRow
-                    label="Área Construida"
+                    label="Área"
                     value={project.area ? `${project.area} m²` : null}
                     icon={FaRulerCombined}
                 />

@@ -304,7 +304,7 @@ export const HomeHeroPage = () => {
                             title="Ver página de inicio en nueva pestaña"
                         >
                             <FaExternalLinkAlt size={14} />
-                            <span className="hidden sm:inline">Ver en Web</span>
+                            <span className="hidden sm:inline">Ver Sitio Web</span>
                         </Link>
 
                         <button

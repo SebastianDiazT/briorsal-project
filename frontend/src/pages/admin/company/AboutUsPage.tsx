@@ -206,29 +206,35 @@ export const AboutUsPage = () => {
                     ]}
                     icon={FaInfoCircle}
                 >
-                    <div className="flex items-center gap-3">
+                    <div className="flex items-center gap-2 sm:gap-3">
                         <Link
                             to="/nosotros"
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="flex items-center justify-center gap-2 px-5 py-2.5 rounded-xl bg-white border border-slate-200 text-slate-600 text-sm font-bold shadow-sm hover:bg-slate-50 hover:text-orange-600 hover:border-orange-200 hover:-translate-y-0.5 transition-all duration-300"
+                            className="flex items-center justify-center gap-2 px-4 sm:px-5 py-2.5 rounded-xl bg-white border border-slate-200 text-slate-600 text-sm font-bold shadow-sm hover:bg-blue-50 hover:text-blue-600 hover:border-blue-200 hover:-translate-y-0.5 transition-all duration-300"
                             title="Ver página en nueva pestaña"
                         >
                             <FaExternalLinkAlt size={14} />
-                            <span className="hidden sm:inline">Ver en Web</span>
+                            <span className="hidden sm:inline">
+                                Ver Sitio Web
+                            </span>
+                            <span className="sm:hidden">Ver</span>
                         </Link>
 
                         <button
                             onClick={handleSubmit(onSubmit)}
                             disabled={isUpdating}
-                            className="flex-1 md:flex-none flex items-center justify-center gap-2 px-6 py-2.5 rounded-xl bg-slate-900 text-white text-sm font-bold shadow-lg shadow-slate-900/20 hover:bg-orange-600 hover:shadow-orange-600/30 hover:-translate-y-0.5 transition-all duration-300 active:scale-95 disabled:opacity-70 disabled:cursor-not-allowed"
+                            className="flex items-center justify-center gap-2 px-4 sm:px-6 py-2.5 rounded-xl bg-slate-900 text-white text-sm font-bold shadow-lg shadow-slate-900/20 hover:bg-orange-600 hover:shadow-orange-600/30 hover:-translate-y-0.5 transition-all duration-300 active:scale-95 disabled:opacity-70 disabled:cursor-not-allowed"
                         >
                             {isUpdating ? (
                                 <FaSpinner className="animate-spin" />
                             ) : (
                                 <FaSave size={14} />
                             )}
-                            <span>Guardar Cambios</span>
+                            <span className="hidden sm:inline">
+                                Guardar Cambios
+                            </span>
+                            <span className="sm:hidden">Guardar</span>
                         </button>
                     </div>
                 </PageHeader>

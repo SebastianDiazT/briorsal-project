@@ -7,6 +7,7 @@ import {
     FaMapMarkerAlt,
     FaCalendarAlt,
     FaGripVertical,
+    FaEye,
 } from 'react-icons/fa';
 import { ProjectCard } from '@/features/projects/types';
 
@@ -59,6 +60,10 @@ const SortableRow = ({
     } as React.CSSProperties;
 
     const displayImage = project.cover;
+
+    const handleView = () => {
+        window.open(`/proyectos/${project.slug}`, '_blank');
+    };
 
     return (
         <tr
@@ -116,8 +121,9 @@ const SortableRow = ({
             <td className="py-3 px-4 align-middle">
                 <div className="flex flex-col gap-1 pr-4">
                     <span
-                        className="text-sm font-bold text-slate-800 leading-tight group-hover:text-orange-600 transition-colors truncate block w-full"
+                        className="text-sm font-bold text-slate-800 leading-tight group-hover:text-orange-600 transition-colors truncate block w-full cursor-pointer hover:underline decoration-orange-300 decoration-2 underline-offset-2"
                         title={project.name}
+                        onClick={handleView}
                     >
                         {project.name}
                     </span>
@@ -194,16 +200,26 @@ const SortableRow = ({
                 </span>
             </td>
 
-            <td className="py-3 px-6 align-middle text-right w-[100px]">
+            <td className="py-3 px-6 align-middle text-right w-[140px]">
                 <div className="flex items-center justify-end gap-2">
+                    <button
+                        onClick={handleView}
+                        disabled={isReordering}
+                        className="w-8 h-8 flex items-center justify-center rounded-full bg-white text-slate-400 hover:text-blue-600 hover:bg-blue-50 border border-slate-200 hover:border-blue-200 transition-all active:scale-95 shadow-sm disabled:opacity-30 disabled:cursor-not-allowed"
+                        title="Ver en sitio web"
+                    >
+                        <FaEye size={11} />
+                    </button>
+
                     <button
                         onClick={() => onEdit(project.slug)}
                         disabled={isReordering}
-                        className="w-8 h-8 flex items-center justify-center rounded-full bg-white text-slate-500 hover:text-blue-600 hover:bg-blue-50 border border-slate-200 hover:border-blue-200 transition-all active:scale-95 shadow-sm disabled:opacity-30 disabled:cursor-not-allowed"
+                        className="w-8 h-8 flex items-center justify-center rounded-full bg-white text-slate-500 hover:text-orange-600 hover:bg-orange-50 border border-slate-200 hover:border-orange-200 transition-all active:scale-95 shadow-sm disabled:opacity-30 disabled:cursor-not-allowed"
                         title="Editar"
                     >
                         <FaEdit size={12} />
                     </button>
+
                     <button
                         onClick={() => onDelete(project.slug)}
                         disabled={isReordering}

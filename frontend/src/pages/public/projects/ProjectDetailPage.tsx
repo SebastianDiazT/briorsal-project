@@ -235,9 +235,8 @@ const ProjectDetailPage = () => {
                 <div className="container mx-auto px-4 -mt-10 relative z-10">
                     <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12">
                         <div className="lg:col-span-8 space-y-12">
-                            <div className="bg-white rounded-3xl p-8 md:p-10 shadow-xl shadow-slate-200/50 border border-slate-100">
                                 {hasDescription ? (
-                                    <>
+                                    <div className="bg-white rounded-3xl p-8 md:p-10 shadow-xl shadow-slate-200/50 border border-slate-100">
                                         <h2 className="text-2xl font-bold text-slate-900 mb-8 flex items-center gap-3 border-b border-slate-100 pb-4">
                                             <span className="w-1.5 h-8 bg-orange-500 rounded-full"></span>
                                             Sobre el Proyecto
@@ -257,16 +256,17 @@ const ProjectDetailPage = () => {
                                                         )
                                                 )}
                                         </div>
-                                    </>
+                                    </div>
                                 ) : (
                                     !hasMedia && (
-                                        <div className="text-center py-16 text-slate-400 italic">
-                                            No hay información detallada
-                                            disponible.
+                                        <div className="bg-white rounded-3xl p-8 md:p-10 shadow-xl shadow-slate-200/50 border border-slate-100">
+                                            <div className="text-center py-16 text-slate-400 italic">
+                                                No hay información detallada
+                                                disponible.
+                                            </div>
                                         </div>
                                     )
                                 )}
-                            </div>
 
                             {hasMedia && (
                                 <FadeIn direction="up">
